@@ -355,7 +355,7 @@ def initialize_parameters(bmk):
     print("Configuration file: ", conffile)
     fileParameters = bmk.read_config_file(conffile)#aux.config_file)#args.config_file)
     # Get command-line parameters
-    args = bmk.parser.parse_known_args()
+    args = bmk.parser.parse_known_args()[0]
     #print ('Params:', fileParameters)
     # Consolidate parameter set. Command-line parameters overwrite file configuration
     gParameters = args_overwrite_config(args, fileParameters)
@@ -589,7 +589,7 @@ def args_overwrite_config(args, config):
     
     params = config
     
-    args_dict = vars(args.Namespace())
+    args_dict = vars(args)
     
     for key in args_dict.keys():
         params[key] = args_dict[key]
