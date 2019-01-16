@@ -589,7 +589,7 @@ def args_overwrite_config(args, config):
     
     params = config
     
-    args_dict = vars(args)
+    args_dict = vars(args.Namespace())
     
     for key in args_dict.keys():
         params[key] = args_dict[key]
