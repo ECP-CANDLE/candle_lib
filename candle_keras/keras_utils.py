@@ -12,7 +12,7 @@ from keras.metrics import binary_crossentropy, mean_squared_error
 
 from scipy.stats.stats import pearsonr
 
-from default_utils import set_seed as set_seed_defaultUtils
+from .default_utils import set_seed as set_seed_defaultUtils
 
 import warnings
 with warnings.catch_warnings():

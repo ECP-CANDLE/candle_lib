@@ -8,8 +8,8 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler
 
 from keras.utils import np_utils
 
-from default_utils import DEFAULT_SEED
-from default_utils import DEFAULT_DATATYPE
+from .default_utils import DEFAULT_SEED
+from .default_utils import DEFAULT_DATATYPE
 
 def convert_to_class(y_one_hot, dtype=int):
     """ Converts a one-hot class encoding (array with as many positions as total

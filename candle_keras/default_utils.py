@@ -22,7 +22,7 @@ sys.path.append(lib_path)
 
 work_path = os.path.dirname(os.path.realpath(__file__))
 
-from file_utils import get_file
+from .file_utils import get_file
 
 # Seed for random generation -- default value
 DEFAULT_SEED = 7102
