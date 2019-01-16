@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-setup(name='shared',
+setup(name='candle_lib',
       version='0.0.1',
       description='CANDLE lib pip installable package',
       author='Harry Yoo',
