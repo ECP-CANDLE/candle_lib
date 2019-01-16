@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
-#__version__ = '0.0.0'
+name = "candke_keras"
+__version__ = '0.0.1'
 
 #import from data_utils
 from data_utils import load_csv_data
