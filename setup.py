@@ -9,4 +9,9 @@ setup(name='candle_lib',
       author_email='hsyoo@anl.gov',
       packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
       license='LICENSE.txt',
+      install_requires=[
+          'numpy',
+          'six',
+          'tqdm',
+      ]
     )
