@@ -14,5 +14,6 @@ setup(name='candle',
           'six',
           'tqdm',
           'requests',
-      ]
-    )
+      ],
+      setup_requires=['flake8'],
+      )
