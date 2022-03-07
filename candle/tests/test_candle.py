@@ -2,7 +2,6 @@
 Unit and regression test for the candle package.
 """
 
-import candle
 import sys
 
 
