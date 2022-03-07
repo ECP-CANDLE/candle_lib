@@ -11,7 +11,7 @@ import os
 import argparse
 import configparser
 
-from helper_utils import eval_string_as_list_of_lists, str2bool
+from .helper_utils import eval_string_as_list_of_lists, str2bool
 
 # Seed for random generation -- default value
 DEFAULT_SEED = 7102
