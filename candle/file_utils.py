@@ -1,8 +1,8 @@
 import os
 import shutil
 import hashlib
-from six.moves.urllib.error import URLError, HTTPError
-from six.moves.urllib.request import urlretrieve
+from urllib.error import URLError, HTTPError
+from urllib.request import urlretrieve
 
 from .generic_utils import Progbar
 from .modac_utils import get_file_from_modac

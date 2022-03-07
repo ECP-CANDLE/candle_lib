@@ -11,7 +11,6 @@ setup(name='candle',
       license='LICENSE.txt',
       install_requires=[
           'numpy',
-          'six',
           'tqdm',
           'requests',
       ],
