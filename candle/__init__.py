@@ -1,4 +1,4 @@
-name = "candke_lib"
+name = "candle"
 __version__ = '0.0.1'
 
 # import from data_utils
