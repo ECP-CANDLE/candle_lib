@@ -13,5 +13,6 @@ setup(name='candle',
           'numpy',
           'six',
           'tqdm',
+          'requests',
       ]
     )
