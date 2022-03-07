@@ -8,6 +8,7 @@ __version__ = '0.0.1'
 
 # import from file_utils
 from .file_utils import get_file
+from .file_utils import validate_file
 
 # import from generic_utils
 from .generic_utils import Progbar

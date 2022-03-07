@@ -14,5 +14,6 @@ setup(name='candle',
           'tqdm',
           'requests',
       ],
-      setup_requires=['flake8'],
+      setup_requires=['pytest-runner', 'flake8'],
+      tests_requires=['pytest']
       )

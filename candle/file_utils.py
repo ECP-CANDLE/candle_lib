@@ -9,8 +9,6 @@ from .modac_utils import get_file_from_modac
 
 
 def get_file(fname, origin, unpack=False,
-             # md5_hash=None, datadir='../Data/common'):
-             # md5_hash=None, cache_subdir='common', datadir='../Data/common'):
              md5_hash=None, cache_subdir='common', datadir=None):  # datadir argument was never actually used so changing it to None
     """ Downloads a file from a URL if it not already in the cache.
         Passing the MD5 hash will verify the file after download as well
