@@ -9,8 +9,8 @@ import hashlib
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.error import URLError, HTTPError
 
-from generic_utils import Progbar
-from modac_utils import get_file_from_modac
+from .generic_utils import Progbar
+from .modac_utils import get_file_from_modac
 
 
 # Under Python 2, 'urlretrieve' relies on FancyURLopener from legacy
