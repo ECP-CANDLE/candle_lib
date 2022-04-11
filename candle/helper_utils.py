@@ -3,11 +3,13 @@ import sys
 import logging
 import argparse
 import numpy as np
+from typing import Dict, List
+from logging import Logger
 
 from .file_utils import get_file
 
 
-def fetch_file(link, subdir, unpack=False, md5_hash=None):
+def fetch_file(link: str, subdir: str, unpack: bool = False, md5_hash: str = None):
     """ Convert URL to file path and download the file
         if it is not already present in spedified cache.
 
@@ -35,7 +37,7 @@ def fetch_file(link, subdir, unpack=False, md5_hash=None):
     return get_file(fname, origin=link, unpack=unpack, md5_hash=md5_hash, cache_subdir=subdir)
 
 
-def verify_path(path):
+def verify_path(path: str) -> None:
     """ Verify if a directory path exists locally. If the path
         does not exist, but is a valid path, it recursivelly creates
         the specified directory path structure.
@@ -50,10 +52,7 @@ def verify_path(path):
         os.makedirs(folder)
 
 
-def set_up_logger(logfile, logger, verbose=False,
-                  fmt_line="[%(asctime)s %(process)d] %(message)s",
-                  fmt_date="%Y-%m-%d %H:%M:%S"
-                  ):
+def set_up_logger(logfile: str, logger: Logger, verbose: bool = False, fmt_line: str = "[%(asctime)s %(process)d] %(message)s", fmt_date: str = "%Y-%m-%d %H:%M:%S") -> None:
     """ Set up the event logging system. Two handlers are created.
         One to send log records to a specified file and
         one to send log records to the (defaulf) sys.stderr stream.
@@ -89,7 +88,7 @@ def set_up_logger(logfile, logger, verbose=False,
 # REFORMATING UTILS
 
 
-def eval_string_as_list(str_read, separator, dtype):
+def eval_string_as_list(str_read: str, separator: str, dtype) -> List:
     """ Parse a string and convert it into a list of lists.
 
         Parameters
@@ -124,7 +123,7 @@ def eval_string_as_list(str_read, separator, dtype):
     return decoded_list
 
 
-def eval_string_as_list_of_lists(str_read, separator_out, separator_in, dtype):
+def eval_string_as_list_of_lists(str_read: str, separator_out: str, separator_in: str, dtype) -> List:
     """ Parse a string and convert it into a list of lists.
 
         Parameters
@@ -164,7 +163,7 @@ def eval_string_as_list_of_lists(str_read, separator_out, separator_in, dtype):
     return decoded_list
 
 
-def str2bool(v):
+def str2bool(v: str) -> bool:
     """This is taken from:
         https://stackoverflow.com/questions/15008758/parsing-boolean-values-with-argparse
         Because type=bool is not interpreted as a bool and action='store_true' cannot be
@@ -192,7 +191,7 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-def keras_default_config():
+def keras_default_config() -> Dict:
     """Defines parameters that intervine in different functions using the keras defaults.
         This helps to keep consistency in parameters between frameworks.
     """
