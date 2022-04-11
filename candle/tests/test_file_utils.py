@@ -11,12 +11,12 @@ def test_get_file():
     """
     MD5_HASH = 'bd638baadc190176439f388d28d8a091'
     candle.get_file(fname='LICENSE.txt',
-                    origin='https://raw.githubusercontent.com/hyoo/candle_lib/master/LICENSE.txt',
+                    origin='https://raw.githubusercontent.com/ECP-CANDLE/candle_lib/master/LICENSE.txt',
                     md5_hash=MD5_HASH,
                     datadir='./')
 
     candle.get_file(fname='README.md',
-                    origin='https://raw.githubusercontent.com/hyoo/candle_lib/master/README.md',
+                    origin='https://raw.githubusercontent.com/ECP-CANDLE/candle_lib/master/README.md',
                     md5_hash=MD5_HASH,
                     datadir='./')
 
