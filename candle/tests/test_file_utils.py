@@ -9,7 +9,7 @@ def test_get_file():
     """
     Test the get_file function.
     """
-    MD5_HASH = 'bd638baadc190176439f388d28d8a091'
+    MD5_HASH = '52950ca88edcdbcb55fb27da21118f6b'
     candle.get_file(fname='LICENSE.txt',
                     origin='https://raw.githubusercontent.com/ECP-CANDLE/candle_lib/master/LICENSE.txt',
                     md5_hash=MD5_HASH,
