@@ -12,3 +12,6 @@ from .file_utils import validate_file
 
 # import from generic_utils
 from .generic_utils import Progbar
+
+# import from helper_utils
+from .helper_utils import str2bool
