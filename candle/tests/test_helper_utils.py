@@ -3,8 +3,28 @@ Unit and regression test for the helper_utils module.
 """
 
 import pytest
+
 import argparse
+import logging
+import os
+import tempfile
+
 import candle
+
+
+def test_verify_path():
+    temp_dir = tempfile.TemporaryDirectory()
+    candle.verify_path(temp_dir.name)
+    assert os.path.exists(temp_dir.name)
+
+
+def test_set_up_logger():
+    temp_dir = tempfile.TemporaryDirectory()
+    logfile = os.path.join(temp_dir.name, "log")
+    logger = logging.getLogger(__name__)
+    candle.set_up_logger(logfile, logger)
+
+    assert logger.getEffectiveLevel() == logging.DEBUG
 
 
 @pytest.mark.parametrize("varstr", ['YES', 'TRUE', 'T', 'Y', '1', 'Yes', 'yes', 'yeS', 'True', 'true', 'tRuE', 'TruE', 't', 'y'])
