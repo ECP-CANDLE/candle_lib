@@ -8,8 +8,8 @@ from .generic_utils import Progbar
 from .modac_utils import get_file_from_modac
 
 
-def get_file(fname, origin, unpack=False,
-             md5_hash=None, cache_subdir='common', datadir=None):  # datadir argument was never actually used so changing it to None
+def get_file(fname: str, origin: str, unpack: bool = False,
+             md5_hash: str = None, cache_subdir: str = 'common', datadir: str = None):
     """ Downloads a file from a URL if it not already in the cache.
         Passing the MD5 hash will verify the file after download as well
         as if it is already present in the cache.
@@ -33,18 +33,16 @@ def get_file(fname, origin, unpack=False,
         ----------
         Path to the downloaded file
     """
+    if datadir is None and os.environ['CANDLE_DATA_DIR'] is not None:
+        datadir = os.environ['CANDLE_DATA_DIR']
+    elif datadir is None and os.environ['CANDLE_DATA_DIR'] is None:
+        raise ValueError('Need data directory. Either pass datadir or set CANDLE_DATA_DIR environment variable')
 
-    if datadir is None:
-        file_path = os.path.dirname(os.path.realpath(__file__))
-        datadir_base = os.path.expanduser(os.path.join(file_path, '..', 'Data'))
-        datadir = os.path.join(datadir_base, cache_subdir)
+    if cache_subdir is not None:
+        datadir = os.path.join(datadir, cache_subdir)
 
     if not os.path.exists(datadir):
         os.makedirs(datadir)
-
-    # if unpack:
-    #    fnamesplit = fname.split('.tar.gz')
-    #    unpack_fpath = os.path.join(datadir, fnamesplit[0])
 
     if fname.endswith('.tar.gz'):
         fnamesplit = fname.split('.tar.gz')
@@ -130,7 +128,6 @@ def get_file(fname, origin, unpack=False,
                         shutil.rmtree(unpack_fpath)
                 raise
         return unpack_fpath
-        print()
 
     return fpath
 
