@@ -3,13 +3,14 @@ import shutil
 import hashlib
 from urllib.error import URLError, HTTPError
 from urllib.request import urlretrieve
+from typing import Dict
 
 from .generic_utils import Progbar
 from .modac_utils import get_file_from_modac
 
 
 def get_file(fname: str, origin: str, unpack: bool = False,
-             md5_hash: str = None, cache_subdir: str = 'common', datadir: str = None):
+             md5_hash: str = None, cache_subdir: str = 'common', datadir: str = None) -> str:
     """ Downloads a file from a URL if it not already in the cache.
         Passing the MD5 hash will verify the file after download as well
         as if it is already present in the cache.
@@ -132,7 +133,7 @@ def get_file(fname: str, origin: str, unpack: bool = False,
     return fpath
 
 
-def validate_file(fpath, md5_hash):
+def validate_file(fpath: str, md5_hash: str) -> bool:
     """ Validates a file against a MD5 hash
 
         Parameters
@@ -157,7 +158,7 @@ def validate_file(fpath, md5_hash):
         return False
 
 
-def directory_from_parameters(params, commonroot='Output'):
+def directory_from_parameters(params: Dict, commonroot: str = 'Output') -> str:
     """ Construct output directory path with unique IDs from parameters
 
         Parameters
