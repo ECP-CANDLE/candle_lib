@@ -20,3 +20,18 @@ from .helper_utils import ( fetch_file,
     str2bool,
     keras_default_config,
 )
+
+# import framework dependent utils
+import sys
+try:
+    import tensorflow
+except ImportError:
+    pass
+
+if 'tensorflow' in sys.modules:
+    print('Importing candle utils for keras')
+
+    from .clr_keras_utils import CyclicLR
+    from .clr_keras_utils import clr_check_args
+    from .clr_keras_utils import clr_set_args
+    from .clr_keras_utils import clr_callback
