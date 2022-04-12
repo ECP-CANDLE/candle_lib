@@ -21,6 +21,20 @@ from .helper_utils import ( fetch_file,
     keras_default_config,
 )
 
+# import from data_preprocessing_utils
+from .data_preprocessing_utils import (
+    quantile_normalization,
+    generate_cross_validation_partition,
+)
+
+# feature selection
+from .feature_selection_utils import (
+    select_features_by_missing_values,
+    select_features_by_variation,
+    select_decorrelated_features,
+)
+
+
 # import framework dependent utils
 import sys
 try:
