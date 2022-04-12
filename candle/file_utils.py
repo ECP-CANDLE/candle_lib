@@ -32,7 +32,8 @@ def get_file(fname: str, origin: str, unpack: bool = False,
 
         Returns
         ----------
-        Path to the downloaded file
+        string
+            Path to the downloaded file
     """
     if datadir is None and os.environ['CANDLE_DATA_DIR'] is not None:
         datadir = os.environ['CANDLE_DATA_DIR']
@@ -168,6 +169,10 @@ def directory_from_parameters(params: Dict, commonroot: str = 'Output') -> str:
         commonroot : string
             String to specify the common folder to store results.
 
+        Returns
+        ----------
+        string
+            Path to the output directory
     """
 
     if commonroot in set(['.', './']):  # Same directory --> convert to absolute path
