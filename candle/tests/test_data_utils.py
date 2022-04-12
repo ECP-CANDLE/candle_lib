@@ -52,7 +52,7 @@ def test_lookup():
 
 
 # should we keep this?
-@pytest.mark.skip(reason="referenced in p1b1 but succeeded by load_csv_data. no-longer")
+@pytest.mark.skip(reason="referenced in p1b1 but succeeded by load_csv_data. no longer used")
 def test_load_X_data():
     pass
 
@@ -69,24 +69,80 @@ def test_load_Xy_one_hot_data():
     pass
 
 
-# should we keep this?
-@pytest.mark.skip(reason="used by p1b2 only")
+# used by p1b2
 def test_load_Xy_one_hot_data2():
-    pass
+    import numpy as np
+    DEFAULT_DATATYPE = np.float32  # will be replaced by default_utils.DEFAULT_DATATYPE once available
+
+    params = {
+        'data_url': 'http://ftp.mcs.anl.gov/pub/candle/public/benchmarks/P1B2/',
+        'train_data': 'P1B2.dummy.train.csv',
+        'test_data': 'P1B2.dummy.test.csv',
+        'feature_subsample': 0,
+        'shuffle': True,
+        'scaling': 'minmax',
+        'val_split': 0.1,
+        'data_type': DEFAULT_DATATYPE
+    }
+    file_train = candle.fetch_file(params['data_url'] + params['train_data'], subdir='Pilot1')
+    file_test = candle.fetch_file(params['data_url'] + params['test_data'], subdir='Pilot1')
+    seed = 2017
+    (x_train, y_train), (x_val, y_val), (x_test, y_test) = candle.load_Xy_one_hot_data2(
+        file_train,
+        file_test,
+        class_col=['cancer_type'],
+        drop_cols=['case_id', 'cancer_type'],
+        n_cols=params['feature_subsample'],
+        shuffle=params['shuffle'],
+        scaling=params['scaling'],
+        validation_split=params['val_split'],
+        dtype=params['data_type'],
+        seed=seed)
+
+    assert x_train.shape == (9, 28204)
+    assert len(y_train) == 9
+    assert len(x_val) == 0
+    assert len(y_val) == 0
+    assert len(x_test) == 1
+    assert len(y_test) == 1
 
 
 # should we keep this?
-@pytest.mark.skip(reason="used by p1b2 only")
+@pytest.mark.skip(reason="referenced in p1b2 but not used")
 def test_load_Xy_data2():
     pass
 
 
-# should we keep this?
-@pytest.mark.skip(reason="used by tc1 only")
+# used by tc1
 def test_load_Xy_data_noheader():
-    pass
+    import numpy as np
+    DEFAULT_DATATYPE = np.float32  # will be replaced by default_utils.DEFAULT_DATATYPE once available
+    params = {
+        'data_url': 'http://ftp.mcs.anl.gov/pub/candle/public/benchmarks/Pilot1/type-class/',
+        'train_data': 'type_18_300_train.dummy.csv',
+        'test_data': 'type_18_300_test.dummy.csv',
+        'data_type': DEFAULT_DATATYPE,
+        'classes': 36,
+    }
+    train_path = candle.fetch_file(params['data_url'] + params['train_data'], 'Pilot1')
+    test_path = candle.fetch_file(params['data_url'] + params['test_data'], 'Pilot1')
+    usecols = None
+
+    x_train, y_train, x_test, y_test = candle.load_Xy_data_noheader(
+        train_path,
+        test_path,
+        params['classes'],
+        usecols,
+        scaling='maxabs',
+        dtype=params['data_type'])
+
+    assert x_train.shape == (10, 60483)
+    assert len(y_train) == 10
+    assert x_test.shape == (2, 60483)
+    assert len(y_test) == 2
 
 
+# used by p1b1
 def test_load_csv_data():
     import numpy as np
     DEFAULT_DATATYPE = np.float32  # will be replaced by default_utils.DEFAULT_DATATYPE once available

@@ -840,13 +840,8 @@ def load_Xy_data_noheader(train_file, test_file, classes, usecols=None, scaling=
             Data labels for testing loaded in a pandas DataFrame.
             One-hot encoding (categorical) is used.
     """
-    print('Loading data...')
     df_train = (pd.read_csv(train_file, header=None, usecols=usecols).values).astype(dtype)
     df_test = (pd.read_csv(test_file, header=None, usecols=usecols).values).astype(dtype)
-    print('done')
-
-    print('df_train shape:', df_train.shape)
-    print('df_test shape:', df_test.shape)
 
     seqlen = df_train.shape[1]
 
@@ -858,9 +853,6 @@ def load_Xy_data_noheader(train_file, test_file, classes, usecols=None, scaling=
 
     df_x_train = df_train[:, 1:seqlen].astype(dtype)
     df_x_test = df_test[:, 1:seqlen].astype(dtype)
-
-#        X_train = df_x_train.as_matrix()
-#        X_test = df_x_test.as_matrix()
 
     X_train = df_x_train
     X_test = df_x_test
