@@ -14,8 +14,10 @@ except ImportError:
     from sklearn.preprocessing import Imputer
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler
 
-from default_utils import DEFAULT_SEED
-from default_utils import DEFAULT_DATATYPE
+# from default_utils import DEFAULT_SEED
+# from default_utils import DEFAULT_DATATYPE
+DEFAULT_SEED = 7102  # until we populate default_utils
+DEFAULT_DATATYPE = np.float32  # until we populate default utils
 
 
 # TAKEN from tensorflow
