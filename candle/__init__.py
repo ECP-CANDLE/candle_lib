@@ -13,6 +13,18 @@ from .file_utils import validate_file
 # import from generic_utils
 from .generic_utils import Progbar
 
+# import from viz_utils
+from .viz_utils import plot_history
+from .viz_utils import plot_scatter
+from .viz_utils import plot_array
+from .viz_utils import plot_density_observed_vs_predicted
+from .viz_utils import plot_2d_density_sigma_vs_error
+from .viz_utils import plot_histogram_error_per_sigma
+from .viz_utils import plot_decile_predictions
+from .viz_utils import plot_calibration_interpolation
+from .viz_utils import plot_calibrated_std
+from .viz_utils import plot_contamination
+
 # import from helper_utils
 from .helper_utils import ( fetch_file,
     set_up_logger,
@@ -44,6 +56,8 @@ except ImportError:
 
 if 'tensorflow' in sys.modules:
     print('Importing candle utils for keras')
+
+    from .viz_utils import plot_metrics
 
     from .clr_keras_utils import CyclicLR
     from .clr_keras_utils import clr_check_args
