@@ -44,6 +44,16 @@ from .feature_selection_utils import (
     select_decorrelated_features,
 )
 
+# noise injection
+from .noise_utils import (
+    label_flip,
+    label_flip_correlated,
+    add_gaussian_noise,
+    add_column_noise,
+    add_cluster_noise,
+    add_noise,
+)
+
 # import from viz_utils
 from .viz_utils import plot_history
 from .viz_utils import plot_scatter
