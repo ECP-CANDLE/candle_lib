@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 import argparse
+import random
 import numpy as np
 from typing import Dict, List
 from logging import Logger
@@ -217,3 +218,17 @@ def keras_default_config() -> Dict:
     kerasDefaults['stddev_normal'] = 0.05     # Standard deviation of the random values to generate
 
     return kerasDefaults
+
+
+def set_seed(seed):
+    """Set the seed of the pseudo-random generator to the specified value.
+
+        Parameters
+        ----------
+        seed : int
+            Value to intialize or re-seed the generator.
+    """
+    os.environ['PYTHONHASHSEED'] = '0'
+    np.random.seed(seed)
+
+    random.seed(seed)

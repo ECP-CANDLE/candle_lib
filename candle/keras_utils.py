@@ -12,7 +12,7 @@ from tensorflow.keras.metrics import binary_crossentropy, mean_squared_error, me
 
 from scipy.stats.stats import pearsonr
 
-from default_utils import set_seed as set_seed_defaultUtils
+from .helper_utils import set_seed as set_seed_defaultUtils
 from typing import Dict
 import warnings
 with warnings.catch_warnings():

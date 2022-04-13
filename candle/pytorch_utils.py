@@ -6,7 +6,7 @@ import torch.nn.init
 import torch.optim
 import torch.nn.functional as F
 
-from default_utils import set_seed as set_seed_defaultUtils
+from .helper_utils import set_seed as set_seed_defaultUtils
 from typing import Dict
 
 
