@@ -44,6 +44,16 @@ from .feature_selection_utils import (
     select_decorrelated_features,
 )
 
+# noise injection
+from .noise_utils import (
+    label_flip,
+    label_flip_correlated,
+    add_gaussian_noise,
+    add_column_noise,
+    add_cluster_noise,
+    add_noise,
+)
+
 # import from viz_utils
 from .viz_utils import plot_history
 from .viz_utils import plot_scatter
@@ -55,7 +65,6 @@ from .viz_utils import plot_decile_predictions
 from .viz_utils import plot_calibration_interpolation
 from .viz_utils import plot_calibrated_std
 from .viz_utils import plot_contamination
-
 
 # Milestone 16 specific
 from .P1_utils import (
@@ -89,6 +98,7 @@ if 'tensorflow' in sys.modules:
         mse,
         compute_trainable_params,
         TerminateOnTimeOut,
+        CandleRemoteMonitor,
     )
 
     from .viz_utils import plot_metrics
@@ -99,6 +109,11 @@ if 'tensorflow' in sys.modules:
         clr_set_args,
         clr_callback,
     )
+
+    from .ckpt_keras_utils import MultiGPUCheckpoint
+    from .ckpt_keras_utils import CandleCheckpointCallback
+    from .ckpt_keras_utils import restart
+
 elif 'torch' in sys.modules:
     print('Importing candle utils for pytorch')
     from .pytorch_utils import (
