@@ -119,7 +119,7 @@ import time
 from pathlib import Path
 from typing import Dict, List
 
-from helper_utils import set_up_logger, str2bool
+from .helper_utils import set_up_logger, str2bool
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import Callback, ModelCheckpoint
 
