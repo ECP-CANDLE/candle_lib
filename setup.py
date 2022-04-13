@@ -18,6 +18,8 @@ setup(name='candle',
           'matplotlib',
           'astropy',
           'scipy',
+          'patsy',
+          'statsmodels',
       ],
       setup_requires=['pytest-runner', 'flake8'],
       tests_requires=['pytest']

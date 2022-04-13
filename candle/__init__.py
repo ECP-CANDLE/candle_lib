@@ -4,13 +4,14 @@ __version__ = '0.0.1'
 from .benchmark_def import Benchmark
 
 # import from data_utils
-from .data_utils import load_csv_data
-from .data_utils import load_Xy_one_hot_data2
-from .data_utils import load_Xy_data_noheader
+from .data_utils import (
+    load_csv_data,
+    load_Xy_one_hot_data2,
+    load_Xy_data_noheader,
+)
 
 # import from file_utils
-from .file_utils import get_file
-from .file_utils import validate_file
+from .file_utils import get_file, validate_file
 
 # import from generic_utils
 from .generic_utils import Progbar
@@ -20,7 +21,6 @@ from .parsing_utils import ( ArgumentStruct,
     finalize_parameters,
     check_flag_conflicts,
     parse_from_dictlist,
-)
 
 # import from helper_utils
 from .helper_utils import ( fetch_file,
@@ -56,6 +56,13 @@ from .viz_utils import plot_calibrated_std
 from .viz_utils import plot_contamination
 
 
+# Milestone 16 specific
+from .P1_utils import (
+    coxen_single_drug_gene_selection,
+    coxen_multi_drug_gene_selection,
+    generate_gene_set_data,
+    combat_batch_effect_removal,
+)
 
 # import framework dependent utils
 import sys
