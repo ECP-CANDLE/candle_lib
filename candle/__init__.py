@@ -98,6 +98,7 @@ if 'tensorflow' in sys.modules:
         mse,
         compute_trainable_params,
         TerminateOnTimeOut,
+        CandleRemoteMonitor,
     )
 
     from .viz_utils import plot_metrics
