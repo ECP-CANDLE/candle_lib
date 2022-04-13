@@ -57,9 +57,42 @@ except ImportError:
 if 'tensorflow' in sys.modules:
     print('Importing candle utils for keras')
 
+    from .keras_utils import (
+        build_initializer,
+        build_optimizer,
+        get_function,
+        set_seed,
+        set_parallelism_threads,
+        PermanentDropout,
+        register_permanent_dropout,
+        LoggingCallback,
+        r2,
+        mae,
+        mse,
+        compute_trainable_params,
+        TerminateOnTimeOut,
+    )
+
     from .viz_utils import plot_metrics
 
-    from .clr_keras_utils import CyclicLR
-    from .clr_keras_utils import clr_check_args
-    from .clr_keras_utils import clr_set_args
-    from .clr_keras_utils import clr_callback
+    from .clr_keras_utils import (
+        CyclicLR,
+        clr_check_args,
+        clr_set_args,
+        clr_callback,
+    )
+elif 'torch' in sys.modules:
+    print('Importing candle utils for pytorch')
+    from .pytorch_utils import (
+        set_seed,
+        build_optimizer,
+        build_activation,
+        get_function,
+        initialize,
+        xent,
+        mse,
+        set_parallelism_threads,
+    )
+
+else:
+    raise Exception('No backend has been specified.')
