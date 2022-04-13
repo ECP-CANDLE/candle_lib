@@ -56,7 +56,6 @@ from .viz_utils import plot_calibration_interpolation
 from .viz_utils import plot_calibrated_std
 from .viz_utils import plot_contamination
 
-
 # Milestone 16 specific
 from .P1_utils import (
     coxen_single_drug_gene_selection,
@@ -99,6 +98,11 @@ if 'tensorflow' in sys.modules:
         clr_set_args,
         clr_callback,
     )
+
+    from ckpt_keras_utils import MultiGPUCheckpoint
+    from ckpt_keras_utils import CandleCheckpointCallback
+    from ckpt_keras_utils import restart
+
 elif 'torch' in sys.modules:
     print('Importing candle utils for pytorch')
     from .pytorch_utils import (
