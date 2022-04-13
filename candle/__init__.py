@@ -99,9 +99,9 @@ if 'tensorflow' in sys.modules:
         clr_callback,
     )
 
-    from ckpt_keras_utils import MultiGPUCheckpoint
-    from ckpt_keras_utils import CandleCheckpointCallback
-    from ckpt_keras_utils import restart
+    from .ckpt_keras_utils import MultiGPUCheckpoint
+    from .ckpt_keras_utils import CandleCheckpointCallback
+    from .ckpt_keras_utils import restart
 
 elif 'torch' in sys.modules:
     print('Importing candle utils for pytorch')
