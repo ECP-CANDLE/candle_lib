@@ -62,6 +62,17 @@ def test_benchmark_required(testobj, required):
                 self.required = set(required)
             self.additional_definitions = testobj.additional_definitions
 
+    try:
+        Benchmark2(testobj.filepath,
+                   testobj.defmodel,
+                   testobj.framework,
+                   testobj.prog,
+                   testobj.desc,
+                   )
+    except Exception as e:
+        print(e)
+        assert 0
+
 
 @pytest.mark.parametrize("additional_definitions", [None, additional_definitions1, additional_definitions2])
 def test_benchmark_additional(testobj, additional_definitions):
