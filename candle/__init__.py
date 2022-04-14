@@ -54,6 +54,17 @@ from .noise_utils import (
     add_noise,
 )
 
+# import from uq_utils
+from .uq_utils import (
+    generate_index_distribution,
+    compute_statistics_homoscedastic_summary,
+    compute_statistics_homoscedastic,
+    compute_statistics_heteroscedastic,
+    compute_statistics_quantile,
+    split_data_for_empirical_calibration,
+    compute_empirical_calibration_interpolation,
+)
+
 # import from viz_utils
 from .viz_utils import plot_history
 from .viz_utils import plot_scatter
@@ -113,6 +124,34 @@ if 'tensorflow' in sys.modules:
     from .ckpt_keras_utils import MultiGPUCheckpoint
     from .ckpt_keras_utils import CandleCheckpointCallback
     from .ckpt_keras_utils import restart
+
+    from .uq_keras_utils import (
+        abstention_loss,
+        sparse_abstention_loss,
+        abstention_acc_metric,
+        sparse_abstention_acc_metric,
+        abstention_metric,
+        acc_class_i_metric,
+        abstention_acc_class_i_metric,
+        abstention_class_i_metric,
+        AbstentionAdapt_Callback,
+        modify_labels,
+        add_model_output,
+        r2_heteroscedastic_metric,
+        mae_heteroscedastic_metric,
+        mse_heteroscedastic_metric,
+        meanS_heteroscedastic_metric,
+        heteroscedastic_loss,
+        quantile_loss,
+        triple_quantile_loss,
+        quantile_metric,
+        add_index_to_output,
+        contamination_loss,
+        Contamination_Callback,
+        mse_contamination_metric,
+        mae_contamination_metric,
+        r2_contamination_metric,
+    )
 
 elif 'torch' in sys.modules:
     print('Importing candle utils for pytorch')
