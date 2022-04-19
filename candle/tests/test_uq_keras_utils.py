@@ -19,15 +19,23 @@ class SetupTest:
         self.ndata = 100
         # Random ground truth
         ytrue_ = np.random.randint(0, high=50, size=self.ndata)
-        ytrue = ytrue_ % 2
-        ytrue = ytrue.reshape((self.ndata, 1))
+        ytrue0 = ytrue_ % 2
+        ytrue1 = 1 - ytrue0
+        ytrue = np.zeros((self.ndata, 3))
+        ytrue[:, 0] = ytrue0
+        ytrue[:, 1] = ytrue1
         # Random predictions including abstention
-        ypred0 = np.random.randn(self.ndata)
-        ypred1 = np.random.rand(self.ndata)
-        ypred = np.vstack([ypred0, ypred1]).T
+        ypred0 = np.random.rand(self.ndata)
+        ypred1 = 1. - ypred0
+        ypred2 = np.random.rand(self.ndata)
+        ypred = np.zeros((self.ndata, 3))
+        ypred[:, 0] = ypred0
+        ypred[:, 1] = ypred1
+        ypred[:, 2] = ypred2
         # Mask for abstention
-        mask = np.zeros(2)
-        mask[-1] = 1
+        mask0 = np.zeros(self.ndata)
+        mask1 = np.ones(self.ndata)
+        mask = np.vstack([mask0, mask0, mask1]).T
         self.mask = mask
 
         # Convert to keras variables
@@ -78,12 +86,36 @@ def test_abstention_loss(testobj):
         assert 0
 
 
-def test_sparse_abstention_loss(testobj):
+def test_sparse_abstention_loss():
     alpha0 = 0.1
     alpha = K.variable(value=alpha0)
-    absloss = candle.sparse_abstention_loss(alpha, testobj.mask)
+    ndata = 100
+    # Random ground truth
+    # Direct classes (not one-hot encoded)
+    ytrue_ = np.random.randint(0, high=50, size=ndata)
+    ytrue = ytrue_ % 2  # 2 classes: 0, 1 labels
+    # Random predictions including abstention
+    # Scores distribution (2 classes) + abstention
+    ypred0 = np.random.rand(ndata)
+    ypred1 = 1. - ypred0
+    ypred2 = np.random.rand(ndata)
+    ypred = np.zeros((ndata, 3))
+    ypred[:, 0] = ypred0
+    ypred[:, 1] = ypred1
+    ypred[:, 2] = ypred2
+    # Mask for abstention
+    mask0 = np.zeros(ndata)
+    mask1 = np.ones(ndata)
+    mask = np.vstack([mask0, mask0, mask1]).T
+    mask = mask
+
+    # Convert to keras variables
+    ytrue = K.variable(value=ytrue)
+    ypred = K.variable(value=ypred)
+
+    absloss = candle.sparse_abstention_loss(alpha, mask)
     try:
-        absloss(testobj.ytrue_class, testobj.ypred_class)
+        absloss(ytrue, ypred)
     except Exception as e:
         print(e)
         assert 0
