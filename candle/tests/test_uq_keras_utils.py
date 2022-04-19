@@ -26,12 +26,11 @@ class SetupTest:
         ypred1 = np.random.rand(self.ndata)
         ypred = np.vstack([ypred0, ypred1]).T
         # Mask for abstention
-        mask0 = np.zeros(self.ndata)
-        mask1 = np.ones(self.ndata)
-        mask = np.vstack([mask0, mask1]).T
+        mask = np.zeros(2)
+        mask[-1] = 1
+        self.mask = mask
 
         # Convert to keras variables
-        self.mask = K.variable(value=mask)
         self.ytrue_class = K.variable(value=ytrue)
         self.ypred_class = K.variable(value=ypred)
 
