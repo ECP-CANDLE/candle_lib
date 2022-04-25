@@ -1,22 +1,34 @@
-"""
-Unit test for the clr_keras_utils module.
-"""
+"""Unit test for the clr_keras_utils module."""
 
 import candle
 import pytest
 
 
 def test_clr_check_args():
-    """ Checks if the arguments for cyclical learning rate are valid. """
-    valid_args = {'clr_mode': 'triangular', 'clr_base_lr': 1e-4, 'clr_max_lr': 1e-3, 'clr_gamma': 0.999994}
-    invalid_args = {'clr_mode': 'triangulr', 'clr_base_lr': 1e-4, 'clr_max_lr': 1e-3}  # Missing gamma
+    """Checks if the arguments for cyclical learning rate are valid."""
+    valid_args = {
+        'clr_mode': 'triangular',
+        'clr_base_lr': 1e-4,
+        'clr_max_lr': 1e-3,
+        'clr_gamma': 0.999994
+    }
+    invalid_args = {
+        'clr_mode': 'triangulr',
+        'clr_base_lr': 1e-4,
+        'clr_max_lr': 1e-3
+    }  # Missing gamma
 
     assert candle.clr_check_args(valid_args)
     assert not candle.clr_check_args(invalid_args)
 
 
 def test_clr_set_args():
-    args = {'clr_mode': 'trng1', 'clr_base_lr': 1e-4, 'clr_max_lr': 1e-3, 'clr_gamma': 0.999994}
+    args = {
+        'clr_mode': 'trng1',
+        'clr_base_lr': 1e-4,
+        'clr_max_lr': 1e-3,
+        'clr_gamma': 0.999994
+    }
 
     clr_keras_kwargs = candle.clr_set_args(args)
 
@@ -38,7 +50,10 @@ def test_clr_callback():
     clr = candle.clr_callback(mode='trng2', base_lr=1e-4, max_lr=1e-3)
     assert clr.mode == 'triangular2'
 
-    clr = candle.clr_callback(mode='exp', base_lr=1e-4, max_lr=1e-3, gamma=0.999994)
+    clr = candle.clr_callback(mode='exp',
+                              base_lr=1e-4,
+                              max_lr=1e-3,
+                              gamma=0.999994)
     assert clr.mode == 'exp_range'
     assert clr.gamma == 0.999994
 

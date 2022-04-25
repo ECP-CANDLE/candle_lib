@@ -1,6 +1,4 @@
-"""
-Unit and regression test for the candle package.
-"""
+"""Unit and regression test for the candle package."""
 
 import sys
 

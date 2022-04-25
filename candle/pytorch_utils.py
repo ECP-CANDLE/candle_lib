@@ -15,12 +15,12 @@ def set_parallelism_threads():  # for compatibility
 
 
 def set_seed(seed):
-    """ Set the random number seed to the desired value
+    """Set the random number seed to the desired value.
 
-        Parameters
-        ----------
-        seed : integer
-            Random number seed.
+    Parameters
+    ----------
+    seed : integer
+        Random number seed.
     """
 
     set_seed_defaultUtils(seed)
@@ -54,7 +54,11 @@ def build_activation(activation: str):
         return torch.nn.Tanh()
 
 
-def build_optimizer(model, optimizer: str, lr: float, kerasDefaults: Dict, trainable_only: bool = True):
+def build_optimizer(model,
+                    optimizer: str,
+                    lr: float,
+                    kerasDefaults: Dict,
+                    trainable_only: bool = True):
     if trainable_only:
         params = filter(lambda p: p.requires_grad, model.parameters())
     else:
@@ -63,10 +67,11 @@ def build_optimizer(model, optimizer: str, lr: float, kerasDefaults: Dict, train
     # schedule = optimizers.optimizer.Schedule() # constant lr (equivalent to default keras setting)
 
     if optimizer == 'sgd':
-        return torch.optim.GradientDescentMomentum(params,
-                                                   lr=lr,
-                                                   momentum_coef=kerasDefaults['momentum_sgd'],
-                                                   nesterov=kerasDefaults['nesterov_sgd'])
+        return torch.optim.GradientDescentMomentum(
+            params,
+            lr=lr,
+            momentum_coef=kerasDefaults['momentum_sgd'],
+            nesterov=kerasDefaults['nesterov_sgd'])
 
     elif optimizer == 'rmsprop':
         return torch.optim.RMSprop(model.parameters(),
@@ -85,10 +90,11 @@ def build_optimizer(model, optimizer: str, lr: float, kerasDefaults: Dict, train
                                     rho=kerasDefaults['rho'])
 
     elif optimizer == 'adam':
-        return torch.optim.Adam(params,
-                                lr=lr,
-                                betas=[kerasDefaults['beta_1'], kerasDefaults['beta_2']],
-                                eps=kerasDefaults['epsilon'])
+        return torch.optim.Adam(
+            params,
+            lr=lr,
+            betas=[kerasDefaults['beta_1'], kerasDefaults['beta_2']],
+            eps=kerasDefaults['epsilon'])
 
 
 def initialize(weights, initializer, kerasDefaults, seed=None, constant=0.):

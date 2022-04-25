@@ -12,8 +12,8 @@ from candle import select_features_by_variation
 
 # Auxiliary functions of COXEN start here ####################
 def calculate_concordance_correlation_coefficient(u, v):
-    '''
-    This function calculates the concordance correlation coefficient between two input 1-D numpy arrays.
+    """This function calculates the concordance correlation coefficient between
+    two input 1-D numpy arrays.
 
     Parameters:
     -----------
@@ -23,17 +23,17 @@ def calculate_concordance_correlation_coefficient(u, v):
     Returns:
     --------
     ccc: a numeric value of concordance correlation coefficient between the two input variables.
-    '''
+    """
     a = 2 * np.mean((u - np.mean(u)) * (v - np.mean(v)))
-    b = np.mean(np.square(u - np.mean(u))) + np.mean(np.square(v - np.mean(v))) + np.square(np.mean(u) - np.mean(v))
+    b = np.mean(np.square(u - np.mean(u))) + np.mean(
+        np.square(v - np.mean(v))) + np.square(np.mean(u) - np.mean(v))
     ccc = a / b
     return ccc
 
 
 def generalization_feature_selection(data1, data2, measure, cutoff):
-    '''
-    This function uses the Pearson correlation coefficient to select the features that are generalizable
-    between data1 and data2.
+    """This function uses the Pearson correlation coefficient to select the
+    features that are generalizable between data1 and data2.
 
     Parameters:
     -----------
@@ -48,33 +48,44 @@ def generalization_feature_selection(data1, data2, measure, cutoff):
     Returns:
     --------
     fid: 1-D numpy array containing the indices of selected features.
-    '''
+    """
     cor1 = np.corrcoef(np.transpose(data1))
     cor2 = np.corrcoef(np.transpose(data2))
     num = data1.shape[1]
     cor = []
     if measure == 'pearson':
         for i in range(num):
-            cor.append(np.corrcoef(np.vstack((list(cor1[:i, i]) + list(cor1[(i + 1):, i]),
-                       list(cor2[:i, i]) + list(cor2[(i + 1):, i]))))[0, 1])
+            cor.append(
+                np.corrcoef(
+                    np.vstack(
+                        (list(cor1[:i, i]) + list(cor1[(i + 1):, i]),
+                         list(cor2[:i, i]) + list(cor2[(i + 1):, i]))))[0, 1])
     elif measure == 'ccc':
         for i in range(num):
-            cor.append(calculate_concordance_correlation_coefficient(np.array(list(cor1[:i, i]) + list(cor1[(i + 1):, i])),
-                       np.array(list(cor2[:i, i]) + list(cor2[(i + 1):, i]))))
+            cor.append(
+                calculate_concordance_correlation_coefficient(
+                    np.array(list(cor1[:i, i]) + list(cor1[(i + 1):, i])),
+                    np.array(list(cor2[:i, i]) + list(cor2[(i + 1):, i]))))
     cor = np.array(cor)
     fid = np.argsort(-cor)[:int(cutoff)]
     return fid
 
 
 # Auxiliary functions of COXEN end here ####################
-def coxen_single_drug_gene_selection(
-    source_data, target_data, drug_response_data, drug_response_col, tumor_col,
-    prediction_power_measure='pearson', num_predictive_gene=100, generalization_power_measure='ccc',
-        num_generalizable_gene=50, multi_drug_mode=False):
-    '''
-    This function selects genes for drug response prediction using the COXEN approach. The COXEN approach is
-    designed for selecting genes to predict the response of tumor cells to a specific drug. This function
-    assumes no missing data exist.
+def coxen_single_drug_gene_selection(source_data,
+                                     target_data,
+                                     drug_response_data,
+                                     drug_response_col,
+                                     tumor_col,
+                                     prediction_power_measure='pearson',
+                                     num_predictive_gene=100,
+                                     generalization_power_measure='ccc',
+                                     num_generalizable_gene=50,
+                                     multi_drug_mode=False):
+    """This function selects genes for drug response prediction using the COXEN
+    approach. The COXEN approach is designed for selecting genes to predict the
+    response of tumor cells to a specific drug. This function assumes no
+    missing data exist.
 
     Parameters:
     -----------
@@ -103,23 +114,31 @@ def coxen_single_drug_gene_selection(
     --------
     indices: 1-D numpy array containing the indices of selected genes, if multi_drug_mode is False;
     1-D numpy array of indices of sorting all genes according to their prediction power, if multi_drug_mode is True.
-    '''
+    """
 
     if isinstance(drug_response_col, str):
-        drug_response_col = np.where(drug_response_data.columns == drug_response_col)[0][0]
+        drug_response_col = np.where(
+            drug_response_data.columns == drug_response_col)[0][0]
 
     if isinstance(tumor_col, str):
         tumor_col = np.where(drug_response_data.columns == tumor_col)[0][0]
 
     drug_response_data = drug_response_data.copy()
-    drug_response_data = drug_response_data.iloc[np.where(np.isin(drug_response_data.iloc[:, tumor_col],
-                                                                  source_data.index))[0], :]
+    drug_response_data = drug_response_data.iloc[np.where(
+        np.isin(drug_response_data.iloc[:,
+                                        tumor_col], source_data.index))[0], :]
 
     source_data = source_data.copy()
-    source_data = source_data.iloc[np.where(np.isin(source_data.index, drug_response_data.iloc[:, tumor_col]))[0], :]
+    source_data = source_data.iloc[np.where(
+        np.isin(source_data.index, drug_response_data.iloc[:,
+                                                           tumor_col]))[0], :]
 
-    source_std_id = select_features_by_variation(source_data, variation_measure='std', threshold=0.00000001)
-    target_std_id = select_features_by_variation(target_data, variation_measure='std', threshold=0.00000001)
+    source_std_id = select_features_by_variation(source_data,
+                                                 variation_measure='std',
+                                                 threshold=0.00000001)
+    target_std_id = select_features_by_variation(target_data,
+                                                 variation_measure='std',
+                                                 threshold=0.00000001)
     std_id = np.sort(np.intersect1d(source_std_id, target_std_id))
     source_data = source_data.iloc[:, std_id]
     target_data = target_data.copy()
@@ -136,14 +155,20 @@ def coxen_single_drug_gene_selection(
         endIndex = min((i + 1) * batchSize, source_data.shape[1])
 
         if prediction_power_measure == 'pearson':
-            cor_i = np.corrcoef(np.vstack(
-                (np.transpose(source_data.iloc[:, startIndex:endIndex].loc[drug_response_data.iloc[:, tumor_col], :].values),
-                 np.reshape(drug_response_data.iloc[:, drug_response_col].values, (1, drug_response_data.shape[0])))))
+            cor_i = np.corrcoef(
+                np.vstack(
+                    (np.transpose(source_data.iloc[:, startIndex:endIndex].loc[
+                        drug_response_data.iloc[:, tumor_col], :].values),
+                     np.reshape(
+                         drug_response_data.iloc[:, drug_response_col].values,
+                         (1, drug_response_data.shape[0])))))
             prediction_power[startIndex:endIndex, 0] = abs(cor_i[:-1, -1])
 
         if prediction_power_measure == 'mutual_info':
-            mi = mutual_info_regression(X=source_data.iloc[:, startIndex:endIndex].loc[drug_response_data.iloc[:, tumor_col], :].values,
-                                        y=drug_response_data.iloc[:, drug_response_col].values)
+            mi = mutual_info_regression(
+                X=source_data.iloc[:, startIndex:endIndex].loc[
+                    drug_response_data.iloc[:, tumor_col], :].values,
+                y=drug_response_data.iloc[:, drug_response_col].values)
             prediction_power[startIndex:endIndex, 0] = mi
 
     if multi_drug_mode:
@@ -158,7 +183,9 @@ def coxen_single_drug_gene_selection(
     target_data = target_data.iloc[:, gid1]
     num_generalizable_gene = int(min(num_generalizable_gene, len(gid1)))
     # perform the second step of COXEN approach to select generalizable genes among the predictive genes
-    gid2 = generalization_feature_selection(source_data.values, target_data.values, generalization_power_measure,
+    gid2 = generalization_feature_selection(source_data.values,
+                                            target_data.values,
+                                            generalization_power_measure,
                                             num_generalizable_gene)
 
     indices = std_id[gid1[gid2]]
@@ -166,27 +193,37 @@ def coxen_single_drug_gene_selection(
     return np.sort(indices)
 
 
-def coxen_multi_drug_gene_selection(
-    source_data, target_data, drug_response_data, drug_response_col, tumor_col, drug_col,
-    prediction_power_measure='lm', num_predictive_gene=100, generalization_power_measure='ccc',
-        num_generalizable_gene=50, union_of_single_drug_selection=False):
-    '''
-    This function uses the COXEN approach to select genes for predicting the response of multiple drugs.
-    It assumes no missing data exist. It works in three modes.
-    (1) If union_of_single_drug_selection is True, prediction_power_measure must be either 'pearson' or 'mutual_info'.
-    This functions runs coxen_single_drug_gene_selection for every drug with the parameter setting and takes the
-    union of the selected genes of every drug as the output. The size of the selected gene set may be larger than
-    num_generalizable_gene.
-    (2) If union_of_single_drug_selection is False and prediction_power_measure is 'lm', this function uses a
-    linear model to fit the response of multiple drugs using the expression of a gene, while the drugs are
-    one-hot encoded. The p-value associated with the coefficient of gene expression is used as the prediction
-    power measure, according to which num_predictive_gene genes will be selected. Then, among the predictive
-    genes, num_generalizable_gene generalizable genes will be  selected.
-    (3) If union_of_single_drug_selection is False and prediction_power_measure is 'pearson' or 'mutual_info',
-    for each drug this functions ranks the genes according to their power of predicting the
-    response of the drug. The union of an equal number of predictive genes for every drug will be generated,
-    and its size must be at least num_predictive_gene. Then, num_generalizable_gene generalizable genes
-    will be selected.
+def coxen_multi_drug_gene_selection(source_data,
+                                    target_data,
+                                    drug_response_data,
+                                    drug_response_col,
+                                    tumor_col,
+                                    drug_col,
+                                    prediction_power_measure='lm',
+                                    num_predictive_gene=100,
+                                    generalization_power_measure='ccc',
+                                    num_generalizable_gene=50,
+                                    union_of_single_drug_selection=False):
+    """This function uses the COXEN approach to select genes for predicting the
+    response of multiple drugs. It assumes no missing data exist. It works in
+    three modes. (1) If union_of_single_drug_selection is True,
+    prediction_power_measure must be either 'pearson' or 'mutual_info'. This
+    functions runs coxen_single_drug_gene_selection for every drug with the
+    parameter setting and takes the union of the selected genes of every drug
+    as the output. The size of the selected gene set may be larger than
+    num_generalizable_gene. (2) If union_of_single_drug_selection is False and
+    prediction_power_measure is 'lm', this function uses a linear model to fit
+    the response of multiple drugs using the expression of a gene, while the
+    drugs are one-hot encoded. The p-value associated with the coefficient of
+    gene expression is used as the prediction power measure, according to which
+    num_predictive_gene genes will be selected. Then, among the predictive
+    genes, num_generalizable_gene generalizable genes will be  selected. (3) If
+    union_of_single_drug_selection is False and prediction_power_measure is
+    'pearson' or 'mutual_info', for each drug this functions ranks the genes
+    according to their power of predicting the response of the drug. The union
+    of an equal number of predictive genes for every drug will be generated,
+    and its size must be at least num_predictive_gene. Then,
+    num_generalizable_gene generalizable genes will be selected.
 
     Parameters:
     -----------
@@ -216,10 +253,11 @@ def coxen_multi_drug_gene_selection(
     Returns:
     --------
     indices: 1-D numpy array containing the indices of selected genes.
-    '''
+    """
 
     if isinstance(drug_response_col, str):
-        drug_response_col = np.where(drug_response_data.columns == drug_response_col)[0][0]
+        drug_response_col = np.where(
+            drug_response_data.columns == drug_response_col)[0][0]
 
     if isinstance(tumor_col, str):
         tumor_col = np.where(drug_response_data.columns == tumor_col)[0][0]
@@ -228,15 +266,22 @@ def coxen_multi_drug_gene_selection(
         drug_col = np.where(drug_response_data.columns == drug_col)[0][0]
 
     drug_response_data = drug_response_data.copy()
-    drug_response_data = drug_response_data.iloc[np.where(np.isin(drug_response_data.iloc[:, tumor_col],
-                                                                  source_data.index))[0], :]
+    drug_response_data = drug_response_data.iloc[np.where(
+        np.isin(drug_response_data.iloc[:,
+                                        tumor_col], source_data.index))[0], :]
     drugs = np.unique(drug_response_data.iloc[:, drug_col])
 
     source_data = source_data.copy()
-    source_data = source_data.iloc[np.where(np.isin(source_data.index, drug_response_data.iloc[:, tumor_col]))[0], :]
+    source_data = source_data.iloc[np.where(
+        np.isin(source_data.index, drug_response_data.iloc[:,
+                                                           tumor_col]))[0], :]
 
-    source_std_id = select_features_by_variation(source_data, variation_measure='std', threshold=0.00000001)
-    target_std_id = select_features_by_variation(target_data, variation_measure='std', threshold=0.00000001)
+    source_std_id = select_features_by_variation(source_data,
+                                                 variation_measure='std',
+                                                 threshold=0.00000001)
+    target_std_id = select_features_by_variation(target_data,
+                                                 variation_measure='std',
+                                                 threshold=0.00000001)
     std_id = np.sort(np.intersect1d(source_std_id, target_std_id))
     source_data = source_data.iloc[:, std_id]
     target_data = target_data.copy()
@@ -246,14 +291,18 @@ def coxen_multi_drug_gene_selection(
 
     if union_of_single_drug_selection:
         if prediction_power_measure != 'pearson' and prediction_power_measure != 'mutual_info':
-            print('pearson or mutual_info must be used as prediction_power_measure for taking the union of selected genes of every drugs')
+            print(
+                'pearson or mutual_info must be used as prediction_power_measure for taking the union of selected genes of every drugs'
+            )
             sys.exit(1)
         gid1 = np.array([]).astype(np.int64)
         for d in drugs:
             idd = np.where(drug_response_data.iloc[:, drug_col] == d)[0]
             response_d = drug_response_data.iloc[idd, :]
-            gid2 = coxen_single_drug_gene_selection(source_data, target_data, response_d, drug_response_col, tumor_col,
-                                                    prediction_power_measure, num_predictive_gene, generalization_power_measure, num_generalizable_gene)
+            gid2 = coxen_single_drug_gene_selection(
+                source_data, target_data, response_d, drug_response_col,
+                tumor_col, prediction_power_measure, num_predictive_gene,
+                generalization_power_measure, num_generalizable_gene)
             gid1 = np.union1d(gid1, gid2)
         return np.sort(std_id[gid1])
 
@@ -264,10 +313,13 @@ def coxen_multi_drug_gene_selection(
         drug_m = pd.DataFrame(drug_m, index=drugs)
         drug_sample = drug_m.loc[drug_response_data.iloc[:, drug_col], :].values
         for i in range(source_data.shape[1]):
-            ge_sample = source_data.iloc[:, i].loc[drug_response_data.iloc[:, tumor_col]].values
-            sample = np.hstack((np.reshape(ge_sample, (len(ge_sample), 1)), drug_sample))
+            ge_sample = source_data.iloc[:, i].loc[
+                drug_response_data.iloc[:, tumor_col]].values
+            sample = np.hstack((np.reshape(ge_sample,
+                                           (len(ge_sample), 1)), drug_sample))
             sample = sm.add_constant(sample)
-            mod = sm.OLS(drug_response_data.iloc[:, drug_response_col].values, sample)
+            mod = sm.OLS(drug_response_data.iloc[:, drug_response_col].values,
+                         sample)
             try:
                 res = mod.fit()
                 pvalue[i, 0] = res.pvalues[1]
@@ -284,12 +336,22 @@ def coxen_multi_drug_gene_selection(
             idd = np.where(drug_response_data.iloc[:, drug_col] == drugs[d])[0]
             response_d = drug_response_data.iloc[idd, :]
             temp_rank = coxen_single_drug_gene_selection(
-                source_data, target_data, response_d,
-                drug_response_col, tumor_col, prediction_power_measure, num_predictive_gene=None,
-                generalization_power_measure=None, num_generalizable_gene=None, multi_drug_mode=True)
+                source_data,
+                target_data,
+                response_d,
+                drug_response_col,
+                tumor_col,
+                prediction_power_measure,
+                num_predictive_gene=None,
+                generalization_power_measure=None,
+                num_generalizable_gene=None,
+                multi_drug_mode=True)
             gene_rank.iloc[d, :len(temp_rank)] = temp_rank
-        for i in range(int(np.ceil(num_predictive_gene / len(drugs))), source_data.shape[1] + 1):
-            gid1 = np.unique(np.reshape(gene_rank.iloc[:, :i].values, (1, gene_rank.shape[0] * i))[0, :])
+        for i in range(int(np.ceil(num_predictive_gene / len(drugs))),
+                       source_data.shape[1] + 1):
+            gid1 = np.unique(
+                np.reshape(gene_rank.iloc[:, :i].values,
+                           (1, gene_rank.shape[0] * i))[0, :])
             gid1 = gid1[np.where(np.invert(np.isnan(gid1)))[0]]
             if len(gid1) >= num_predictive_gene:
                 break
@@ -301,7 +363,9 @@ def coxen_multi_drug_gene_selection(
     num_generalizable_gene = int(min(num_generalizable_gene, len(gid1)))
 
     # perform the second step of COXEN approach to select generalizable genes among the predictive genes
-    gid2 = generalization_feature_selection(source_data.values, target_data.values, generalization_power_measure,
+    gid2 = generalization_feature_selection(source_data.values,
+                                            target_data.values,
+                                            generalization_power_measure,
                                             num_generalizable_gene)
 
     indices = std_id[gid1[gid2]]
@@ -309,10 +373,15 @@ def coxen_multi_drug_gene_selection(
     return np.sort(indices)
 
 
-def generate_gene_set_data(data, genes, gene_name_type='entrez', gene_set_category='c6.all', metric='mean',
-                           standardize=False, data_dir='../../Data/examples/Gene_Sets/MSigDB.v7.0/'):
-    '''
-    This function generates genomic data summarized at the gene set level.
+def generate_gene_set_data(
+        data,
+        genes,
+        gene_name_type='entrez',
+        gene_set_category='c6.all',
+        metric='mean',
+        standardize=False,
+        data_dir='../../Data/examples/Gene_Sets/MSigDB.v7.0/'):
+    """This function generates genomic data summarized at the gene set level.
 
     Parameters:
     -----------
@@ -337,7 +406,7 @@ def generate_gene_set_data(data, genes, gene_name_type='entrez', gene_set_catego
     Returns:
     --------
     gene_set_data: a data frame of calculated gene-set-level data. Column names are the gene set names.
-    '''
+    """
 
     sample_name = None
     if isinstance(data, pd.DataFrame):
@@ -377,16 +446,20 @@ def generate_gene_set_data(data, genes, gene_name_type='entrez', gene_set_catego
             elif metric == 'min':
                 gene_set_data[:, i] = np.nanmin(data[:, idi], axis=1)
             elif metric == 'abs_mean':
-                gene_set_data[:, i] = np.nanmean(np.absolute(data[:, idi]), axis=1)
+                gene_set_data[:, i] = np.nanmean(np.absolute(data[:, idi]),
+                                                 axis=1)
             elif metric == 'abs_maximum':
-                gene_set_data[:, i] = np.nanmax(np.absolute(data[:, idi]), axis=1)
+                gene_set_data[:, i] = np.nanmax(np.absolute(data[:, idi]),
+                                                axis=1)
             else:  # 'mean'
                 gene_set_data[:, i] = np.nanmean(data[:, idi], axis=1)
 
     if sample_name is None:
         gene_set_data = pd.DataFrame(gene_set_data, columns=gene_set_names)
     else:
-        gene_set_data = pd.DataFrame(gene_set_data, columns=gene_set_names, index=sample_name)
+        gene_set_data = pd.DataFrame(gene_set_data,
+                                     columns=gene_set_names,
+                                     index=sample_name)
     keep_id = np.where(np.sum(np.invert(pd.isna(gene_set_data)), axis=0) > 0)[0]
     gene_set_data = gene_set_data.iloc[:, keep_id]
 
@@ -398,17 +471,20 @@ def design_mat(mod, numerical_covariates, batch_levels):
     # require levels to make sure they are in the same order as we use in the
     # rest of the script.
     design = patsy.dmatrix("~ 0 + C(batch, levels=%s)" % str(batch_levels),
-                           mod, return_type="dataframe")
+                           mod,
+                           return_type="dataframe")
 
     mod = mod.drop(["batch"], axis=1)
     numerical_covariates = list(numerical_covariates)
     sys.stdout.write("found %i batches\n" % design.shape[1])
-    other_cols = [c for i, c in enumerate(mod.columns)
-                  if i not in numerical_covariates]
+    other_cols = [
+        c for i, c in enumerate(mod.columns) if i not in numerical_covariates
+    ]
     factor_matrix = mod[other_cols]
     design = pd.concat((design, factor_matrix), axis=1)
     if numerical_covariates is not None:
-        sys.stdout.write("found %i numerical covariates...\n" % len(numerical_covariates))
+        sys.stdout.write("found %i numerical covariates...\n" %
+                         len(numerical_covariates))
         for i, nC in enumerate(numerical_covariates):
             cname = mod.columns[nC]
             sys.stdout.write("\t{0}\n".format(cname))
@@ -428,11 +504,12 @@ def it_sol(sdat, g_hat, d_hat, g_bar, t2, a, b, conv=0.0001):
     while change > conv:
         # print g_hat.shape, g_bar.shape, t2.shape
         g_new = postmean(g_hat, g_bar, n, d_old, t2)
-        sum2 = ((sdat - np.dot(g_new.values.reshape((g_new.shape[0], 1)), np.ones((1, sdat.shape[1])))) ** 2).sum(
-            axis=1)
+        sum2 = ((sdat - np.dot(g_new.values.reshape(
+            (g_new.shape[0], 1)), np.ones((1, sdat.shape[1]))))**2).sum(axis=1)
         d_new = postvar(sum2, n, a, b)
 
-        change = max((abs(g_new - g_old) / g_old).max(), (abs(d_new - d_old) / d_old).max())
+        change = max((abs(g_new - g_old) / g_old).max(),
+                     (abs(d_new - d_old) / d_old).max())
         g_old = g_new  # .copy()
         d_old = d_new  # .copy()
         count = count + 1
@@ -443,13 +520,13 @@ def it_sol(sdat, g_hat, d_hat, g_bar, t2, a, b, conv=0.0001):
 def aprior(gamma_hat):
     m = gamma_hat.mean()
     s2 = gamma_hat.var()
-    return (2 * s2 + m ** 2) / s2
+    return (2 * s2 + m**2) / s2
 
 
 def bprior(gamma_hat):
     m = gamma_hat.mean()
     s2 = gamma_hat.var()
-    return (m * s2 + m ** 3) / s2
+    return (m * s2 + m**3) / s2
 
 
 def postmean(g_hat, g_bar, n, d_star, t2):
@@ -461,9 +538,11 @@ def postvar(sum2, n, a, b):
 
 
 # Auxiliary functions of ComBat end here ####################
-def combat_batch_effect_removal(data, batch_labels, model=None, numerical_covariates=None):
-    '''
-    This function corrects for batch effect in data.
+def combat_batch_effect_removal(data,
+                                batch_labels,
+                                model=None,
+                                numerical_covariates=None):
+    """This function corrects for batch effect in data.
 
     Parameters:
     -----------
@@ -480,7 +559,7 @@ def combat_batch_effect_removal(data, batch_labels, model=None, numerical_covari
     --------
     corrected : pandas data frame of numeric values, with a size of (n_features, n_samples). It is
         the data with batch effects corrected.
-    '''
+    """
 
     if isinstance(numerical_covariates, str):
         numerical_covariates = [numerical_covariates]
@@ -500,29 +579,40 @@ def combat_batch_effect_removal(data, batch_labels, model=None, numerical_covari
     n_array = float(sum(n_batches))
 
     # drop intercept
-    drop_cols = [cname for cname, inter in ((model == 1).all()).iteritems() if inter == True]  # noqa E712
+    drop_cols = [
+        cname for cname, inter in ((model == 1).all()).iteritems()
+        if inter == True
+    ]  # noqa E712
     # drop_idxs = [list(model.columns).index(cdrop) for cdrop in drop_cols]
     model = model[[c for c in model.columns if c not in drop_cols]]
-    numerical_covariates = [list(model.columns).index(c) if isinstance(c, str) else c
-                            for c in numerical_covariates if c not in drop_cols]
+    numerical_covariates = [
+        list(model.columns).index(c) if isinstance(c, str) else c
+        for c in numerical_covariates
+        if c not in drop_cols
+    ]
 
     design = design_mat(model, numerical_covariates, batch_levels)
 
     sys.stdout.write("Standardizing Data across genes.\n")
     B_hat = np.dot(np.dot(la.inv(np.dot(design.T, design)), design.T), data.T)
     grand_mean = np.dot((n_batches / n_array).T, B_hat[:n_batch, :])
-    var_pooled = np.dot(((data - np.dot(design, B_hat).T) ** 2), np.ones((int(n_array), 1)) / int(n_array))
+    var_pooled = np.dot(((data - np.dot(design, B_hat).T)**2),
+                        np.ones((int(n_array), 1)) / int(n_array))
 
-    stand_mean = np.dot(grand_mean.T.reshape((len(grand_mean), 1)), np.ones((1, int(n_array))))
+    stand_mean = np.dot(grand_mean.T.reshape((len(grand_mean), 1)),
+                        np.ones((1, int(n_array))))
     tmp = np.array(design.copy())
     tmp[:, :n_batch] = 0
     stand_mean += np.dot(tmp, B_hat).T
 
-    s_data = ((data - stand_mean) / np.dot(np.sqrt(var_pooled), np.ones((1, int(n_array)))))
+    s_data = ((data - stand_mean) /
+              np.dot(np.sqrt(var_pooled), np.ones((1, int(n_array)))))
 
     sys.stdout.write("Fitting L/S model and finding priors\n")
     batch_design = design[design.columns[:n_batch]]
-    gamma_hat = np.dot(np.dot(la.inv(np.dot(batch_design.T, batch_design)), batch_design.T), s_data.T)
+    gamma_hat = np.dot(
+        np.dot(la.inv(np.dot(batch_design.T, batch_design)), batch_design.T),
+        s_data.T)
 
     delta_hat = []
 
@@ -538,8 +628,8 @@ def combat_batch_effect_removal(data, batch_labels, model=None, numerical_covari
     sys.stdout.write("Finding parametric adjustments\n")
     gamma_star, delta_star = [], []
     for i, batch_idxs in enumerate(batch_info):
-        temp = it_sol(s_data[batch_idxs], gamma_hat[i],
-                      delta_hat[i], gamma_bar[i], t2[i], a_prior[i], b_prior[i])
+        temp = it_sol(s_data[batch_idxs], gamma_hat[i], delta_hat[i],
+                      gamma_bar[i], t2[i], a_prior[i], b_prior[i])
 
         gamma_star.append(temp[0])
         delta_star.append(temp[1])
@@ -553,11 +643,13 @@ def combat_batch_effect_removal(data, batch_labels, model=None, numerical_covari
         dsq = np.sqrt(delta_star[j, :])
         dsq = dsq.reshape((len(dsq), 1))
         denom = np.dot(dsq, np.ones((1, n_batches[j])))
-        numer = np.array(bayesdata[batch_idxs] - np.dot(batch_design.loc[batch_idxs], gamma_star).T)
+        numer = np.array(bayesdata[batch_idxs] -
+                         np.dot(batch_design.loc[batch_idxs], gamma_star).T)
 
         bayesdata[batch_idxs] = numer / denom
 
     vpsq = np.sqrt(var_pooled).reshape((len(var_pooled), 1))
-    bayesdata = bayesdata * np.dot(vpsq, np.ones((1, int(n_array)))) + stand_mean
+    bayesdata = bayesdata * np.dot(vpsq, np.ones(
+        (1, int(n_array)))) + stand_mean
 
     return bayesdata

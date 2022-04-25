@@ -1,6 +1,4 @@
-"""
-Unit and regression test for the uq_utils module.
-"""
+"""Unit and regression test for the uq_utils module."""
 
 import pytest
 import numpy as np
@@ -20,7 +18,8 @@ def test1_frac_distribution(N):
     numtest = N // 2
     numval = 0
     total = numtrain + numtest + numval
-    indTr, indVl, indTt = candle.generate_index_distribution(numtrain, numtest, numval, config)
+    indTr, indVl, indTt = candle.generate_index_distribution(
+        numtrain, numtest, numval, config)
     numtr = int(np.round(total * trf))
     numtt = total - numtr
     assert len(indTr) == numtr
@@ -40,7 +39,8 @@ def test2_frac_distribution(N):
     numtest = N // 2
     numval = numtest
     total = numtrain + numtest + numval
-    indTr, indVl, indTt = candle.generate_index_distribution(numtrain, numtest, numval, config)
+    indTr, indVl, indTt = candle.generate_index_distribution(
+        numtrain, numtest, numval, config)
     numtr = int(np.round(total * trf))
     numv = int(np.round(total * vf))
     numtt = total - numtr - numv
@@ -60,7 +60,8 @@ def test3_frac_distribution(N):
     numtest = 0
     numval = N // 2
     total = numtrain + numtest + numval
-    indTr, indVl, indTt = candle.generate_index_distribution(numtrain, numtest, numval, config)
+    indTr, indVl, indTt = candle.generate_index_distribution(
+        numtrain, numtest, numval, config)
     numtr = int(np.round(total * trf))
     numv = total - numtr
     assert len(indTr) == numtr
@@ -80,7 +81,8 @@ def test1_blk_distribution(N):
     numval = 0
     total = numtrain + numtest + numval
     numblk = trb + ttb + vb
-    indTr, indVl, indTt = candle.generate_index_distribution(numtrain, numtest, numval, config)
+    indTr, indVl, indTt = candle.generate_index_distribution(
+        numtrain, numtest, numval, config)
     numtr = int(np.round(total * trb / numblk))
     numtt = total - numtr
     assert len(indTr) == numtr
@@ -100,7 +102,8 @@ def test2_blk_distribution(N):
     numval = 0
     total = numtrain + numtest + numval
     numblk = trb + ttb + vb
-    indTr, indVl, indTt = candle.generate_index_distribution(numtrain, numtest, numval, config)
+    indTr, indVl, indTt = candle.generate_index_distribution(
+        numtrain, numtest, numval, config)
     numtr = int(np.round(total * trb / numblk))
     numv = int(np.round(total * vb / numblk))
     numtt = total - numtr - numv
@@ -124,7 +127,8 @@ def test2_blklst_distribution(N):
     trv = all_lst[offset:]
     config = {'uq_train_vec': trv, 'uq_valid_vec': vv, 'uq_test_vec': ttv}
 
-    indTr, indVl, indTt = candle.generate_index_distribution(numtrain, numtest, numval, config)
+    indTr, indVl, indTt = candle.generate_index_distribution(
+        numtrain, numtest, numval, config)
     assert len(indTr) == len(trv)
     assert len(indVl) == len(vv)
     assert len(indTt) == len(ttv)
@@ -228,7 +232,10 @@ def test_calibration_interpolation():
     ypred = np.random.randn(numsamples)
 
     try:
-        candle.compute_empirical_calibration_interpolation(psigma, ypred, ytrue, cv=3)
+        candle.compute_empirical_calibration_interpolation(psigma,
+                                                           ypred,
+                                                           ytrue,
+                                                           cv=3)
     except Exception as e:
         print(e)
         assert 0

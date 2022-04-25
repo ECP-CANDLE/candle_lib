@@ -9,36 +9,42 @@ from .generic_utils import Progbar
 from .modac_utils import get_file_from_modac
 
 
-def get_file(fname: str, origin: str, unpack: bool = False,
-             md5_hash: str = None, cache_subdir: str = 'common', datadir: str = None) -> str:
-    """ Downloads a file from a URL if it not already in the cache.
-        Passing the MD5 hash will verify the file after download as well
-        as if it is already present in the cache.
+def get_file(fname: str,
+             origin: str,
+             unpack: bool = False,
+             md5_hash: str = None,
+             cache_subdir: str = 'common',
+             datadir: str = None) -> str:
+    """Downloads a file from a URL if it not already in the cache. Passing the
+    MD5 hash will verify the file after download as well as if it is already
+    present in the cache.
 
-        Parameters
-        ----------
-        fname : string
-            name of the file
-        origin : string
-            original URL of the file
-        unpack : boolean
-            whether the file should be decompressed
-        md5_hash : string
-            MD5 hash of the file for verification
-        cache_subdir : string
-            directory being used as the cache
-        datadir : string
-            if set, datadir becomes its setting (which could be e.g. an absolute path) and cache_subdir no longer matters
+    Parameters
+    ----------
+    fname : string
+        name of the file
+    origin : string
+        original URL of the file
+    unpack : boolean
+        whether the file should be decompressed
+    md5_hash : string
+        MD5 hash of the file for verification
+    cache_subdir : string
+        directory being used as the cache
+    datadir : string
+        if set, datadir becomes its setting (which could be e.g. an absolute path) and cache_subdir no longer matters
 
-        Returns
-        ----------
-        string
-            Path to the downloaded file
+    Returns
+    ----------
+    string
+        Path to the downloaded file
     """
     if datadir is None and os.environ['CANDLE_DATA_DIR'] is not None:
         datadir = os.environ['CANDLE_DATA_DIR']
     elif datadir is None and os.environ['CANDLE_DATA_DIR'] is None:
-        raise ValueError('Need data directory. Either pass datadir or set CANDLE_DATA_DIR environment variable')
+        raise ValueError(
+            'Need data directory. Either pass datadir or set CANDLE_DATA_DIR environment variable'
+        )
 
     if cache_subdir is not None:
         datadir = os.path.join(datadir, cache_subdir)
@@ -66,7 +72,8 @@ def get_file(fname: str, origin: str, unpack: bool = False,
         os.makedirs(os.path.dirname(fpath))
 
     download = False
-    if os.path.exists(fpath) or (unpack_fpath is not None and os.path.exists(unpack_fpath)):
+    if os.path.exists(fpath) or (unpack_fpath is not None and
+                                 os.path.exists(unpack_fpath)):
         # file found; verify integrity if a hash was provided
         if md5_hash is not None:
             if not validate_file(fpath, md5_hash):
@@ -135,19 +142,19 @@ def get_file(fname: str, origin: str, unpack: bool = False,
 
 
 def validate_file(fpath: str, md5_hash: str) -> bool:
-    """ Validates a file against a MD5 hash
+    """Validates a file against a MD5 hash.
 
-        Parameters
-        ----------
-        fpath : string
-            path to the file being validated
-        md5_hash : string
-            the MD5 hash being validated against
+    Parameters
+    ----------
+    fpath : string
+        path to the file being validated
+    md5_hash : string
+        the MD5 hash being validated against
 
-        Returns
-        ----------
-        boolean
-            Whether the file is valid
+    Returns
+    ----------
+    boolean
+        Whether the file is valid
     """
     hasher = hashlib.md5()
     with open(fpath, 'rb') as f:
@@ -160,22 +167,23 @@ def validate_file(fpath: str, md5_hash: str) -> bool:
 
 
 def directory_from_parameters(params: Dict, commonroot: str = 'Output') -> str:
-    """ Construct output directory path with unique IDs from parameters
+    """Construct output directory path with unique IDs from parameters.
 
-        Parameters
-        ----------
-        params : python dictionary
-            Dictionary of parameters read
-        commonroot : string
-            String to specify the common folder to store results.
+    Parameters
+    ----------
+    params : python dictionary
+        Dictionary of parameters read
+    commonroot : string
+        String to specify the common folder to store results.
 
-        Returns
-        ----------
-        string
-            Path to the output directory
+    Returns
+    ----------
+    string
+        Path to the output directory
     """
 
-    if commonroot in set(['.', './']):  # Same directory --> convert to absolute path
+    if commonroot in set(['.',
+                          './']):  # Same directory --> convert to absolute path
         outdir = os.path.abspath('.')
     else:  # Create path specified
         outdir = os.path.abspath(os.path.join('.', commonroot))

@@ -1,6 +1,4 @@
-"""
-Unit and regression test for the uq_keras_utils module.
-"""
+"""Unit and regression test for the uq_keras_utils module."""
 
 import pytest
 
@@ -14,6 +12,7 @@ import candle
 
 
 class SetupTest:
+
     def __init__(self):
         # Size of data
         self.ndata = 100
@@ -179,7 +178,9 @@ def test_absadapt_callback():
     alpha0 = 0.1
 
     try:
-        candle.AbstentionAdapt_Callback(acc_monitor='val_abstention_acc', abs_monitor='val_abstention', alpha0=alpha0)
+        candle.AbstentionAdapt_Callback(acc_monitor='val_abstention_acc',
+                                        abs_monitor='val_abstention',
+                                        alpha0=alpha0)
     except Exception as e:
         print(e)
         assert 0
@@ -202,14 +203,25 @@ def test2_absadapt_callback():
     x = Dense(10, activation='relu')(inputs)
     outputs = Dense(nb_classes, activation='elu')(x)
     model = Model(inputs=inputs, outputs=outputs)
-    model = candle.add_model_output(model, mode='abstain', num_add=1, activation='sigmoid')
+    model = candle.add_model_output(model,
+                                    mode='abstain',
+                                    num_add=1,
+                                    activation='sigmoid')
 
     alpha0 = 0.1
-    cbk = candle.AbstentionAdapt_Callback(acc_monitor='val_abstention_acc', abs_monitor='val_abstention', alpha0=alpha0)
+    cbk = candle.AbstentionAdapt_Callback(acc_monitor='val_abstention_acc',
+                                          abs_monitor='val_abstention',
+                                          alpha0=alpha0)
     callbacks = [cbk]
     sgd = optimizers.SGD(lr=1e-4, decay=1e-6, momentum=0.9, nesterov=True)
     try:
-        model.compile(loss=candle.abstention_loss(cbk.alpha, mask), optimizer=sgd, metrics=['acc', candle.abstention_acc_metric(nb_classes), candle.abstention_metric(nb_classes)])
+        model.compile(loss=candle.abstention_loss(cbk.alpha, mask),
+                      optimizer=sgd,
+                      metrics=[
+                          'acc',
+                          candle.abstention_acc_metric(nb_classes),
+                          candle.abstention_metric(nb_classes)
+                      ])
 
         model.fit(xtrain, ytrain, batch_size=10, epochs=1, callbacks=callbacks)
 
@@ -239,7 +251,10 @@ def test_modify_labels():
 def test1_add_model_output(testobj):
 
     num_add = 1
-    model = candle.add_model_output(testobj.model, mode='abstain', num_add=num_add, activation='sigmoid')
+    model = candle.add_model_output(testobj.model,
+                                    mode='abstain',
+                                    num_add=num_add,
+                                    activation='sigmoid')
 
     assert model.layers[-1].output_shape[-1] == (testobj.num_ouputs + num_add)
 
@@ -261,7 +276,12 @@ def test3_add_model_output_exception(testobj):
         candle.add_model_output(testobj.model, mode="no")
 
 
-@pytest.mark.parametrize("metric", [candle.r2_heteroscedastic_metric, candle.mae_heteroscedastic_metric, candle.mse_heteroscedastic_metric, candle.meanS_heteroscedastic_metric, ])
+@pytest.mark.parametrize("metric", [
+    candle.r2_heteroscedastic_metric,
+    candle.mae_heteroscedastic_metric,
+    candle.mse_heteroscedastic_metric,
+    candle.meanS_heteroscedastic_metric,
+])
 def test_heteroscedastic_metrics(testobj, metric):
     mtcfun = metric(testobj.nout_reg)
     try:
@@ -284,7 +304,8 @@ def test_triple_qtl_loss(testobj):
     low_quantile = 0.1
     high_quantile = 0.9
 
-    qtlloss = candle.triple_quantile_loss(testobj.nout_reg, low_quantile, high_quantile)
+    qtlloss = candle.triple_quantile_loss(testobj.nout_reg, low_quantile,
+                                          high_quantile)
     try:
         qtlloss(testobj.ytrue, testobj.ypred_qtl)
     except Exception as e:
@@ -335,7 +356,8 @@ def test_contamination_loss(testobj):
     sigmaSQ = K.variable(value=0.01)
     gammaSQ = K.variable(value=0.09)
 
-    contmloss = candle.contamination_loss(testobj.nout_reg_cont, Tk, a, sigmaSQ, gammaSQ)
+    contmloss = candle.contamination_loss(testobj.nout_reg_cont, Tk, a, sigmaSQ,
+                                          gammaSQ)
     try:
         contmloss(testobj.ytrue_aug, testobj.ypred_cont)
     except Exception as e:
@@ -386,16 +408,29 @@ def test2_contamination_callback():
     callbacks = [cbk]
     sgd = optimizers.SGD(lr=1e-4, decay=1e-6, momentum=0.9, nesterov=True)
     try:
-        model.compile(loss=candle.contamination_loss(nout, cbk.T_k, cbk.a, cbk.sigmaSQ, cbk.gammaSQ), optimizer=sgd, metrics=[candle.mae_contamination_metric(nout),
-                      candle.r2_contamination_metric(nout)])
-        model.fit(xtrain, ytrain_augmented, batch_size=10, epochs=1, callbacks=callbacks)
+        model.compile(loss=candle.contamination_loss(nout, cbk.T_k, cbk.a,
+                                                     cbk.sigmaSQ, cbk.gammaSQ),
+                      optimizer=sgd,
+                      metrics=[
+                          candle.mae_contamination_metric(nout),
+                          candle.r2_contamination_metric(nout)
+                      ])
+        model.fit(xtrain,
+                  ytrain_augmented,
+                  batch_size=10,
+                  epochs=1,
+                  callbacks=callbacks)
 
     except Exception as e:
         print(e)
         assert 0
 
 
-@pytest.mark.parametrize("metric", [candle.mse_contamination_metric, candle.mae_contamination_metric, candle.r2_contamination_metric, ])
+@pytest.mark.parametrize("metric", [
+    candle.mse_contamination_metric,
+    candle.mae_contamination_metric,
+    candle.r2_contamination_metric,
+])
 def test_contamination_metrics(testobj, metric):
     mtcfun = metric(testobj.nout_reg_cont)
     try:

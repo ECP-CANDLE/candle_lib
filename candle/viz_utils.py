@@ -1,11 +1,18 @@
 from pathlib import Path
 import matplotlib as mpl
+
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_history(out, history, metric='loss', val=True, title=None, width=8, height=6):
+def plot_history(out,
+                 history,
+                 metric='loss',
+                 val=True,
+                 title=None,
+                 width=8,
+                 height=6):
     title = title or 'model {}'.format(metric)
     val_metric = 'val_{}'.format(metric)
     plt.figure(figsize=(width, height))
@@ -16,7 +23,8 @@ def plot_history(out, history, metric='loss', val=True, title=None, width=8, hei
     plt.ylabel(metric)
     plt.xlabel('epoch')
     if val:
-        plt.legend(['train_{}'.format(metric), 'val_{}'.format(metric)], loc='upper center')
+        plt.legend(['train_{}'.format(metric), 'val_{}'.format(metric)],
+                   loc='upper center')
     else:
         plt.legend(['train_{}'.format(metric)], loc='upper center')
     png = '{}.plot.{}.png'.format(out, metric)
@@ -27,14 +35,25 @@ def plot_history(out, history, metric='loss', val=True, title=None, width=8, hei
 def plot_scatter(data, classes, out, width=10, height=8):
     cmap = plt.cm.get_cmap('gist_rainbow')
     plt.figure(figsize=(width, height))
-    plt.scatter(data[:, 0], data[:, 1], c=classes, cmap=cmap, lw=0.5, edgecolor='black', alpha=0.7)
+    plt.scatter(data[:, 0],
+                data[:, 1],
+                c=classes,
+                cmap=cmap,
+                lw=0.5,
+                edgecolor='black',
+                alpha=0.7)
     plt.colorbar()
     png = '{}.png'.format(out)
     plt.savefig(png, bbox_inches='tight')
     plt.close()
 
 
-def plot_error(y_true, y_pred, batch, file_ext, file_pre='output_dir', subsample=1000):
+def plot_error(y_true,
+               y_pred,
+               batch,
+               file_ext,
+               file_pre='output_dir',
+               subsample=1000):
     if batch % 10:
         return
 
@@ -64,7 +83,9 @@ def plot_error(y_true, y_pred, batch, file_ext, file_pre='output_dir', subsample
     plt.grid('on')
     ax.scatter(y_true, y_pred, color='red', s=10)
     ax.plot([y_true.min(), y_true.max()],
-            [y_true.min(), y_true.max()], 'k--', lw=4)
+            [y_true.min(), y_true.max()],
+            'k--',
+            lw=4)
     ax.set_xlabel('Measured')
     ax.set_ylabel('Predicted')
     plt.savefig(file_pre + '.diff' + file_ext + '.b' + str(batch) + '.png')
@@ -84,13 +105,16 @@ def plot_array(nparray, xlabel, ylabel, title, fname):
 
 # UTILS for UQ / CALIBRATION VISUALIZATION
 
-
 from matplotlib.colors import LogNorm
 
 
-def plot_density_observed_vs_predicted(Ytest, Ypred, pred_name=None, figprefix=None):
-    """Functionality to plot a 2D histogram of the distribution of observed (ground truth)
-       values vs. predicted values. The plot generated is stored in a png file.
+def plot_density_observed_vs_predicted(Ytest,
+                                       Ypred,
+                                       pred_name=None,
+                                       figprefix=None):
+    """Functionality to plot a 2D histogram of the distribution of observed
+    (ground truth) values vs. predicted values. The plot generated is stored in
+    a png file.
 
     Parameters
     ----------
@@ -110,13 +134,20 @@ def plot_density_observed_vs_predicted(Ytest, Ypred, pred_name=None, figprefix=N
 
     plt.figure(figsize=(24, 18))  # (30, 16)
     ax = plt.gca()
-    plt.rc('xtick', labelsize=16)    # fontsize of the tick labels
-    ax.plot([Ytest.min(), Ytest.max()], [Ytest.min(), Ytest.max()], 'r--', lw=4.)
+    plt.rc('xtick', labelsize=16)  # fontsize of the tick labels
+    ax.plot([Ytest.min(), Ytest.max()], [Ytest.min(), Ytest.max()],
+            'r--',
+            lw=4.)
     plt.hist2d(Ytest, Ypred, bins=xbins, norm=LogNorm())
     cb = plt.colorbar()
     ax.set_xlabel('Observed ' + pred_name, fontsize=38, labelpad=15.)
     ax.set_ylabel('Mean ' + pred_name + ' Predicted', fontsize=38, labelpad=15.)
-    ax.axis([Ytest.min() * 0.98, Ytest.max() * 1.02, Ytest.min() * 0.98, Ytest.max() * 1.02])
+    ax.axis([
+        Ytest.min() * 0.98,
+        Ytest.max() * 1.02,
+        Ytest.min() * 0.98,
+        Ytest.max() * 1.02
+    ])
     plt.setp(ax.get_xticklabels(), fontsize=32)
     plt.setp(ax.get_yticklabels(), fontsize=32)
     cb.ax.set_yticklabels(cb.ax.get_yticklabels(), fontsize=28)
@@ -127,8 +158,9 @@ def plot_density_observed_vs_predicted(Ytest, Ypred, pred_name=None, figprefix=N
 
 
 def plot_2d_density_sigma_vs_error(sigma, yerror, method=None, figprefix=None):
-    """Functionality to plot a 2D histogram of the distribution of
-       the standard deviations computed for the predictions vs. the
+    """Functionality to plot a 2D histogram of the distribution of the standard
+    deviations computed for the predictions vs. the.
+
        computed errors (i.e. values of observed - predicted).
        The plot generated is stored in a png file.
 
@@ -155,9 +187,14 @@ def plot_2d_density_sigma_vs_error(sigma, yerror, method=None, figprefix=None):
     plt.rc('xtick', labelsize=16)  # fontsize of the tick labels
     plt.hist2d(sigma, yerror, bins=[xbins, ybins], norm=LogNorm())
     cb = plt.colorbar()
-    ax.set_xlabel('Standard Deviation (' + method + ')', fontsize=38, labelpad=15.)
+    ax.set_xlabel('Standard Deviation (' + method + ')',
+                  fontsize=38,
+                  labelpad=15.)
     ax.set_ylabel('Error: Observed - Mean Predicted', fontsize=38, labelpad=15.)
-    ax.axis([sigma.min() * 0.98, sigma.max() * 1.02, -yerror.max(), yerror.max()])
+    ax.axis(
+        [sigma.min() * 0.98,
+         sigma.max() * 1.02, -yerror.max(),
+         yerror.max()])
     plt.setp(ax.get_xticklabels(), fontsize=32)
     plt.setp(ax.get_yticklabels(), fontsize=32)
     cb.ax.set_yticklabels(cb.ax.get_yticklabels(), fontsize=28)
@@ -168,7 +205,8 @@ def plot_2d_density_sigma_vs_error(sigma, yerror, method=None, figprefix=None):
 
 
 def plot_histogram_error_per_sigma(sigma, yerror, method=None, figprefix=None):
-    """Functionality to plot a 1D histogram of the distribution of
+    """Functionality to plot a 1D histogram of the distribution of.
+
        computed errors (i.e. values of observed - predicted) observed
        for specific values of standard deviations computed. The range of
        standard deviations computed is split in xbins values and the
@@ -194,15 +232,20 @@ def plot_histogram_error_per_sigma(sigma, yerror, method=None, figprefix=None):
     xbins = 21
     ybins = 31
 
-    H, xedges, yedges, img = plt.hist2d(sigma, yerror,  # normed=True,
-                                        bins=[xbins, ybins])
+    H, xedges, yedges, img = plt.hist2d(
+        sigma,
+        yerror,  # normed=True,
+        bins=[xbins, ybins])
 
     plt.figure(figsize=(18, 24))
     legend = []
     for ii in range(4):  # (H.shape[0]):
         if ii != 1:
-            plt.plot(yedges[0:H.shape[1]], H[ii, :] / np.sum(H[ii, :]),
-                     marker='o', markersize=12, lw=6.)
+            plt.plot(yedges[0:H.shape[1]],
+                     H[ii, :] / np.sum(H[ii, :]),
+                     marker='o',
+                     markersize=12,
+                     lw=6.)
         legend.append(str((xedges[ii] + xedges[ii + 1]) / 2))
     plt.legend(legend, fontsize=28)
     ax = plt.gca()
@@ -217,9 +260,14 @@ def plot_histogram_error_per_sigma(sigma, yerror, method=None, figprefix=None):
     print('Generated plot: ', figprefix + '_histogram_error_per_std.png')
 
 
-def plot_decile_predictions(Ypred, Ypred_Lp, Ypred_Hp, decile_list, pred_name=None, figprefix=None):
-    """Functionality to plot the mean of the deciles predicted.
-       The plot generated is stored in a png file.
+def plot_decile_predictions(Ypred,
+                            Ypred_Lp,
+                            Ypred_Hp,
+                            decile_list,
+                            pred_name=None,
+                            figprefix=None):
+    """Functionality to plot the mean of the deciles predicted. The plot
+    generated is stored in a png file.
 
     Parameters
     ----------
@@ -257,13 +305,18 @@ def plot_decile_predictions(Ypred, Ypred_Lp, Ypred_Hp, decile_list, pred_name=No
     print('Generated plot: ', figprefix + '_decile_predictions.png')
 
 
-def plot_calibration_interpolation(mean_sigma, error, splineobj1, splineobj2, method='', figprefix=None, steps=False):
-    """Functionality to plot empirical calibration curves
-       estimated by interpolation of the computed
-       standard deviations and errors. Since the estimations
-       are very noisy, two levels of smoothing are used. Both
-       can be plotted independently, if requested.
-       The plot(s) generated is(are) stored in png file(s).
+def plot_calibration_interpolation(mean_sigma,
+                                   error,
+                                   splineobj1,
+                                   splineobj2,
+                                   method='',
+                                   figprefix=None,
+                                   steps=False):
+    """Functionality to plot empirical calibration curves estimated by
+    interpolation of the computed standard deviations and errors. Since the
+    estimations are very noisy, two levels of smoothing are used. Both can be
+    plotted independently, if requested. The plot(s) generated is(are) stored
+    in png file(s).
 
     Parameters
     ----------
@@ -310,16 +363,19 @@ def plot_calibration_interpolation(mean_sigma, error, splineobj1, splineobj2, me
         ax.plot(mean_sigma, error, 'kx')
         ax.plot(xp23, yp23_1, 'gx', ms=20)
         plt.legend(['True', 'Cubic Spline'], fontsize=28)
-        plt.xlabel('Standard Deviation Predicted (' + method + ')', fontsize=38.)
+        plt.xlabel('Standard Deviation Predicted (' + method + ')',
+                   fontsize=38.)
         plt.ylabel('Error: ABS Observed - Mean Predicted', fontsize=38.)
         plt.title('Calibration (by Interpolation)', fontsize=40)
         plt.setp(ax.get_xticklabels(), fontsize=32)
         plt.setp(ax.get_yticklabels(), fontsize=32)
         plt.grid()
         fig.tight_layout()
-        plt.savefig(figprefix + '_empirical_calibration_interp_smooth1.png', bbox_inches='tight')
+        plt.savefig(figprefix + '_empirical_calibration_interp_smooth1.png',
+                    bbox_inches='tight')
         plt.close()
-        print('Generated plot: ', figprefix + '_empirical_calibration_interp_smooth1.png')
+        print('Generated plot: ',
+              figprefix + '_empirical_calibration_interp_smooth1.png')
 
     fig = plt.figure(figsize=(24, 18))
     ax = plt.gca()
@@ -333,13 +389,22 @@ def plot_calibration_interpolation(mean_sigma, error, splineobj1, splineobj2, me
     plt.setp(ax.get_yticklabels(), fontsize=32)
     plt.grid()
     fig.tight_layout()
-    plt.savefig(figprefix + '_empirical_calibration_interpolation.png', bbox_inches='tight')
+    plt.savefig(figprefix + '_empirical_calibration_interpolation.png',
+                bbox_inches='tight')
     plt.close()
-    print('Generated plot: ', figprefix + '_empirical_calibration_interpolation.png')
+    print('Generated plot: ',
+          figprefix + '_empirical_calibration_interpolation.png')
 
 
-def plot_calibrated_std(y_test, y_pred, std_calibrated, thresC, pred_name=None, figprefix=None):
-    """Functionality to plot values in testing set after calibration. An estimation of the lower-confidence samples is made. The plot generated is stored in a png file.
+def plot_calibrated_std(y_test,
+                        y_pred,
+                        std_calibrated,
+                        thresC,
+                        pred_name=None,
+                        figprefix=None):
+    """Functionality to plot values in testing set after calibration. An
+    estimation of the lower-confidence samples is made. The plot generated is
+    stored in a png file.
 
     Parameters
     ----------
@@ -373,9 +438,11 @@ def plot_calibrated_std(y_test, y_pred, std_calibrated, thresC, pred_name=None, 
     fig = plt.figure(figsize=(24, 18))
     ax = plt.gca()
     ax.scatter(x, y_test[index], color='red', s=scale, alpha=0.5)
-    plt.fill_between(x, y_pred[index] - 1.28 * std_calibrated[index],
+    plt.fill_between(x,
+                     y_pred[index] - 1.28 * std_calibrated[index],
                      y_pred[index] + 1.28 * std_calibrated[index],
-                     color='gray', alpha=alphafill)
+                     color='gray',
+                     alpha=alphafill)
     plt.scatter(x, y_pred[index], color='orange', s=scale)
     plt.scatter(x[indexC], y_test[indexC], color='green', s=scale, alpha=0.5)
     plt.legend(['True', '1.28 Std', 'Pred', 'Low conf'], fontsize=28)
@@ -391,17 +458,21 @@ def plot_calibrated_std(y_test, y_pred, std_calibrated, thresC, pred_name=None, 
     print('Generated plot: ', figprefix + '_calibrated.png')
 
 
-def plot_contamination(y_true, y_pred, sigma, T=None, thresC=0.1, pred_name=None, figprefix=None):
-    """Functionality to plot results for the contamination model.
-       This includes the latent variables T if they are given (i.e.
-       if the results provided correspond to training results). Global
-       parameters for the normal distribution are used for shading 80%
-       confidence interval.
-       If results for training (i.e. T available), samples determined to
-       be outliers (i.e. samples whose probability of membership to the
-       heavy tailed distribution (Cauchy) is greater than the threshold
-       given) are highlighted.
-       The plot(s) generated is(are) stored in a png file.
+def plot_contamination(y_true,
+                       y_pred,
+                       sigma,
+                       T=None,
+                       thresC=0.1,
+                       pred_name=None,
+                       figprefix=None):
+    """Functionality to plot results for the contamination model. This includes
+    the latent variables T if they are given (i.e. if the results provided
+    correspond to training results). Global parameters for the normal
+    distribution are used for shading 80% confidence interval. If results for
+    training (i.e. T available), samples determined to be outliers (i.e.
+    samples whose probability of membership to the heavy tailed distribution
+    (Cauchy) is greater than the threshold given) are highlighted. The plot(s)
+    generated is(are) stored in a png file.
 
     Parameters
     ----------
@@ -447,7 +518,8 @@ def plot_contamination(y_true, y_pred, sigma, T=None, thresC=0.1, pred_name=None
     ax = plt.gca()
     ax.scatter(x, y_true[index], color='red', s=scale)
     if T is not None:
-        plt.scatter(x[indexC], y_true[indexC], color='green', s=scale)  # , alpha=0.8)
+        plt.scatter(x[indexC], y_true[indexC], color='green',
+                    s=scale)  # , alpha=0.8)
     plt.scatter(x, y_pred[index], color='orange', s=scale)
     plt.fill_between(x, auxGl[index], auxGh[index], color='gray', alpha=0.5)
     if T is not None:
@@ -487,7 +559,8 @@ def plot_contamination(y_true, y_pred, sigma, T=None, thresC=0.1, pred_name=None
 
 # plot training and validation metrics together and generate one chart per metrics
 def plot_metrics(history, title=None, skip_ep=0, outdir='.', add_lr=False):
-    """ Plots keras training curves history.
+    """Plots keras training curves history.
+
     Args:
         skip_ep: number of epochs to skip when plotting metrics
         add_lr: add curve of learning rate progression over epochs
@@ -521,8 +594,22 @@ def plot_metrics(history, title=None, skip_ep=0, outdir='.', add_lr=False):
         fig, ax1 = plt.subplots()
 
         # Plot metrics
-        ax1.plot(eps, y_tr, color='b', marker='.', linestyle='-', linewidth=1, alpha=0.6, label=capitalize_metric(metric_name))
-        ax1.plot(eps, y_vl, color='r', marker='.', linestyle='--', linewidth=1, alpha=0.6, label=capitalize_metric(metric_name_val))
+        ax1.plot(eps,
+                 y_tr,
+                 color='b',
+                 marker='.',
+                 linestyle='-',
+                 linewidth=1,
+                 alpha=0.6,
+                 label=capitalize_metric(metric_name))
+        ax1.plot(eps,
+                 y_vl,
+                 color='r',
+                 marker='.',
+                 linestyle='--',
+                 linewidth=1,
+                 alpha=0.6,
+                 label=capitalize_metric(metric_name_val))
         ax1.set_xlabel('Epoch')
         ax1.set_ylabel(capitalize_metric(metric_name))
         ax1.set_xlim([min(eps) - 1, max(eps) + 1])
@@ -532,8 +619,15 @@ def plot_metrics(history, title=None, skip_ep=0, outdir='.', add_lr=False):
         # Add learning rate
         if (add_lr is True) and ('lr' in hh):
             ax2 = ax1.twinx()
-            ax2.plot(eps, hh['lr'][skip_ep:], color='g', marker='.', linestyle=':', linewidth=1,
-                     alpha=0.6, markersize=5, label='LR')
+            ax2.plot(eps,
+                     hh['lr'][skip_ep:],
+                     color='g',
+                     marker='.',
+                     linestyle=':',
+                     linewidth=1,
+                     alpha=0.6,
+                     markersize=5,
+                     label='LR')
             ax2.set_ylabel('Learning rate', color='g', fontsize=12)
 
             ax2.set_yscale('log')

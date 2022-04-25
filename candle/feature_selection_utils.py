@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 
 
 def select_features_by_missing_values(data, threshold=0.1):
-    '''
-    This function returns the indices of the features whose missing rates are smaller than the threshold.
+    """This function returns the indices of the features whose missing rates
+    are smaller than the threshold.
 
     Parameters:
     -----------
@@ -18,7 +18,7 @@ def select_features_by_missing_values(data, threshold=0.1):
     Returns:
     --------
     indices: 1-D numpy array containing the indices of selected features
-    '''
+    """
 
     if isinstance(data, pd.DataFrame):
         data = data.values
@@ -34,11 +34,16 @@ def select_features_by_missing_values(data, threshold=0.1):
     return indices
 
 
-def select_features_by_variation(data, variation_measure='var', threshold=None, portion=None, draw_histogram=False,
-                                 bins=100, log=False):
-    '''
-    This function evaluates the variations of individual features and returns the indices of features with large
-    variations. Missing values are ignored in evaluating variation.
+def select_features_by_variation(data,
+                                 variation_measure='var',
+                                 threshold=None,
+                                 portion=None,
+                                 draw_histogram=False,
+                                 bins=100,
+                                 log=False):
+    """This function evaluates the variations of individual features and
+    returns the indices of features with large variations. Missing values are
+    ignored in evaluating variation.
 
     Parameters:
     -----------
@@ -60,7 +65,7 @@ def select_features_by_variation(data, variation_measure='var', threshold=None, 
     --------
     indices: 1-D numpy array containing the indices of selected features. If both threshold and
         portion are None, indices will be an empty array.
-    '''
+    """
 
     if isinstance(data, pd.DataFrame):
         data = data.values
@@ -80,7 +85,9 @@ def select_features_by_variation(data, variation_measure='var', threshold=None, 
 
     if draw_histogram:
         if len(v) < 50:
-            print('There must be at least 50 features with variation measures to draw a histogram')
+            print(
+                'There must be at least 50 features with variation measures to draw a histogram'
+            )
         else:
             bins = int(min(bins, len(v)))
             _ = plt.hist(v, bins=bins, log=log)
@@ -89,7 +96,9 @@ def select_features_by_variation(data, variation_measure='var', threshold=None, 
     if threshold is None and portion is None:
         return np.array([])
     elif threshold is not None and portion is not None:
-        print('threshold and portion can not be used simultaneously. Only one of them can take a real value')
+        print(
+            'threshold and portion can not be used simultaneously. Only one of them can take a real value'
+        )
         sys.exit(1)
 
     if threshold is not None:
@@ -103,12 +112,16 @@ def select_features_by_variation(data, variation_measure='var', threshold=None, 
     return indices
 
 
-def select_decorrelated_features(data, method='pearson', threshold=None, random_seed=None):
-    '''
-    This function selects features whose mutual absolute correlation coefficients are smaller than a threshold.
-    It allows missing values in data. The correlation coefficient of two features are calculated based on
-    the observations that are not missing in both features. Features with only one or no value present and
-    features with a zero standard deviation are not considered for selection.
+def select_decorrelated_features(data,
+                                 method='pearson',
+                                 threshold=None,
+                                 random_seed=None):
+    """This function selects features whose mutual absolute correlation
+    coefficients are smaller than a threshold. It allows missing values in
+    data. The correlation coefficient of two features are calculated based on
+    the observations that are not missing in both features. Features with only
+    one or no value present and features with a zero standard deviation are not
+    considered for selection.
 
     Parameters:
     -----------
@@ -125,7 +138,7 @@ def select_decorrelated_features(data, method='pearson', threshold=None, random_
     Returns:
     --------
     indices: 1-D numpy array containing the indices of selected features.
-    '''
+    """
 
     if isinstance(data, np.ndarray):
         data = pd.DataFrame(data)
@@ -134,7 +147,8 @@ def select_decorrelated_features(data, method='pearson', threshold=None, random_
         sys.exit(1)
 
     present = np.where(np.sum(np.invert(pd.isna(data)), axis=0) > 1)[0]
-    present = present[np.where(np.nanstd(data.iloc[:, present].values, axis=0) > 0)[0]]
+    present = present[np.where(
+        np.nanstd(data.iloc[:, present].values, axis=0) > 0)[0]]
 
     data = data.iloc[:, present]
 
@@ -162,9 +176,15 @@ def select_decorrelated_features(data, method='pearson', threshold=None, random_
         idi = idi[np.where(rm[idi] == False)[0]]  # noqa: E712
         if len(idi) > 0:
             if threshold is None:
-                idi = idi[np.where(np.sum(np.isnan(data[:, idi]) ^ np.isnan(data[:, index][:, np.newaxis]), axis=0) == 0)[0]]
+                idi = idi[np.where(
+                    np.sum(np.isnan(data[:, idi]) ^
+                           np.isnan(data[:, index][:, np.newaxis]),
+                           axis=0) == 0)[0]]
                 if len(idi) > 0:
-                    idi = idi[np.where(np.nansum(abs(data[:, idi] - data[:, index][:, np.newaxis]), axis=0) == 0)[0]]
+                    idi = idi[np.where(
+                        np.nansum(abs(data[:, idi] -
+                                      data[:, index][:, np.newaxis]),
+                                  axis=0) == 0)[0]]
             else:
                 idi = idi[np.where(abs(cor[index, idi]) >= threshold)[0]]
             if len(idi) > 0:

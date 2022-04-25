@@ -7,7 +7,9 @@ setup(name='candle',
       description='CANDLE lib pip installable package',
       author='Harry Yoo',
       author_email='hsyoo@anl.gov',
-      packages=find_packages(include=['candle', 'candle.*'], exclude=['*.tests', '*.tests.*', 'tests.*', 'tests']),
+      packages=find_packages(
+          include=['candle', 'candle.*'],
+          exclude=['*.tests', '*.tests.*', 'tests.*', 'tests']),
       license='LICENSE.txt',
       install_requires=[
           'numpy',
@@ -22,5 +24,4 @@ setup(name='candle',
           'statsmodels',
       ],
       setup_requires=['pytest-runner', 'flake8'],
-      tests_requires=['pytest']
-      )
+      tests_requires=['pytest'])
