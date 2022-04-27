@@ -1,9 +1,10 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 
-# Don't run pre-commit on files under third-party/
+# Don't run pre-commit on files under build/ - currently happens by default
+# delete and uncomment if needed
 #exclude: "^\
-#  (third-party/.*)\
+#  (build/.*)\
 #  "
 
 repos:
