@@ -1,8 +1,9 @@
 import sys
-import pandas as pd
-import numpy as np
-from scipy import stats
 from collections import Counter
+
+import numpy as np
+import pandas as pd
+from scipy import stats
 
 
 def quantile_normalization(data):
@@ -28,7 +29,7 @@ def quantile_normalization(data):
         rownames = data.index
         data = data.values
     elif not isinstance(data, np.ndarray):
-        print('Input data must be a numpy array or pandas data frame')
+        print("Input data must be a numpy array or pandas data frame")
         sys.exit(1)
 
     norm_data = data.copy()
@@ -39,9 +40,9 @@ def quantile_normalization(data):
             idi_nan = np.where(np.isnan(norm_data[i, :]))[0]
             if len(idi_nan) > 0:
                 idi = np.setdiff1d(range(n_features), idi_nan)
-                norm_data[i, idi_nan] = np.random.choice(norm_data[i, idi],
-                                                         size=len(idi_nan),
-                                                         replace=True)
+                norm_data[i, idi_nan] = np.random.choice(
+                    norm_data[i, idi], size=len(idi_nan), replace=True
+                )
 
     quantiles = np.mean(np.sort(norm_data, axis=1), axis=0)
     ranks = np.apply_along_axis(stats.rankdata, 1, norm_data)
@@ -58,11 +59,9 @@ def quantile_normalization(data):
     return norm_data
 
 
-def generate_cross_validation_partition(group_label,
-                                        n_folds=5,
-                                        n_repeats=1,
-                                        portions=None,
-                                        random_seed=None):
+def generate_cross_validation_partition(
+    group_label, n_folds=5, n_repeats=1, portions=None, random_seed=None
+):
     """This function generates partition indices of samples for cross-
     validation analysis.
 
@@ -89,19 +88,18 @@ def generate_cross_validation_partition(group_label,
     n_group = len(unique_label)
     if n_group < n_folds:
         print(
-            'The number of groups in labels can not be smaller than the number of folds.'
+            "The number of groups in labels can not be smaller than the number of folds."
         )
         sys.exit(1)
     sorted_label = np.array(
-        sorted(unique_label, key=lambda x: group_counter[x], reverse=True))
+        sorted(unique_label, key=lambda x: group_counter[x], reverse=True)
+    )
 
     if portions is None:
         portions = [1, n_folds - 1]
     else:
         if np.sum(portions) != n_folds:
-            print(
-                'The summation of elements in portions must be equal to n_folds'
-            )
+            print("The summation of elements in portions must be equal to n_folds")
             sys.exit(1)
 
     if random_seed is not None:

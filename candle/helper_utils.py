@@ -1,19 +1,17 @@
-import os
-import sys
-import logging
 import argparse
+import logging
+import os
 import random
-import numpy as np
-from typing import Dict, List
+import sys
 from logging import Logger
+from typing import Dict, List
+
+import numpy as np
 
 from .file_utils import get_file
 
 
-def fetch_file(link: str,
-               subdir: str,
-               unpack: bool = False,
-               md5_hash: str = None):
+def fetch_file(link: str, subdir: str, unpack: bool = False, md5_hash: str = None):
     """Convert URL to file path and download the file if it is not already
     present in spedified cache.
 
@@ -38,11 +36,9 @@ def fetch_file(link: str,
     """
 
     fname = os.path.basename(link)
-    return get_file(fname,
-                    origin=link,
-                    unpack=unpack,
-                    md5_hash=md5_hash,
-                    cache_subdir=subdir)
+    return get_file(
+        fname, origin=link, unpack=unpack, md5_hash=md5_hash, cache_subdir=subdir
+    )
 
 
 def verify_path(path: str) -> None:
@@ -60,11 +56,13 @@ def verify_path(path: str) -> None:
         os.makedirs(folder)
 
 
-def set_up_logger(logfile: str,
-                  logger: Logger,
-                  verbose: bool = False,
-                  fmt_line: str = "[%(asctime)s %(process)d] %(message)s",
-                  fmt_date: str = "%Y-%m-%d %H:%M:%S") -> None:
+def set_up_logger(
+    logfile: str,
+    logger: Logger,
+    verbose: bool = False,
+    fmt_line: str = "[%(asctime)s %(process)d] %(message)s",
+    fmt_date: str = "%Y-%m-%d %H:%M:%S",
+) -> None:
     """Set up the event logging system. Two handlers are created. One to send
     log records to a specified file and one to send log records to the
     (defaulf) sys.stderr stream. The logger and the file handler are set to
@@ -88,7 +86,7 @@ def set_up_logger(logfile: str,
     fh.setLevel(logging.DEBUG)
 
     sh = logging.StreamHandler(sys.stdout)
-    sh.setFormatter(logging.Formatter(''))
+    sh.setFormatter(logging.Formatter(""))
     sh.setLevel(logging.DEBUG if verbose else logging.INFO)
 
     logger.setLevel(logging.DEBUG)
@@ -134,8 +132,9 @@ def eval_string_as_list(str_read: str, separator: str, dtype) -> List:
     return decoded_list
 
 
-def eval_string_as_list_of_lists(str_read: str, separator_out: str,
-                                 separator_in: str, dtype) -> List:
+def eval_string_as_list_of_lists(
+    str_read: str, separator_out: str, separator_in: str, dtype
+) -> List:
     """Parse a string and convert it into a list of lists.
 
     Parameters
@@ -195,12 +194,12 @@ def str2bool(v: str) -> bool:
     Strings recognized as boolean False :
         'no', 'false', 'f', 'n', '0' and uppercase versions (where applicable).
     """
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+    if v.lower() in ("yes", "true", "t", "y", "1"):
         return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+    elif v.lower() in ("no", "false", "f", "n", "0"):
         return False
     else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
+        raise argparse.ArgumentTypeError("Boolean value expected.")
 
 
 def keras_default_config() -> Dict:
@@ -215,29 +214,36 @@ def keras_default_config() -> Dict:
     # Optimizers
     # kerasDefaults['clipnorm']=?               # Maximum norm to clip all parameter gradients
     # kerasDefaults['clipvalue']=?              # Maximum (minimum=-max) value to clip all parameter gradients
-    kerasDefaults['decay_lr'] = 0.  # Learning rate decay over each update
+    kerasDefaults["decay_lr"] = 0.0  # Learning rate decay over each update
+    kerasDefaults["epsilon"] = 1e-8  # Factor to avoid divide by zero (fuzz factor)
     kerasDefaults[
-        'epsilon'] = 1e-8  # Factor to avoid divide by zero (fuzz factor)
+        "rho"
+    ] = 0.9  # Decay parameter in some optmizer updates (rmsprop, adadelta)
     kerasDefaults[
-        'rho'] = 0.9  # Decay parameter in some optmizer updates (rmsprop, adadelta)
+        "momentum_sgd"
+    ] = 0.0  # Momentum for parameter update in sgd optimizer
     kerasDefaults[
-        'momentum_sgd'] = 0.  # Momentum for parameter update in sgd optimizer
+        "nesterov_sgd"
+    ] = False  # Whether to apply Nesterov momentum in sgd optimizer
     kerasDefaults[
-        'nesterov_sgd'] = False  # Whether to apply Nesterov momentum in sgd optimizer
+        "beta_1"
+    ] = 0.9  # Parameter in some optmizer updates (adam, adamax, nadam)
     kerasDefaults[
-        'beta_1'] = 0.9  # Parameter in some optmizer updates (adam, adamax, nadam)
-    kerasDefaults[
-        'beta_2'] = 0.999  # Parameter in some optmizer updates (adam, adamax, nadam)
-    kerasDefaults['decay_schedule_lr'] = 0.004  # Parameter for nadam optmizer
+        "beta_2"
+    ] = 0.999  # Parameter in some optmizer updates (adam, adamax, nadam)
+    kerasDefaults["decay_schedule_lr"] = 0.004  # Parameter for nadam optmizer
 
     # Initializers
     kerasDefaults[
-        'minval_uniform'] = -0.05  # Lower bound of the range of random values to generate
+        "minval_uniform"
+    ] = -0.05  # Lower bound of the range of random values to generate
     kerasDefaults[
-        'maxval_uniform'] = 0.05  # Upper bound of the range of random values to generate
-    kerasDefaults['mean_normal'] = 0.  # Mean of the random values to generate
+        "maxval_uniform"
+    ] = 0.05  # Upper bound of the range of random values to generate
+    kerasDefaults["mean_normal"] = 0.0  # Mean of the random values to generate
     kerasDefaults[
-        'stddev_normal'] = 0.05  # Standard deviation of the random values to generate
+        "stddev_normal"
+    ] = 0.05  # Standard deviation of the random values to generate
 
     return kerasDefaults
 
@@ -250,7 +256,7 @@ def set_seed(seed):
     seed : int
         Value to intialize or re-seed the generator.
     """
-    os.environ['PYTHONHASHSEED'] = '0'
+    os.environ["PYTHONHASHSEED"] = "0"
     np.random.seed(seed)
 
     random.seed(seed)

@@ -1,16 +1,15 @@
 from __future__ import absolute_import
 
-import numpy as np
-from typing import Any, List, Tuple, Type
-from pandas import DataFrame
-from scipy.stats import pearsonr
-from scipy import signal
-from scipy import interpolate
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-import warnings
-
 import sys
+import warnings
+from typing import Any, List, Tuple, Type
+
+import numpy as np
+from pandas import DataFrame
+from scipy import interpolate, signal
+from scipy.stats import pearsonr
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
 
 if sys.version_info >= (3, 8):
     from typing import TypedDict  # pylint: disable=no-name-in-module
@@ -23,6 +22,7 @@ Array = Type[np.ndarray]
 class UQDistDict(TypedDict):
     """Definition of the dictionary structure expected for the parsing of UQ
     parameters for generating distributions."""
+
     uq_train_fr: float
     uq_valid_fr: float
     uq_test_fr: float
@@ -34,8 +34,9 @@ class UQDistDict(TypedDict):
     uq_test_bks: int
 
 
-def generate_index_distribution(numTrain: int, numTest: int, numValidation: int,
-                                params: UQDistDict) -> Tuple[Any, ...]:
+def generate_index_distribution(
+    numTrain: int, numTest: int, numValidation: int, params: UQDistDict
+) -> Tuple[Any, ...]:
     """Generates a vector of indices to partition the data for training. NO
     CHECKING IS DONE: it is assumed that the data could be partitioned in the
     specified blocks and that the block indices describe a coherent partition.
@@ -63,35 +64,34 @@ def generate_index_distribution(numTrain: int, numTest: int, numValidation: int,
     indexTest : int numpy array
         Indices for data in testing (if merging)
     """
-    if all(k in params for k in ('uq_train_fr', 'uq_valid_fr', 'uq_test_fr')):
+    if all(k in params for k in ("uq_train_fr", "uq_valid_fr", "uq_test_fr")):
         # specification by fraction
         print("Computing UQ cross-validation - Distributing by FRACTION")
         return generate_index_distribution_from_fraction(
-            numTrain, numTest, numValidation, params)
-    elif all(k in params
-             for k in ('uq_train_vec', 'uq_valid_vec', 'uq_test_vec')):
+            numTrain, numTest, numValidation, params
+        )
+    elif all(k in params for k in ("uq_train_vec", "uq_valid_vec", "uq_test_vec")):
         # specification by block list
         print("Computing UQ cross-validation - Distributing by BLOCK LIST")
         return generate_index_distribution_from_block_list(
-            numTrain, numTest, numValidation, params)
-    elif all(k in params
-             for k in ('uq_train_bks', 'uq_valid_bks', 'uq_test_bks')):
+            numTrain, numTest, numValidation, params
+        )
+    elif all(k in params for k in ("uq_train_bks", "uq_valid_bks", "uq_test_bks")):
         # specification by block size
         print("Computing UQ cross-validation - Distributing by BLOCK NUMBER")
-        return generate_index_distribution_from_blocks(numTrain, numTest,
-                                                       numValidation, params)
-    else:
-        print(
-            "ERROR !! No consistent UQ parameter specification found !! ... exiting "
+        return generate_index_distribution_from_blocks(
+            numTrain, numTest, numValidation, params
         )
+    else:
+        print("ERROR !! No consistent UQ parameter specification found !! ... exiting ")
         raise KeyError(
             "No valid triplet of ('uq_train_*', 'uq_valid_*', 'uq_test_*') found. (* is any of fr, vec or bks)"
         )
 
 
 def generate_index_distribution_from_fraction(
-        numTrain: int, numTest: int, numValidation: int,
-        params: UQDistDict) -> Tuple[Any, ...]:
+    numTrain: int, numTest: int, numValidation: int, params: UQDistDict
+) -> Tuple[Any, ...]:
     """Generates a vector of indices to partition the data for training. It
     checks that the fractions provided are (0, 1) and add up to 1.
 
@@ -120,26 +120,30 @@ def generate_index_distribution_from_fraction(
     tol = 1e-7
 
     # Extract required parameters
-    fractionTrain = params['uq_train_fr']
-    fractionValidation = params['uq_valid_fr']
-    fractionTest = params['uq_test_fr']
+    fractionTrain = params["uq_train_fr"]
+    fractionValidation = params["uq_valid_fr"]
+    fractionTest = params["uq_test_fr"]
 
-    if (fractionTrain < 0.) or (fractionTrain > 1.):
-        raise ValueError('uq_train_fr is not in (0, 1) range. uq_train_fr: ',
-                         fractionTrain)
-    if (fractionValidation < 0.) or (fractionValidation > 1.):
-        raise ValueError('uq_valid_fr is not in (0, 1) range. uq_valid_fr: ',
-                         fractionValidation)
-    if (fractionTest < 0.) or (fractionTest > 1.):
-        raise ValueError('uq_test_fr is not in (0, 1) range. uq_test_fr: ',
-                         fractionTest)
+    if (fractionTrain < 0.0) or (fractionTrain > 1.0):
+        raise ValueError(
+            "uq_train_fr is not in (0, 1) range. uq_train_fr: ", fractionTrain
+        )
+    if (fractionValidation < 0.0) or (fractionValidation > 1.0):
+        raise ValueError(
+            "uq_valid_fr is not in (0, 1) range. uq_valid_fr: ", fractionValidation
+        )
+    if (fractionTest < 0.0) or (fractionTest > 1.0):
+        raise ValueError(
+            "uq_test_fr is not in (0, 1) range. uq_test_fr: ", fractionTest
+        )
 
     fractionSum = fractionTrain + fractionValidation + fractionTest
     # if (fractionSum > 1.) or (fractionSum < 1.):
-    if abs(fractionSum - 1.) > tol:
+    if abs(fractionSum - 1.0) > tol:
         raise ValueError(
-            'Specified UQ fractions (uq_train_fr, uq_valid_fr, uq_test_fr) do not add up to 1. No cross-validation partition is computed ! sum:',
-            fractionSum)
+            "Specified UQ fractions (uq_train_fr, uq_valid_fr, uq_test_fr) do not add up to 1. No cross-validation partition is computed ! sum:",
+            fractionSum,
+        )
 
     # Determine data size and block size
     if fractionTest > 0:
@@ -160,18 +164,18 @@ def generate_index_distribution_from_fraction(
     # Fill validation partition
     indexValidation = None
     if fractionValidation > 0:
-        indexValidation = Folds[sizeTraining:sizeTraining + sizeValidation]
+        indexValidation = Folds[sizeTraining : sizeTraining + sizeValidation]
     # Fill test partition
     indexTest = None
     if fractionTest > 0:
-        indexTest = Folds[sizeTraining + sizeValidation:]
+        indexTest = Folds[sizeTraining + sizeValidation :]
 
     return indexTrain, indexValidation, indexTest
 
 
 def generate_index_distribution_from_blocks(
-        numTrain: int, numTest: int, numValidation: int,
-        params: UQDistDict) -> Tuple[Any, ...]:
+    numTrain: int, numTest: int, numValidation: int, params: UQDistDict
+) -> Tuple[Any, ...]:
     """Generates a vector of indices to partition the data for training. NO
     CHECKING IS DONE: it is assumed that the data could be partitioned in the
     specified block quantities and that the block quantities describe a
@@ -200,9 +204,9 @@ def generate_index_distribution_from_blocks(
     """
 
     # Extract required parameters
-    numBlocksTrain = params['uq_train_bks']
-    numBlocksValidation = params['uq_valid_bks']
-    numBlocksTest = params['uq_test_bks']
+    numBlocksTrain = params["uq_train_bks"]
+    numBlocksValidation = params["uq_valid_bks"]
+    numBlocksTest = params["uq_test_bks"]
     numBlocksTotal = numBlocksTrain + numBlocksValidation + numBlocksTest
 
     # Determine data size and block size
@@ -213,8 +217,9 @@ def generate_index_distribution_from_blocks(
         # Preserve test partition
         numData = numTrain + numValidation
 
-    blockSize = (numData + numBlocksTotal //
-                 2) // numBlocksTotal  # integer division with rounding
+    blockSize = (
+        numData + numBlocksTotal // 2
+    ) // numBlocksTotal  # integer division with rounding
     remainder = numData - blockSize * numBlocksTotal
     if remainder != 0:
         print(
@@ -233,18 +238,18 @@ def generate_index_distribution_from_blocks(
     # Fill validation partition
     indexValidation = None
     if numBlocksValidation > 0:
-        indexValidation = Folds[sizeTraining:sizeTraining + sizeValidation]
+        indexValidation = Folds[sizeTraining : sizeTraining + sizeValidation]
     # Fill test partition
     indexTest = None
     if numBlocksTest > 0:
-        indexTest = Folds[sizeTraining + sizeValidation:]
+        indexTest = Folds[sizeTraining + sizeValidation :]
 
     return indexTrain, indexValidation, indexTest
 
 
 def generate_index_distribution_from_block_list(
-        numTrain: int, numTest: int, numValidation: int,
-        params: UQDistDict) -> Tuple[Any, ...]:
+    numTrain: int, numTest: int, numValidation: int, params: UQDistDict
+) -> Tuple[Any, ...]:
     """Generates a vector of indices to partition the data for training. NO
     CHECKING IS DONE: it is assumed that the data could be partitioned in the
     specified list of blocks and that the block indices describe a coherent
@@ -273,9 +278,9 @@ def generate_index_distribution_from_block_list(
     """
 
     # Extract required parameters
-    blocksTrain = params['uq_train_vec']
-    blocksValidation = params['uq_valid_vec']
-    blocksTest = params['uq_test_vec']
+    blocksTrain = params["uq_train_vec"]
+    blocksValidation = params["uq_valid_vec"]
+    blocksTest = params["uq_test_vec"]
 
     # Determine data size and block size
     numBlocksTrain = len(blocksTrain)
@@ -290,39 +295,45 @@ def generate_index_distribution_from_block_list(
         # Preserve test partition
         numData = numTrain + numValidation
 
-    blockSize = (numData + numBlocksTotal //
-                 2) // numBlocksTotal  # integer division with rounding
+    blockSize = (
+        numData + numBlocksTotal // 2
+    ) // numBlocksTotal  # integer division with rounding
     remainder = numData - blockSize * numBlocksTotal
     if remainder != 0:
         print(
             "Warning ! Requested partition does not distribute data evenly between blocks. "
-            "Last block will have different size.")
+            "Last block will have different size."
+        )
     if remainder < 0:
         remainder = 0
 
     # Fill partition indices
     # Fill train partition
     maxSizeTrain = blockSize * numBlocksTrain + remainder
-    indexTrain = fill_array(blocksTrain, maxSizeTrain, numData, numBlocksTotal,
-                            blockSize)
+    indexTrain = fill_array(
+        blocksTrain, maxSizeTrain, numData, numBlocksTotal, blockSize
+    )
     # Fill validation partition
     indexValidation = None
     if numBlocksValidation > 0:
         maxSizeValidation = blockSize * numBlocksValidation + remainder
-        indexValidation = fill_array(blocksValidation, maxSizeValidation,
-                                     numData, numBlocksTotal, blockSize)
+        indexValidation = fill_array(
+            blocksValidation, maxSizeValidation, numData, numBlocksTotal, blockSize
+        )
     # Fill test partition
     indexTest = None
     if numBlocksTest > 0:
         maxSizeTest = blockSize * numBlocksTest + remainder
-        indexTest = fill_array(blocksTest, maxSizeTest, numData, numBlocksTotal,
-                               blockSize)
+        indexTest = fill_array(
+            blocksTest, maxSizeTest, numData, numBlocksTotal, blockSize
+        )
 
     return indexTrain, indexValidation, indexTest
 
 
-def compute_limits(numdata: int, numblocks: int, blocksize: int,
-                   blockn: int) -> Tuple[int, ...]:
+def compute_limits(
+    numdata: int, numblocks: int, blocksize: int, blockn: int
+) -> Tuple[int, ...]:
     """Generates the limit of indices corresponding to a specific block. It
     takes into account the non-exact divisibility of numdata into numblocks
     letting the last block to take the extra chunk.
@@ -353,8 +364,9 @@ def compute_limits(numdata: int, numblocks: int, blocksize: int,
     return start, end
 
 
-def fill_array(blocklist: List[int], maxsize: int, numdata: int, numblocks: int,
-               blocksize: int) -> Array:
+def fill_array(
+    blocklist: List[int], maxsize: int, numdata: int, numblocks: int, blocksize: int
+) -> Array:
     """Fills a new array of integers with the indices corresponding to the
     specified block structure.
 
@@ -386,7 +398,7 @@ def fill_array(blocklist: List[int], maxsize: int, numdata: int, numblocks: int,
     for i in blocklist:
         start, end = compute_limits(numdata, numblocks, blocksize, i)
         length = end - start
-        indexArray[offset:offset + length] = np.arange(start, end)
+        indexArray[offset : offset + length] = np.arange(start, end)
         offset += length
 
     return indexArray[:offset]
@@ -451,24 +463,23 @@ def compute_statistics_homoscedastic_summary(
     yerror = Ytrue - Ypred_mean
     sigma = Ypred_std  # std
     MSE = mean_squared_error(Ytrue, Ypred_mean)
-    print('MSE: ', MSE)
-    MSE_STD = np.std((Ytrue - Ypred_mean)**2)
-    print('MSE_STD: ', MSE_STD)
+    print("MSE: ", MSE)
+    MSE_STD = np.std((Ytrue - Ypred_mean) ** 2)
+    print("MSE_STD: ", MSE_STD)
     MAE = mean_absolute_error(Ytrue, Ypred_mean)
-    print('MAE: ', MAE)
+    print("MAE: ", MAE)
     r2 = r2_score(Ytrue, Ypred_mean)
-    print('R2: ', r2)
+    print("R2: ", r2)
     # p-value 'not entirely reliable, reasonable for datasets > 500'
     pearson_cc, pval = pearsonr(Ytrue, Ypred_mean)
-    print('Pearson CC: %f, p-value: %e' % (pearson_cc, pval))
+    print("Pearson CC: %f, p-value: %e" % (pearson_cc, pval))
 
     return Ytrue, Ypred_mean, yerror, sigma, Ypred_std, pred_name
 
 
 def compute_statistics_homoscedastic(
-        df_data: DataFrame,
-        col_true: int = 4,
-        col_pred_start: int = 6) -> Tuple[Array, ...]:
+    df_data: DataFrame, col_true: int = 4, col_pred_start: int = 6
+) -> Tuple[Array, ...]:
     """Extracts ground truth, mean prediction, error and standard deviation of
     prediction from inference data frame. The latter includes all the
     individual inference realizations.
@@ -518,16 +529,16 @@ def compute_statistics_homoscedastic(
     yerror = Ytrue - Ypred_mean
     sigma = Ypred_std  # std
     MSE = mean_squared_error(Ytrue, Ypred_mean)
-    print('MSE: ', MSE)
-    MSE_STD = np.std((Ytrue - Ypred_mean)**2)
-    print('MSE_STD: ', MSE_STD)
+    print("MSE: ", MSE)
+    MSE_STD = np.std((Ytrue - Ypred_mean) ** 2)
+    print("MSE_STD: ", MSE_STD)
     MAE = mean_absolute_error(Ytrue, Ypred_mean)
-    print('MAE: ', MAE)
+    print("MAE: ", MAE)
     r2 = r2_score(Ytrue, Ypred_mean)
-    print('R2: ', r2)
+    print("R2: ", r2)
     # p-value 'not entirely reliable, reasonable for datasets > 500'
     pearson_cc, pval = pearsonr(Ytrue, Ypred_mean)
-    print('Pearson CC: %f, p-value: %e' % (pearson_cc, pval))
+    print("Pearson CC: %f, p-value: %e" % (pearson_cc, pval))
 
     return Ytrue, Ypred_mean, yerror, sigma, Ypred_std, pred_name
 
@@ -595,24 +606,26 @@ def compute_statistics_heteroscedastic(
     var = np.exp(s_mean.values)  # variance
     sigma = np.sqrt(var)  # std
     MSE = mean_squared_error(Ytrue, Ypred_mean)
-    print('MSE: ', MSE)
-    MSE_STD = np.std((Ytrue - Ypred_mean)**2)
-    print('MSE_STD: ', MSE_STD)
+    print("MSE: ", MSE)
+    MSE_STD = np.std((Ytrue - Ypred_mean) ** 2)
+    print("MSE_STD: ", MSE_STD)
     MAE = mean_absolute_error(Ytrue, Ypred_mean)
-    print('MAE: ', MAE)
+    print("MAE: ", MAE)
     r2 = r2_score(Ytrue, Ypred_mean)
-    print('R2: ', r2)
+    print("R2: ", r2)
     # p-value 'not entirely reliable, reasonable for datasets > 500'
     pearson_cc, pval = pearsonr(Ytrue, Ypred_mean)
-    print('Pearson CC: %f, p-value: %e' % (pearson_cc, pval))
+    print("Pearson CC: %f, p-value: %e" % (pearson_cc, pval))
 
     return Ytrue, Ypred_mean, yerror, sigma, Ypred_std, pred_name
 
 
-def compute_statistics_quantile(df_data: DataFrame,
-                                sigma_divisor: float = 2.56,
-                                col_true: int = 4,
-                                col_pred_start: int = 6) -> Tuple[Array, ...]:
+def compute_statistics_quantile(
+    df_data: DataFrame,
+    sigma_divisor: float = 2.56,
+    col_true: int = 4,
+    col_pred_start: int = 6,
+) -> Tuple[Array, ...]:
     """Extracts ground truth, 50th percentile mean prediction, low percentile
     and high percentile mean prediction (usually 1st decile and 9th decile
     respectively), error (using 5th decile), standard deviation of prediction
@@ -671,8 +684,8 @@ def compute_statistics_quantile(df_data: DataFrame,
     pred_name = df_data.columns[col_true]
     Ypred_5d_mean = np.mean(df_data.iloc[:, col_pred_start::3], axis=1)
     Ypred_mean = Ypred_5d_mean.values
-    Ypred_Lp_mean_ = np.mean(df_data.iloc[:, col_pred_start + 1::3], axis=1)
-    Ypred_Hp_mean_ = np.mean(df_data.iloc[:, col_pred_start + 2::3], axis=1)
+    Ypred_Lp_mean_ = np.mean(df_data.iloc[:, col_pred_start + 1 :: 3], axis=1)
+    Ypred_Hp_mean_ = np.mean(df_data.iloc[:, col_pred_start + 2 :: 3], axis=1)
     Ypred_Lp_mean = Ypred_Lp_mean_.values
     Ypred_Hp_mean = Ypred_Hp_mean_.values
     interdecile_range = Ypred_Hp_mean - Ypred_Lp_mean
@@ -681,25 +694,32 @@ def compute_statistics_quantile(df_data: DataFrame,
     Ypred_std_ = np.std(df_data.iloc[:, col_pred_start::3], axis=1)
     Ypred_std = Ypred_std_.values
     MSE = mean_squared_error(Ytrue, Ypred_mean)
-    print('MSE: ', MSE)
-    MSE_STD = np.std((Ytrue - Ypred_mean)**2)
-    print('MSE_STD: ', MSE_STD)
+    print("MSE: ", MSE)
+    MSE_STD = np.std((Ytrue - Ypred_mean) ** 2)
+    print("MSE_STD: ", MSE_STD)
     MAE = mean_absolute_error(Ytrue, Ypred_mean)
-    print('MAE: ', MAE)
+    print("MAE: ", MAE)
     r2 = r2_score(Ytrue, Ypred_mean)
-    print('R2: ', r2)
+    print("R2: ", r2)
     # p-value 'not entirely reliable, reasonable for datasets > 500'
     pearson_cc, pval = pearsonr(Ytrue, Ypred_mean)
-    print('Pearson CC: %f, p-value: %e' % (pearson_cc, pval))
+    print("Pearson CC: %f, p-value: %e" % (pearson_cc, pval))
 
-    return Ytrue, Ypred_mean, yerror, sigma, Ypred_std, pred_name, Ypred_Lp_mean, Ypred_Hp_mean
+    return (
+        Ytrue,
+        Ypred_mean,
+        yerror,
+        sigma,
+        Ypred_std,
+        pred_name,
+        Ypred_Lp_mean,
+        Ypred_Hp_mean,
+    )
 
 
 def split_data_for_empirical_calibration(
-        Ytrue: Array,
-        Ypred: Array,
-        sigma: Array,
-        cal_split: float = 0.8) -> Tuple[Array, ...]:
+    Ytrue: Array, Ypred: Array, sigma: Array, cal_split: float = 0.8
+) -> Tuple[Array, ...]:
     """Extracts a portion of the arrays provided for the computation of the
     calibration and reserves the remainder portion for testing.
 
@@ -758,16 +778,23 @@ def split_data_for_empirical_calibration(
     true_cal = true_perm_all[:num_cal]
     true_test = true_perm_all[num_cal:]
 
-    print('Size of calibration set: ', true_cal.shape)
-    print('Size of test set: ', true_test.shape)
+    print("Size of calibration set: ", true_cal.shape)
+    print("Size of test set: ", true_test.shape)
 
-    return index_perm_total, pSigma_cal, pSigma_test, pPred_cal, pPred_test, true_cal, true_test
+    return (
+        index_perm_total,
+        pSigma_cal,
+        pSigma_test,
+        pPred_cal,
+        pPred_test,
+        true_cal,
+        true_test,
+    )
 
 
-def compute_empirical_calibration_interpolation(pSigma_cal: Array,
-                                                pPred_cal: Array,
-                                                true_cal: Array,
-                                                cv: int = 10):
+def compute_empirical_calibration_interpolation(
+    pSigma_cal: Array, pPred_cal: Array, true_cal: Array, cv: int = 10
+):
     """Use the arrays provided to estimate an empirical mapping between
     standard deviation and absolute value of error, both of which have been
     observed during inference. Since most of the times the prediction
@@ -819,33 +846,31 @@ def compute_empirical_calibration_interpolation(pSigma_cal: Array,
 
     warnings.filterwarnings("ignore")
 
-    print('--------------------------------------------')
-    print('Using CV for selecting calibration smoothing')
-    print('--------------------------------------------')
+    print("--------------------------------------------")
+    print("Using CV for selecting calibration smoothing")
+    print("--------------------------------------------")
 
     min_error = np.inf
     for cv_ in range(cv):
         # Split data for the different folds
         X_train, X_test, y_train, y_test = train_test_split(
-            xs3, z3, test_size=test_split, shuffle=True)
+            xs3, z3, test_size=test_split, shuffle=True
+        )
 
         # Order x to apply smoothing and interpolation
         xindsort = np.argsort(X_train)
         # Smooth abs error
         # z3smooth = signal.savgol_filter(y_train[xindsort], 31, 1, mode='nearest')
-        z3smooth = signal.savgol_filter(y_train[xindsort],
-                                        21,
-                                        1,
-                                        mode='nearest')
+        z3smooth = signal.savgol_filter(y_train[xindsort], 21, 1, mode="nearest")
         # Compute Piecewise Cubic Hermite Interpolating Polynomial
-        splineobj = interpolate.PchipInterpolator(X_train[xindsort],
-                                                  z3smooth,
-                                                  extrapolate=True)
+        splineobj = interpolate.PchipInterpolator(
+            X_train[xindsort], z3smooth, extrapolate=True
+        )
         # Compute prediction from interpolator
         ytest = splineobj(X_test)
         # compute MAE of true ABS error vs predicted ABS error
         mae = mean_absolute_error(y_test, ytest)
-        print('MAE: ', mae)
+        print("MAE: ", mae)
 
         if mae < min_error:  # store spline interpolator for best fold
             min_error = mae
@@ -856,10 +881,8 @@ def compute_empirical_calibration_interpolation(pSigma_cal: Array,
     # Predict using best interpolator from folds
     yp23 = splineobj_best(xp23)
     # Smooth the ABS error predicted
-    yp23smooth = signal.savgol_filter(yp23, 15, 1, mode='nearest')
+    yp23smooth = signal.savgol_filter(yp23, 15, 1, mode="nearest")
     # Compute spline over second level of smoothing
-    splineobj2 = interpolate.PchipInterpolator(xp23,
-                                               yp23smooth,
-                                               extrapolate=True)
+    splineobj2 = interpolate.PchipInterpolator(xp23, yp23smooth, extrapolate=True)
 
     return splineobj_best, splineobj2

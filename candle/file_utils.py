@@ -1,20 +1,22 @@
+import hashlib
 import os
 import shutil
-import hashlib
-from urllib.error import URLError, HTTPError
-from urllib.request import urlretrieve
 from typing import Dict
+from urllib.error import HTTPError, URLError
+from urllib.request import urlretrieve
 
 from .generic_utils import Progbar
 from .modac_utils import get_file_from_modac
 
 
-def get_file(fname: str,
-             origin: str,
-             unpack: bool = False,
-             md5_hash: str = None,
-             cache_subdir: str = 'common',
-             datadir: str = None) -> str:
+def get_file(
+    fname: str,
+    origin: str,
+    unpack: bool = False,
+    md5_hash: str = None,
+    cache_subdir: str = "common",
+    datadir: str = None,
+) -> str:
     """Downloads a file from a URL if it not already in the cache. Passing the
     MD5 hash will verify the file after download as well as if it is already
     present in the cache.
@@ -39,11 +41,11 @@ def get_file(fname: str,
     string
         Path to the downloaded file
     """
-    if datadir is None and os.environ['CANDLE_DATA_DIR'] is not None:
-        datadir = os.environ['CANDLE_DATA_DIR']
-    elif datadir is None and os.environ['CANDLE_DATA_DIR'] is None:
+    if datadir is None and os.environ["CANDLE_DATA_DIR"] is not None:
+        datadir = os.environ["CANDLE_DATA_DIR"]
+    elif datadir is None and os.environ["CANDLE_DATA_DIR"] is None:
         raise ValueError(
-            'Need data directory. Either pass datadir or set CANDLE_DATA_DIR environment variable'
+            "Need data directory. Either pass datadir or set CANDLE_DATA_DIR environment variable"
         )
 
     if cache_subdir is not None:
@@ -52,16 +54,16 @@ def get_file(fname: str,
     if not os.path.exists(datadir):
         os.makedirs(datadir)
 
-    if fname.endswith('.tar.gz'):
-        fnamesplit = fname.split('.tar.gz')
+    if fname.endswith(".tar.gz"):
+        fnamesplit = fname.split(".tar.gz")
         unpack_fpath = os.path.join(datadir, fnamesplit[0])
         unpack = True
-    elif fname.endswith('.tgz'):
-        fnamesplit = fname.split('.tgz')
+    elif fname.endswith(".tgz"):
+        fnamesplit = fname.split(".tgz")
         unpack_fpath = os.path.join(datadir, fnamesplit[0])
         unpack = True
-    elif fname.endswith('.zip'):
-        fnamesplit = fname.split('.zip')
+    elif fname.endswith(".zip"):
+        fnamesplit = fname.split(".zip")
         unpack_fpath = os.path.join(datadir, fnamesplit[0])
         unpack = True
     else:
@@ -72,30 +74,33 @@ def get_file(fname: str,
         os.makedirs(os.path.dirname(fpath))
 
     download = False
-    if os.path.exists(fpath) or (unpack_fpath is not None and
-                                 os.path.exists(unpack_fpath)):
+    if os.path.exists(fpath) or (
+        unpack_fpath is not None and os.path.exists(unpack_fpath)
+    ):
         # file found; verify integrity if a hash was provided
         if md5_hash is not None:
             if not validate_file(fpath, md5_hash):
-                print('A local file was found, but it seems to be '
-                      'incomplete or outdated.')
+                print(
+                    "A local file was found, but it seems to be "
+                    "incomplete or outdated."
+                )
                 download = True
     else:
         download = True
 
     # fix ftp protocol if needed
-    '''
+    """
     if origin.startswith('ftp://'):
         new_url = origin.replace('ftp://','http://')
         origin = new_url
     print('Origin = ', origin)
-    '''
+    """
 
     if download:
-        if 'modac.cancer.gov' in origin:
+        if "modac.cancer.gov" in origin:
             get_file_from_modac(fpath, origin)
         else:
-            print('Downloading data from', origin)
+            print("Downloading data from", origin)
             global progbar
             progbar = None
 
@@ -106,7 +111,7 @@ def get_file(fname: str,
                 else:
                     progbar.update(count * block_size)
 
-            error_msg = 'URL fetch failure on {}: {} -- {}'
+            error_msg = "URL fetch failure on {}: {} -- {}"
             try:
                 try:
                     urlretrieve(origin, fpath, dl_progress)
@@ -125,7 +130,7 @@ def get_file(fname: str,
 
     if unpack:
         if not os.path.exists(unpack_fpath):
-            print('Unpacking file...')
+            print("Unpacking file...")
             try:
                 shutil.unpack_archive(fpath, datadir)
             except (Exception, KeyboardInterrupt) as e:
@@ -157,7 +162,7 @@ def validate_file(fpath: str, md5_hash: str) -> bool:
         Whether the file is valid
     """
     hasher = hashlib.md5()
-    with open(fpath, 'rb') as f:
+    with open(fpath, "rb") as f:
         buf = f.read()
         hasher.update(buf)
     if str(hasher.hexdigest()) == str(md5_hash):
@@ -166,7 +171,7 @@ def validate_file(fpath: str, md5_hash: str) -> bool:
         return False
 
 
-def directory_from_parameters(params: Dict, commonroot: str = 'Output') -> str:
+def directory_from_parameters(params: Dict, commonroot: str = "Output") -> str:
     """Construct output directory path with unique IDs from parameters.
 
     Parameters
@@ -182,19 +187,18 @@ def directory_from_parameters(params: Dict, commonroot: str = 'Output') -> str:
         Path to the output directory
     """
 
-    if commonroot in set(['.',
-                          './']):  # Same directory --> convert to absolute path
-        outdir = os.path.abspath('.')
+    if commonroot in set([".", "./"]):  # Same directory --> convert to absolute path
+        outdir = os.path.abspath(".")
     else:  # Create path specified
-        outdir = os.path.abspath(os.path.join('.', commonroot))
+        outdir = os.path.abspath(os.path.join(".", commonroot))
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        outdir = os.path.abspath(os.path.join(outdir, params['experiment_id']))
+        outdir = os.path.abspath(os.path.join(outdir, params["experiment_id"]))
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        outdir = os.path.abspath(os.path.join(outdir, params['run_id']))
+        outdir = os.path.abspath(os.path.join(outdir, params["run_id"]))
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 

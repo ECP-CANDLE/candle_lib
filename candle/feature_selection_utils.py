@@ -1,8 +1,9 @@
 import sys
-import pandas as pd
-import numpy as np
-from astropy.stats import median_absolute_deviation
+
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from astropy.stats import median_absolute_deviation
 
 
 def select_features_by_missing_values(data, threshold=0.1):
@@ -23,7 +24,7 @@ def select_features_by_missing_values(data, threshold=0.1):
     if isinstance(data, pd.DataFrame):
         data = data.values
     elif not isinstance(data, np.ndarray):
-        print('Input data must be a numpy array or pandas data frame')
+        print("Input data must be a numpy array or pandas data frame")
         sys.exit(1)
 
     missing_rate = np.sum(np.isnan(data), axis=0) / data.shape[0]
@@ -34,13 +35,15 @@ def select_features_by_missing_values(data, threshold=0.1):
     return indices
 
 
-def select_features_by_variation(data,
-                                 variation_measure='var',
-                                 threshold=None,
-                                 portion=None,
-                                 draw_histogram=False,
-                                 bins=100,
-                                 log=False):
+def select_features_by_variation(
+    data,
+    variation_measure="var",
+    threshold=None,
+    portion=None,
+    draw_histogram=False,
+    bins=100,
+    log=False,
+):
     """This function evaluates the variations of individual features and
     returns the indices of features with large variations. Missing values are
     ignored in evaluating variation.
@@ -70,12 +73,12 @@ def select_features_by_variation(data,
     if isinstance(data, pd.DataFrame):
         data = data.values
     elif not isinstance(data, np.ndarray):
-        print('Input data must be a numpy array or pandas data frame')
+        print("Input data must be a numpy array or pandas data frame")
         sys.exit(1)
 
-    if variation_measure == 'std':
+    if variation_measure == "std":
         v_all = np.nanstd(a=data, axis=0)
-    elif variation_measure == 'mad':
+    elif variation_measure == "mad":
         v_all = median_absolute_deviation(data=data, axis=0, ignore_nan=True)
     else:
         v_all = np.nanvar(a=data, axis=0)
@@ -86,7 +89,7 @@ def select_features_by_variation(data,
     if draw_histogram:
         if len(v) < 50:
             print(
-                'There must be at least 50 features with variation measures to draw a histogram'
+                "There must be at least 50 features with variation measures to draw a histogram"
             )
         else:
             bins = int(min(bins, len(v)))
@@ -97,7 +100,7 @@ def select_features_by_variation(data,
         return np.array([])
     elif threshold is not None and portion is not None:
         print(
-            'threshold and portion can not be used simultaneously. Only one of them can take a real value'
+            "threshold and portion can not be used simultaneously. Only one of them can take a real value"
         )
         sys.exit(1)
 
@@ -112,10 +115,9 @@ def select_features_by_variation(data,
     return indices
 
 
-def select_decorrelated_features(data,
-                                 method='pearson',
-                                 threshold=None,
-                                 random_seed=None):
+def select_decorrelated_features(
+    data, method="pearson", threshold=None, random_seed=None
+):
     """This function selects features whose mutual absolute correlation
     coefficients are smaller than a threshold. It allows missing values in
     data. The correlation coefficient of two features are calculated based on
@@ -143,12 +145,11 @@ def select_decorrelated_features(data,
     if isinstance(data, np.ndarray):
         data = pd.DataFrame(data)
     elif not isinstance(data, pd.DataFrame):
-        print('Input data must be a numpy array or pandas data frame')
+        print("Input data must be a numpy array or pandas data frame")
         sys.exit(1)
 
     present = np.where(np.sum(np.invert(pd.isna(data)), axis=0) > 1)[0]
-    present = present[np.where(
-        np.nanstd(data.iloc[:, present].values, axis=0) > 0)[0]]
+    present = present[np.where(np.nanstd(data.iloc[:, present].values, axis=0) > 0)[0]]
 
     data = data.iloc[:, present]
 
@@ -159,7 +160,7 @@ def select_decorrelated_features(data,
         data = data.iloc[:, random_order]
 
     if threshold is not None:
-        if np.sum(pd.isna(data).values) == 0 and method == 'pearson':
+        if np.sum(pd.isna(data).values) == 0 and method == "pearson":
             cor = np.corrcoef(data.values, rowvar=False)
         else:
             cor = data.corr(method=method).values
@@ -176,15 +177,26 @@ def select_decorrelated_features(data,
         idi = idi[np.where(rm[idi] == False)[0]]  # noqa: E712
         if len(idi) > 0:
             if threshold is None:
-                idi = idi[np.where(
-                    np.sum(np.isnan(data[:, idi]) ^
-                           np.isnan(data[:, index][:, np.newaxis]),
-                           axis=0) == 0)[0]]
+                idi = idi[
+                    np.where(
+                        np.sum(
+                            np.isnan(data[:, idi])
+                            ^ np.isnan(data[:, index][:, np.newaxis]),
+                            axis=0,
+                        )
+                        == 0
+                    )[0]
+                ]
                 if len(idi) > 0:
-                    idi = idi[np.where(
-                        np.nansum(abs(data[:, idi] -
-                                      data[:, index][:, np.newaxis]),
-                                  axis=0) == 0)[0]]
+                    idi = idi[
+                        np.where(
+                            np.nansum(
+                                abs(data[:, idi] - data[:, index][:, np.newaxis]),
+                                axis=0,
+                            )
+                            == 0
+                        )[0]
+                    ]
             else:
                 idi = idi[np.where(abs(cor[index, idi]) >= threshold)[0]]
             if len(idi) > 0:

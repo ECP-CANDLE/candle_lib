@@ -1,21 +1,23 @@
-import numpy as np
-from datetime import datetime
 import json
+import warnings
+from datetime import datetime
+from typing import Dict
 
-from tensorflow.keras import backend as K
-from tensorflow.keras import optimizers
-from tensorflow.keras import initializers
-
-from tensorflow.keras.layers import Dropout
-from tensorflow.keras.callbacks import Callback
-from tensorflow.keras.utils import get_custom_objects
-from tensorflow.keras.metrics import binary_crossentropy, mean_squared_error, mean_absolute_error
-
+import numpy as np
 from scipy.stats.stats import pearsonr
+from tensorflow.keras import backend as K
+from tensorflow.keras import initializers, optimizers
+from tensorflow.keras.callbacks import Callback
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras.metrics import (
+    binary_crossentropy,
+    mean_absolute_error,
+    mean_squared_error,
+)
+from tensorflow.keras.utils import get_custom_objects
 
 from .helper_utils import set_seed as set_seed_defaultUtils
-from typing import Dict
-import warnings
+
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     from sklearn.metrics import r2_score
@@ -27,13 +29,18 @@ def set_parallelism_threads():
     """Set the number of parallel threads according to the number available on
     the hardware."""
 
-    if K.backend(
-    ) == 'tensorflow' and 'NUM_INTRA_THREADS' in os.environ and 'NUM_INTER_THREADS' in os.environ:
+    if (
+        K.backend() == "tensorflow"
+        and "NUM_INTRA_THREADS" in os.environ
+        and "NUM_INTER_THREADS" in os.environ
+    ):
         import tensorflow as tf
+
         # print('Using Thread Parallelism: {} NUM_INTRA_THREADS, {} NUM_INTER_THREADS'.format(os.environ['NUM_INTRA_THREADS'], os.environ['NUM_INTER_THREADS']))
         session_conf = tf.ConfigProto(
-            inter_op_parallelism_threads=int(os.environ['NUM_INTER_THREADS']),
-            intra_op_parallelism_threads=int(os.environ['NUM_INTRA_THREADS']))
+            inter_op_parallelism_threads=int(os.environ["NUM_INTER_THREADS"]),
+            intra_op_parallelism_threads=int(os.environ["NUM_INTRA_THREADS"]),
+        )
         sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
         K.set_session(sess)
 
@@ -49,8 +56,9 @@ def set_seed(seed: int):
 
     set_seed_defaultUtils(seed)
 
-    if K.backend() == 'tensorflow':
+    if K.backend() == "tensorflow":
         import tensorflow as tf
+
         if tf.__version__ < "2.0.0":
             tf.compat.v1.set_random_seed(seed)
         else:
@@ -91,41 +99,48 @@ def build_optimizer(optimizer, lr, kerasDefaults):
     The appropriate Keras optimizer function
     """
 
-    if optimizer == 'sgd':
-        return optimizers.SGD(lr=lr,
-                              decay=kerasDefaults['decay_lr'],
-                              momentum=kerasDefaults['momentum_sgd'],
-                              nesterov=kerasDefaults['nesterov_sgd'])
+    if optimizer == "sgd":
+        return optimizers.SGD(
+            lr=lr,
+            decay=kerasDefaults["decay_lr"],
+            momentum=kerasDefaults["momentum_sgd"],
+            nesterov=kerasDefaults["nesterov_sgd"],
+        )
 
-    elif optimizer == 'rmsprop':
-        return optimizers.RMSprop(lr=lr,
-                                  rho=kerasDefaults['rho'],
-                                  epsilon=kerasDefaults['epsilon'],
-                                  decay=kerasDefaults['decay_lr'])
+    elif optimizer == "rmsprop":
+        return optimizers.RMSprop(
+            lr=lr,
+            rho=kerasDefaults["rho"],
+            epsilon=kerasDefaults["epsilon"],
+            decay=kerasDefaults["decay_lr"],
+        )
 
-    elif optimizer == 'adagrad':
-        return optimizers.Adagrad(lr=lr,
-                                  epsilon=kerasDefaults['epsilon'],
-                                  decay=kerasDefaults['decay_lr'])
+    elif optimizer == "adagrad":
+        return optimizers.Adagrad(
+            lr=lr, epsilon=kerasDefaults["epsilon"], decay=kerasDefaults["decay_lr"]
+        )
 
-    elif optimizer == 'adadelta':
-        return optimizers.Adadelta(lr=lr,
-                                   rho=kerasDefaults['rho'],
-                                   epsilon=kerasDefaults['epsilon'],
-                                   decay=kerasDefaults['decay_lr'])
+    elif optimizer == "adadelta":
+        return optimizers.Adadelta(
+            lr=lr,
+            rho=kerasDefaults["rho"],
+            epsilon=kerasDefaults["epsilon"],
+            decay=kerasDefaults["decay_lr"],
+        )
 
-    elif optimizer == 'adam':
-        return optimizers.Adam(lr=lr,
-                               beta_1=kerasDefaults['beta_1'],
-                               beta_2=kerasDefaults['beta_2'],
-                               epsilon=kerasDefaults['epsilon'],
-                               decay=kerasDefaults['decay_lr'])
+    elif optimizer == "adam":
+        return optimizers.Adam(
+            lr=lr,
+            beta_1=kerasDefaults["beta_1"],
+            beta_2=kerasDefaults["beta_2"],
+            epsilon=kerasDefaults["epsilon"],
+            decay=kerasDefaults["decay_lr"],
+        )
 
 
-def build_initializer(initializer: str,
-                      kerasDefaults: Dict,
-                      seed: int = None,
-                      constant: float = 0.):
+def build_initializer(
+    initializer: str, kerasDefaults: Dict, seed: int = None, constant: float = 0.0
+):
     """Set the initializer to the appropriate Keras initializer function based
     on the input string and learning rate. Other required values are set to the
     Keras default values.
@@ -154,31 +169,34 @@ def build_initializer(initializer: str,
     The appropriate Keras initializer function
     """
 
-    if initializer == 'constant':
+    if initializer == "constant":
         return initializers.Constant(value=constant)
 
-    elif initializer == 'uniform':
+    elif initializer == "uniform":
         return initializers.RandomUniform(
-            minval=kerasDefaults['minval_uniform'],
-            maxval=kerasDefaults['maxval_uniform'],
-            seed=seed)
+            minval=kerasDefaults["minval_uniform"],
+            maxval=kerasDefaults["maxval_uniform"],
+            seed=seed,
+        )
 
-    elif initializer == 'normal':
-        return initializers.RandomNormal(mean=kerasDefaults['mean_normal'],
-                                         stddev=kerasDefaults['stddev_normal'],
-                                         seed=seed)
+    elif initializer == "normal":
+        return initializers.RandomNormal(
+            mean=kerasDefaults["mean_normal"],
+            stddev=kerasDefaults["stddev_normal"],
+            seed=seed,
+        )
 
-    elif initializer == 'glorot_normal':
+    elif initializer == "glorot_normal":
         # aka Xavier normal initializer. keras default
         return initializers.glorot_normal(seed=seed)
 
-    elif initializer == 'glorot_uniform':
+    elif initializer == "glorot_uniform":
         return initializers.glorot_uniform(seed=seed)
 
-    elif initializer == 'lecun_uniform':
+    elif initializer == "lecun_uniform":
         return initializers.lecun_uniform(seed=seed)
 
-    elif initializer == 'he_normal':
+    elif initializer == "he_normal":
         return initializers.he_normal(seed=seed)
 
 
@@ -189,7 +207,7 @@ def xent(y_true, y_pred):
 def r2(y_true, y_pred):
     SS_res = K.sum(K.square(y_true - y_pred))
     SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
-    return (1 - SS_res / (SS_tot + K.epsilon()))
+    return 1 - SS_res / (SS_tot + K.epsilon())
 
 
 def mae(y_true, y_pred):
@@ -216,61 +234,61 @@ def evaluate_autoencoder(y_pred, y_test):
     r2 = r2_score(y_test, y_pred)
     corr, _ = pearsonr(y_pred.flatten(), y_test.flatten())
     # print('Mean squared error: {}%'.format(mse))
-    return {'mse': mse, 'r2_score': r2, 'correlation': corr}
+    return {"mse": mse, "r2_score": r2, "correlation": corr}
 
 
 class PermanentDropout(Dropout):
-
     def __init__(self, rate, **kwargs):
         super(PermanentDropout, self).__init__(rate, **kwargs)
         self.uses_learning_phase = False
 
     def call(self, x, mask=None):
-        if 0. < self.rate < 1.:
+        if 0.0 < self.rate < 1.0:
             noise_shape = self._get_noise_shape(x)
             x = K.dropout(x, self.rate, noise_shape)
         return x
 
 
 def register_permanent_dropout():
-    get_custom_objects()['PermanentDropout'] = PermanentDropout
+    get_custom_objects()["PermanentDropout"] = PermanentDropout
 
 
 class LoggingCallback(Callback):
-
     def __init__(self, print_fcn=print):
         Callback.__init__(self)
         self.print_fcn = print_fcn
 
     def on_epoch_end(self, epoch, logs={}):
-        msg = "[Epoch: %i] %s" % (epoch, ", ".join(
-            "%s: %f" % (k, v) for k, v in sorted(logs.items())))
+        msg = "[Epoch: %i] %s" % (
+            epoch,
+            ", ".join("%s: %f" % (k, v) for k, v in sorted(logs.items())),
+        )
         self.print_fcn(msg)
 
 
 def compute_trainable_params(model):
-    """ Extract number of parameters from the given Keras model
-        Parameters
-        -----------
-        model : Keras model
-        Return
-        ----------
-        python dictionary that contains trainable_params, non_trainable_params and total_params
+    """Extract number of parameters from the given Keras model
+    Parameters
+    -----------
+    model : Keras model
+    Return
+    ----------
+    python dictionary that contains trainable_params, non_trainable_params and total_params
     """
     if str(type(model)).startswith("<class 'keras."):
         from keras import backend as K
     else:
         import tensorflow.keras.backend as K
 
-    trainable_count = int(
-        np.sum([K.count_params(w) for w in model.trainable_weights]))
+    trainable_count = int(np.sum([K.count_params(w) for w in model.trainable_weights]))
     non_trainable_count = int(
-        np.sum([K.count_params(w) for w in model.non_trainable_weights]))
+        np.sum([K.count_params(w) for w in model.non_trainable_weights])
+    )
 
     return {
-        'trainable_params': trainable_count,
-        'non_trainable_params': non_trainable_count,
-        'total_params': (trainable_count + non_trainable_count)
+        "trainable_params": trainable_count,
+        "non_trainable_params": non_trainable_count,
+        "total_params": (trainable_count + non_trainable_count),
     }
 
 
@@ -283,10 +301,10 @@ class TerminateOnTimeOut(Callback):
 
     def __init__(self, timeout_in_sec=10):
         """Initialize TerminateOnTimeOut class.
-            Parameters
-            -----------
-            timeout_in_sec : int
-                seconds to timeout
+        Parameters
+        -----------
+        timeout_in_sec : int
+            seconds to timeout
         """
 
         super(TerminateOnTimeOut, self).__init__()
@@ -303,11 +321,13 @@ class TerminateOnTimeOut(Callback):
         run_end = datetime.now()
         run_duration = run_end - self.run_timestamp
         run_in_sec = run_duration.total_seconds()
-        print('Current time ....%2.3f' % run_in_sec)
+        print("Current time ....%2.3f" % run_in_sec)
         if self.timeout_in_sec != -1:
             if run_in_sec >= self.timeout_in_sec:
-                print('Timeout==>Runtime: %2.3fs, Maxtime: %2.3fs' %
-                      (run_in_sec, self.timeout_in_sec))
+                print(
+                    "Timeout==>Runtime: %2.3fs, Maxtime: %2.3fs"
+                    % (run_in_sec, self.timeout_in_sec)
+                )
                 self.model.stop_training = True
 
 
@@ -329,21 +349,27 @@ class CandleRemoteMonitor(Callback):
     def on_train_begin(self, logs=None):
         logs = logs or {}
         self.run_timestamp = datetime.now()
-        self.experiment_id = self.global_params[
-            'experiment_id'] if 'experiment_id' in self.global_params else "EXP_default"
-        self.run_id = self.global_params[
-            'run_id'] if 'run_id' in self.global_params else "RUN_default"
+        self.experiment_id = (
+            self.global_params["experiment_id"]
+            if "experiment_id" in self.global_params
+            else "EXP_default"
+        )
+        self.run_id = (
+            self.global_params["run_id"]
+            if "run_id" in self.global_params
+            else "RUN_default"
+        )
 
         run_params = []
         for key, val in self.global_params.items():
             run_params.append("{}: {}".format(key, val))
 
         send = {
-            'experiment_id': self.experiment_id,
-            'run_id': self.run_id,
-            'parameters': run_params,
-            'start_time': str(self.run_timestamp),
-            'status': 'Started'
+            "experiment_id": self.experiment_id,
+            "run_id": self.run_id,
+            "parameters": run_params,
+            "start_time": str(self.run_timestamp),
+            "status": "Started",
         }
         # print("on_train_begin", send)
         self.log_messages.append(send)
@@ -353,28 +379,21 @@ class CandleRemoteMonitor(Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         logs = logs or {}
-        loss = logs.get('loss')
-        val_loss = logs.get('val_loss')
-        epoch_total = self.global_params['epochs']
+        loss = logs.get("loss")
+        val_loss = logs.get("val_loss")
+        epoch_total = self.global_params["epochs"]
         epoch_duration = datetime.now() - self.epoch_timestamp
         epoch_in_sec = epoch_duration.total_seconds()
         epoch_line = "epoch: {}/{}, duration: {}s, loss: {}, val_loss: {}".format(
-            (epoch + 1), epoch_total, epoch_in_sec, loss, val_loss)
+            (epoch + 1), epoch_total, epoch_in_sec, loss, val_loss
+        )
 
         send = {
-            'run_id': self.run_id,
-            'status': {
-                'set': 'Running'
-            },
-            'training_loss': {
-                'set': loss
-            },
-            'validation_loss': {
-                'set': val_loss
-            },
-            'run_progress': {
-                'add': [epoch_line]
-            }
+            "run_id": self.run_id,
+            "status": {"set": "Running"},
+            "training_loss": {"set": loss},
+            "validation_loss": {"set": val_loss},
+            "run_progress": {"add": [epoch_line]},
         }
         # print("on_epoch_end", send)
         self.log_messages.append(send)
@@ -386,19 +405,11 @@ class CandleRemoteMonitor(Callback):
         run_in_hour = run_duration.total_seconds() / (60 * 60)
 
         send = {
-            'run_id': self.run_id,
-            'runtime_hours': {
-                'set': run_in_hour
-            },
-            'end_time': {
-                'set': str(run_end)
-            },
-            'status': {
-                'set': 'Finished'
-            },
-            'date_modified': {
-                'set': 'NOW'
-            }
+            "run_id": self.run_id,
+            "runtime_hours": {"set": run_in_hour},
+            "end_time": {"set": str(run_end)},
+            "status": {"set": "Finished"},
+            "date_modified": {"set": "NOW"},
         }
         # print("on_train_end", send)
         self.log_messages.append(send)
@@ -409,12 +420,16 @@ class CandleRemoteMonitor(Callback):
     def save(self):
         """Save log_messages to file."""
         # path = os.getenv('TURBINE_OUTPUT') if 'TURBINE_OUTPUT' in os.environ else '.'
-        path = self.global_params[
-            'output_dir'] if 'output_dir' in self.global_params else '.'
+        path = (
+            self.global_params["output_dir"]
+            if "output_dir" in self.global_params
+            else "."
+        )
         if not os.path.exists(path):
             os.makedirs(path)
 
         filename = "/run.{}.json".format(self.run_id)
         with open(path + filename, "a") as file_run_json:
             file_run_json.write(
-                json.dumps(self.log_messages, indent=4, separators=(',', ': ')))
+                json.dumps(self.log_messages, indent=4, separators=(",", ": "))
+            )

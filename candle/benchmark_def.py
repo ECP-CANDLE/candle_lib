@@ -1,15 +1,20 @@
 import argparse
 import configparser
-
-import os
-import numpy as np
 import inspect
+import os
 import random
-
 from typing import Any, List, Optional, Set
 
-from .parsing_utils import ConfigDict, ParseDict, registered_conf, parse_common, parse_from_dictlist
+import numpy as np
+
 from .helper_utils import eval_string_as_list_of_lists
+from .parsing_utils import (
+    ConfigDict,
+    ParseDict,
+    parse_common,
+    parse_from_dictlist,
+    registered_conf,
+)
 
 DType = Any
 
@@ -22,7 +27,7 @@ def set_seed(seed: float) -> None:
     seed : int
         Value to intialize or re-seed the generator.
     """
-    os.environ['PYTHONHASHSEED'] = '0'
+    os.environ["PYTHONHASHSEED"] = "0"
     np.random.seed(seed)
 
     random.seed(seed)
@@ -40,13 +45,15 @@ class Benchmark:
     benchmark's configuration files.
     """
 
-    def __init__(self,
-                 filepath: str,
-                 defmodel: str,
-                 framework: str,
-                 prog: str = None,
-                 desc: str = None,
-                 parser=None) -> None:
+    def __init__(
+        self,
+        filepath: str,
+        defmodel: str,
+        framework: str,
+        prog: str = None,
+        desc: str = None,
+        parser=None,
+    ) -> None:
         """Initialize Benchmark object.
 
         Parameters
@@ -71,7 +78,8 @@ class Benchmark:
                 prog=prog,
                 formatter_class=argparse.ArgumentDefaultsHelpFormatter,
                 description=desc,
-                conflict_handler='resolve')
+                conflict_handler="resolve",
+            )
 
         self.parser = parser
         self.file_path = filepath
@@ -97,14 +105,14 @@ class Benchmark:
         # Parse has been split between arguments that are common with the default neon parser
         # and all the other options
         self.parser = parse_common(self.parser)
-        self.parser = parse_from_dictlist(self.additional_definitions,
-                                          self.parser)
+        self.parser = parse_from_dictlist(self.additional_definitions, self.parser)
 
         # Set default configuration file
         self.conffile = os.path.join(self.file_path, self.default_model)
 
     def format_benchmark_config_arguments(
-            self, dictfileparam: ConfigDict) -> ConfigDict:
+        self, dictfileparam: ConfigDict
+    ) -> ConfigDict:
         """Functionality to format the particular parameters of the benchmark.
 
         Parameters
@@ -123,23 +131,26 @@ class Benchmark:
 
         dtype: Optional[DType] = None
         for d in kwall:  # self.additional_definitions:
-            if d['name'] in configOut.keys():
-                if 'type' in d:
-                    dtype = d['type']
+            if d["name"] in configOut.keys():
+                if "type" in d:
+                    dtype = d["type"]
                 else:
                     dtype = None
 
-                if 'action' in d:
-                    if inspect.isclass(d['action']):
-                        str_read = dictfileparam[d['name']]
-                        configOut[d['name']] = eval_string_as_list_of_lists(
-                            str_read, ':', ',', dtype)
-                elif d['default'] != argparse.SUPPRESS:
+                if "action" in d:
+                    if inspect.isclass(d["action"]):
+                        str_read = dictfileparam[d["name"]]
+                        configOut[d["name"]] = eval_string_as_list_of_lists(
+                            str_read, ":", ",", dtype
+                        )
+                elif d["default"] != argparse.SUPPRESS:
                     # default value on benchmark definition cannot overwrite config file
-                    self.parser.add_argument('--' + d['name'],
-                                             type=d['type'],
-                                             default=configOut[d['name']],
-                                             help=d['help'])
+                    self.parser.add_argument(
+                        "--" + d["name"],
+                        type=d["type"],
+                        default=configOut[d["name"]],
+                        help=d["help"],
+                    )
 
         return configOut
 
@@ -185,7 +196,9 @@ class Benchmark:
         intersect_set = key_set.intersection(self.required)
         diff_set = self.required.difference(intersect_set)
 
-        if (len(diff_set) > 0):
+        if len(diff_set) > 0:
             raise Exception(
-                'ERROR ! Required parameters are not specified.  These required parameters have not been initialized: '
-                + str(sorted(diff_set)) + '... Exiting')
+                "ERROR ! Required parameters are not specified.  These required parameters have not been initialized: "
+                + str(sorted(diff_set))
+                + "... Exiting"
+            )
