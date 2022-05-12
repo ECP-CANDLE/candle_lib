@@ -7,8 +7,8 @@ from typing import Any, List, Optional, Set
 
 import numpy as np
 
-from .helper_utils import eval_string_as_list_of_lists
-from .parsing_utils import (
+from candle.helper_utils import eval_string_as_list_of_lists
+from candle.parsing_utils import (
     ConfigDict,
     ParseDict,
     parse_common,
