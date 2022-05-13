@@ -16,7 +16,7 @@ def set_pytorch_threads():  # for compatibility
 
 
 def set_pytorch_seed(seed):
-    """ Set the random number seed to the desired value
+    """Set the random number seed to the desired value
 
     Parameters
     ----------
@@ -55,7 +55,9 @@ def build_pytorch_activation(activation: str):
         return torch.nn.Tanh()
 
 
-def build_pytorch_optimizer(model, optimizer: str, lr: float, kerasDefaults: Dict, trainable_only: bool = True):
+def build_pytorch_optimizer(
+    model, optimizer: str, lr: float, kerasDefaults: Dict, trainable_only: bool = True
+):
     if trainable_only:
         params = filter(lambda p: p.requires_grad, model.parameters())
     else:
@@ -98,9 +100,9 @@ def build_pytorch_optimizer(model, optimizer: str, lr: float, kerasDefaults: Dic
         )
 
 
-def pytorch_initialize(weights, initializer, kerasDefaults, seed=None, constant=0.):
+def pytorch_initialize(weights, initializer, kerasDefaults, seed=None, constant=0.0):
 
-    if initializer == 'constant':
+    if initializer == "constant":
         return torch.nn.init.constant_(weights, val=constant)
 
     elif initializer == "uniform":
