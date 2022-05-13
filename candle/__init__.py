@@ -146,14 +146,14 @@ if "tensorflow" in sys.modules:
 elif "torch" in sys.modules:
     print("Importing candle utils for pytorch")
     from .pytorch_utils import (
-        build_activation,
-        build_optimizer,
-        get_function,
-        initialize,
-        mse,
-        set_parallelism_threads,
-        set_seed,
-        xent,
+        set_pytorch_seed,
+        build_pytorch_optimizer,
+        build_pytorch_activation,
+        get_pytorch_function,
+        pytorch_initialize,
+        pytorch_xent,
+        pytorch_mse,
+        set_pytorch_threads,
     )
 
 else:

@@ -11,12 +11,12 @@ import torch.optim
 from .helper_utils import set_seed as set_seed_defaultUtils
 
 
-def set_parallelism_threads():  # for compatibility
+def set_pytorch_threads():  # for compatibility
     pass
 
 
-def set_seed(seed):
-    """Set the random number seed to the desired value.
+def set_pytorch_seed(seed):
+    """ Set the random number seed to the desired value
 
     Parameters
     ----------
@@ -28,7 +28,7 @@ def set_seed(seed):
     torch.manual_seed(seed)
 
 
-def get_function(name: str):
+def get_pytorch_function(name: str):
     mapping = {}
 
     # loss
@@ -44,7 +44,7 @@ def get_function(name: str):
     return mapped
 
 
-def build_activation(activation: str):
+def build_pytorch_activation(activation: str):
 
     # activation
     if activation == "relu":
@@ -55,9 +55,7 @@ def build_activation(activation: str):
         return torch.nn.Tanh()
 
 
-def build_optimizer(
-    model, optimizer: str, lr: float, kerasDefaults: Dict, trainable_only: bool = True
-):
+def build_pytorch_optimizer(model, optimizer: str, lr: float, kerasDefaults: Dict, trainable_only: bool = True):
     if trainable_only:
         params = filter(lambda p: p.requires_grad, model.parameters())
     else:
@@ -100,9 +98,9 @@ def build_optimizer(
         )
 
 
-def initialize(weights, initializer, kerasDefaults, seed=None, constant=0.0):
+def pytorch_initialize(weights, initializer, kerasDefaults, seed=None, constant=0.):
 
-    if initializer == "constant":
+    if initializer == 'constant':
         return torch.nn.init.constant_(weights, val=constant)
 
     elif initializer == "uniform":
@@ -129,9 +127,9 @@ def initialize(weights, initializer, kerasDefaults, seed=None, constant=0.0):
         return torch.nn.init.kaiming_uniform(weights)
 
 
-def xent(y_true, y_pred):
+def pytorch_xent(y_true, y_pred):
     return F.cross_entropy(y_pred, y_true)
 
 
-def mse(y_true, y_pred):
+def pytorch_mse(y_true, y_pred):
     return F.mse_loss(y_pred, y_true)
