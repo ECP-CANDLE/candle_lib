@@ -17,7 +17,8 @@ DType = Any
 
 
 class Benchmark:
-    """Class that implements an interface to handle configuration options for
+    """
+    Class that implements an interface to handle configuration options for
     the different CANDLE benchmarks.
 
     It provides access to all the common configuration options and
@@ -37,22 +38,21 @@ class Benchmark:
         desc: str = None,
         parser=None,
     ) -> None:
-        """Initialize Benchmark object.
+        """
+        Initialize Benchmark object.
 
-        Parameters
-        ----------
-        filepath : ./
+        :param string filepath: ./
             os.path.dirname where the benchmark is located. Necessary to locate utils and
             establish input/ouput paths
-        defmodel : 'p*b*_default_model.txt'
+        :param string defmodel: 'p*b*_default_model.txt'
             string corresponding to the default model of the benchmark
-        framework : 'keras', 'neon', 'mxnet', 'pytorch'
+        :param string framework : 'keras', 'neon', 'mxnet', 'pytorch'
             framework used to run the benchmark
-        prog : 'p*b*_baseline_*'
+        :param string prog: 'p*b*_baseline_*'
             string for program name (usually associated to benchmark and framework)
-        desc : ' '
+        :param string desc: ' '
             string describing benchmark (usually a description of the neural network model built)
-        parser : argparser (default None)
+        :param argparser parser: (default None)
             if 'neon' framework a NeonArgparser is passed. Otherwise an argparser is constructed.
         """
 
@@ -78,7 +78,8 @@ class Benchmark:
         self.set_locals()
 
     def parse_parameters(self) -> None:
-        """Functionality to parse options common for all benchmarks.
+        """
+        Functionality to parse options common for all benchmarks.
 
         This functionality is based on methods 'get_default_neon_parser'
         and 'get_common_parser' which are defined previously(above). If
@@ -96,17 +97,16 @@ class Benchmark:
     def format_benchmark_config_arguments(
         self, dictfileparam: ConfigDict
     ) -> ConfigDict:
-        """Functionality to format the particular parameters of the benchmark.
+        """
+        Functionality to format the particular parameters of the benchmark.
 
-        Parameters
-        ----------
-        dictfileparam : python dictionary
-            parameters read from configuration file
-        args : python dictionary
-            parameters read from command-line
+        :param ConfigDict dictfileparam: parameters read from configuration file
+
+        :return args: parameters read from command-line
             Most of the time command-line overwrites configuration file
             except when the command-line is using default values and
             config file defines those values
+        :rtype: ConfigDict
         """
 
         configOut = dictfileparam.copy()
@@ -138,8 +138,15 @@ class Benchmark:
         return configOut
 
     def read_config_file(self, file: str) -> ConfigDict:
-        """Functionality to read the configue file specific for each
-        benchmark."""
+        """
+        Functionality to read the configue file specific for each
+        benchmark.
+
+        :param string file: path to the configuration file
+
+        :return: parameters read from configuration file
+        :rtype: ConfigDict
+        """
 
         config = configparser.ConfigParser()
         config.read(file)
@@ -162,7 +169,8 @@ class Benchmark:
         return fileParams
 
     def set_locals(self):
-        """Functionality to set variables specific for the benchmark.
+        """
+        Functionality to set variables specific for the benchmark.
 
         - required: set of required parameters for the benchmark.
         - additional_definitions: list of dictionaries describing \
@@ -172,8 +180,10 @@ class Benchmark:
         pass
 
     def check_required_exists(self, gparam: ConfigDict) -> None:
-        """Functionality to verify that the required model parameters have been
-        specified."""
+        """
+        Functionality to verify that the required model parameters have been
+        specified.
+        """
 
         key_set = set(gparam.keys())
         intersect_set = key_set.intersection(self.required)
