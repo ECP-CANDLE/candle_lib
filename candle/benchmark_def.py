@@ -2,10 +2,7 @@ import argparse
 import configparser
 import inspect
 import os
-import random
 from typing import Any, List, Optional, Set
-
-import numpy as np
 
 from candle.helper_utils import eval_string_as_list_of_lists
 from candle.parsing_utils import (
@@ -17,20 +14,6 @@ from candle.parsing_utils import (
 )
 
 DType = Any
-
-
-def set_seed(seed: float) -> None:
-    """Set the seed of the pseudo-random generator to the specified value.
-
-    Parameters
-    ----------
-    seed : int
-        Value to intialize or re-seed the generator.
-    """
-    os.environ["PYTHONHASHSEED"] = "0"
-    np.random.seed(seed)
-
-    random.seed(seed)
 
 
 class Benchmark:
