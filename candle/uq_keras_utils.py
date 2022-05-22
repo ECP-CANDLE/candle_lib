@@ -22,27 +22,20 @@ piSQ = np.pi**2
 
 
 def abstention_loss(alpha, mask: Array):
-    """Function to compute abstention loss. It is composed by two terms: (i)
+    """
+    Function to compute abstention loss. It is composed by two terms: (i)
     original loss of the multiclass classification problem, (ii) cost
     associated to the abstaining samples.
 
-    Parameters
-    ----------
-    alpha : Keras variable
-        Weight of abstention term in cost function
-    mask : ndarray
-        Numpy array to use as mask for abstention:
+    :param alpha: Keras variable. Weight of abstention term in cost function
+    :param ndarray mask: Numpy array to use as mask for abstention: \
         it is 1 on the output associated to the abstention class and 0 otherwise
     """
 
     def loss(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : keras tensor
-            True values to predict
-        y_pred : keras tensor
-            Prediction made by the model.
+        :param y_true: keras tensor. True values to predict
+        :param y_pred: keras tensor. Prediction made by the model. \
             It is assumed that this keras tensor includes extra columns to store the abstaining classes.
         """
         base_pred = (1 - mask) * y_pred + K.epsilon()
@@ -61,27 +54,22 @@ def abstention_loss(alpha, mask: Array):
 
 
 def sparse_abstention_loss(alpha, mask: Array):
-    """Function to compute abstention loss. It is composed by two terms: (i)
+    """
+    Function to compute abstention loss. It is composed by two terms: (i)
     original loss of the multiclass classification problem, (ii) cost
     associated to the abstaining samples. Assumes y_true is not one-hot
     encoded.
 
-    Parameters
-    ----------
-    alpha : Keras variable
-        Weight of abstention term in cost function
-    mask : ndarray
-        Numpy array to use as mask for abstention: it is 1 on the output associated to the abstention class and 0 otherwise
+    :param alpha: Keras variable.  Weight of abstention term in cost function
+    :param ndarray mask: Numpy array to use as mask for abstention: it is 1 on the output associated \
+        to the abstention class and 0 otherwise
     """
 
     def loss(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : keras tensor
-            True values to predict
-        y_pred : keras tensor
-            Prediction made by the model. It is assumed that this keras tensor includes extra columns to store the abstaining classes.
+        :param y_true: keras tensor. True values to predict
+        :param y_pred: keras tensor. Prediction made by the model. \
+            It is assumed that this keras tensor includes extra columns to store the abstaining classes.
         """
         base_pred = (1 - mask) * y_pred + K.epsilon()
         base_true = y_true
@@ -99,23 +87,17 @@ def sparse_abstention_loss(alpha, mask: Array):
 
 
 def abstention_acc_metric(nb_classes: Union[int, Array]):
-    """Abstained accuracy: Function to estimate accuracy over the predicted
+    """
+    Abstained accuracy: Function to estimate accuracy over the predicted
     samples after removing the samples where the model is abstaining.
 
-    Parameters
-    ----------
-    nb_classes : int or ndarray
-        Integer or numpy array defining indices of the abstention class
+    :param int or ndarray nb_classes: Integer or numpy array defining indices of the abstention class
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : keras tensor
-            True values to predict
-        y_pred : keras tensor
-            Prediction made by the model.
+        :param y_true: keras tensor. True values to predict
+        :param y_pred: keras tensor. Prediction made by the model.\
             It is assumed that this keras tensor includes extra columns to store the abstaining classes.
         """
         # matching in original classes
@@ -149,24 +131,18 @@ def abstention_acc_metric(nb_classes: Union[int, Array]):
 
 
 def sparse_abstention_acc_metric(nb_classes: Union[int, Array]):
-    """Abstained accuracy: Function to estimate accuracy over the predicted
+    """
+    Abstained accuracy: Function to estimate accuracy over the predicted
     samples after removing the samples where the model is abstaining. Assumes
     y_true is not one-hot encoded.
 
-    Parameters
-    ----------
-    nb_classes : int or ndarray
-        Integer or numpy array defining indices of the abstention class
+    :param int or ndarray nb_classes: Integer or numpy array defining indices of the abstention class
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : keras tensor
-            True values to predict
-        y_pred : keras tensor
-            Prediction made by the model.
+        :param y_true: keras tensor. True values to predict
+        :param y_pred: keras tensor. Prediction made by the model. \
             It is assumed that this keras tensor includes extra columns to store the abstaining classes.
         """
         # matching in original classes
@@ -198,23 +174,17 @@ def sparse_abstention_acc_metric(nb_classes: Union[int, Array]):
 
 
 def abstention_metric(nb_classes: Union[int, Array]):
-    """Function to estimate fraction of the samples where the model is
+    """
+    Function to estimate fraction of the samples where the model is
     abstaining.
 
-    Parameters
-    ----------
-    nb_classes : int or ndarray
-        Integer or numpy array defining indices of the abstention class
+    :param int or ndarray nb_classes: Integer or numpy array defining indices of the abstention class
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : keras tensor
-            True values to predict
-        y_pred : keras tensor
-            Prediction made by the model.
+        :param y_true: keras tensor. True values to predict
+        :param y_pred: keras tensor.  Prediction made by the model. \
             It is assumed that this keras tensor includes extra columns to store the abstaining classes.
         """
         # total abstention
@@ -236,23 +206,17 @@ def abstention_metric(nb_classes: Union[int, Array]):
 
 
 def acc_class_i_metric(class_i: int):
-    """Function to estimate accuracy over the ith class prediction. This
+    """
+    Function to estimate accuracy over the ith class prediction. This
     estimation is global (i.e. abstaining samples are not removed)
 
-    Parameters
-    ----------
-    class_i : int
-        Index of the class to estimate accuracy
+    :param int class_i: Index of the class to estimate accuracy
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : keras tensor
-            True values to predict
-        y_pred : keras tensor
-            Prediction made by the model.
+        :param y_true: keras tensor. True values to predict
+        :param y_pred: keras tensor. Prediction made by the model. \
             It is assumed that this keras tensor includes extra columns to store the abstaining classes.
         """
         # Find locations in ground truth belonging to class i
@@ -287,25 +251,18 @@ def acc_class_i_metric(class_i: int):
 
 
 def abstention_acc_class_i_metric(nb_classes: Union[int, Array], class_i: int):
-    """Function to estimate accuracy over the class i prediction after removing
+    """
+    Function to estimate accuracy over the class i prediction after removing
     the samples where the model is abstaining.
 
-    Parameters
-    ----------
-    nb_classes : int or ndarray
-        Integer or numpy array defining indices of the abstention class
-    class_i : int
-        Index of the class to estimate accuracy after removing abstention samples
+    :param int or ndarray nb_classes: Integer or numpy array defining indices of the abstention class
+    :param int class_i: Index of the class to estimate accuracy after removing abstention samples
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : keras tensor
-            True values to predict
-        y_pred : keras tensor
-            Prediction made by the model.
+        :param y_true: keras tensor. True values to predict
+        :param y_pred: keras tensor. Prediction made by the model. \
             It is assumed that this keras tensor includes extra columns to store the abstaining classes.
         """
         # Find locations in ground truth belonging to class i
@@ -346,25 +303,19 @@ def abstention_acc_class_i_metric(nb_classes: Union[int, Array], class_i: int):
 
 
 def abstention_class_i_metric(nb_classes: Union[int, Array], class_i: int):
-    """Function to estimate fraction of the samples where the model is
+    """
+    Function to estimate fraction of the samples where the model is
     abstaining in class i.
 
-    Parameters
-    ----------
-    nb_classes : int or ndarray
-        Integer or numpy array defining indices of the abstention class
-    class_i : int
-        Index of the class to estimate accuracy
+    :param int or ndarray nb_classes: Integer or numpy array defining indices of the abstention class
+    :param int class_i: Index of the class to estimate accuracy
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : keras tensor
-            True values to predict
-        y_pred : keras tensor
-            Prediction made by the model. It is assumed that this keras tensor includes extra columns to store the abstaining classes.
+        :param y_true: keras tensor. True values to predict
+        :param y_pred: keras tensor. Prediction made by the model. \
+            It is assumed that this keras tensor includes extra columns to store the abstaining classes.
         """
         # Find locations in ground truth belonging to class i
         ytrue_i_int = K.cast(K.equal(K.argmax(y_true, axis=-1), class_i), "int64")
@@ -387,7 +338,8 @@ def abstention_class_i_metric(nb_classes: Union[int, Array], class_i: int):
 
 
 class AbstentionAdapt_Callback(Callback):
-    """This callback is used to adapt the parameter alpha in the abstention
+    """
+    This callback is used to adapt the parameter alpha in the abstention
     loss.
 
     The parameter alpha (weight of the abstention term in the abstention
@@ -422,27 +374,23 @@ class AbstentionAdapt_Callback(Callback):
         acc_gain: float = 5.0,
         abs_gain: float = 1.0,
     ):
-        """Initializer of the AbstentionAdapt_Callback.
-        Parameters
-        ----------
-        acc_monitor : keras metric
-            Accuracy metric to monitor during the run and use as base to adapt the weight of the abstention term (i.e. alpha) in the abstention cost function. (Must be an accuracy metric that takes abstention into account).
-        abs_monitor : keras metric
-            Abstention metric monitored during the run and used as the other factor to adapt the weight of the abstention term (i.e. alpha) in the asbstention loss function
-        alpha0 : float
-            Initial weight of abstention term in cost function
-        init_abs_epoch : integer
-            Value of the epochs to start adjusting the weight of the abstention term (i.e. alpha). Default: 4.
-        alpha_scale_factor: float
-            Factor to scale (increase by dividing or decrease by multiplying) the weight of the abstention term (i.e. alpha). Default: 0.8.
-        min_abs_acc: float
-            Minimum accuracy to target in the current training. Default: 0.9.
-        max_abs_frac: float
-            Maximum abstention fraction to tolerate in the current training. Default: 0.4.
-        acc_gain: float
-            Factor to adjust alpha scale. Default: 5.0.
-        abs_gain: float
-            Factor to adjust alpha scale. Default: 1.0.
+        """
+        Initializer of the AbstentionAdapt_Callback.
+
+        :param keras.metric acc_monitor: Accuracy metric to monitor during the run and use \
+            as base to adapt the weight of the abstention term (i.e. alpha) in the abstention \
+            cost function. (Must be an accuracy metric that takes abstention into account).
+        :param keras.metric abs_monitor: Abstention metric monitored during the run and \
+            used as the other factor to adapt the weight of the abstention term (i.e. alpha) in the asbstention loss function
+        :param float alpha0: Initial weight of abstention term in cost function
+        :param int init_abs_epoch: Value of the epochs to start adjusting the weight of the abstention \
+            term (i.e. alpha). Default: 4.
+        :param float alpha_scale_factor: Factor to scale (increase by dividing or decrease by multiplying) \
+            the weight of the abstention term (i.e. alpha). Default: 0.8.
+        :param float min_abs_acc: Minimum accuracy to target in the current training. Default: 0.9.
+        :param float max_abs_frac: Maximum abstention fraction to tolerate in the current training. Default: 0.4.
+        :param float acc_gain: Factor to adjust alpha scale. Default: 5.0.
+        :param float abs_gain: Factor to adjust alpha scale. Default: 1.0.
         """
         super(AbstentionAdapt_Callback, self).__init__()
 
@@ -460,13 +408,11 @@ class AbstentionAdapt_Callback(Callback):
         self.alphavalues: List[float] = []  # array to store alpha evolution
 
     def on_epoch_end(self, epoch: int, logs=None):
-        """Updates the weight of abstention term on epoch end.
-        Parameters
-        ----------
-        epoch : integer
-            Current epoch in training.
-        logs : keras logs
-            Metrics stored during current keras training.
+        """
+        Updates the weight of abstention term on epoch end.
+
+        :param int epoch: Current epoch in training.
+        :param logs: Metrics stored during current keras training.
         """
 
         new_alpha_val = K.get_value(self.alpha)
@@ -520,19 +466,14 @@ class AbstentionAdapt_Callback(Callback):
 def modify_labels(
     numclasses_out: int, ytrain: Array, ytest: Array, yval: Optional[Array] = None
 ) -> Tuple[Array, ...]:
-    """This function generates a categorical representation with a class added
+    """
+    This function generates a categorical representation with a class added
     for indicating abstention.
 
-    Parameters
-    ----------
-    numclasses_out : integer
-        Original number of classes + 1 abstention class
-    ytrain : ndarray
-        Numpy array of the classes (labels) in the training set
-    ytest : ndarray
-        Numpy array of the classes (labels) in the testing set
-    yval : ndarray
-        Numpy array of the classes (labels) in the validation set
+    :param int numclasses_out: Original number of classes + 1 abstention class
+    :param ndarray ytrain: Numpy array of the classes (labels) in the training set
+    :param ndarray ytest: Numpy array of the classes (labels) in the testing set
+    :param ndarray yval: Numpy array of the classes (labels) in the validation set
     """
 
     classestrain = np.max(ytrain) + 1
@@ -583,28 +524,25 @@ def add_model_output(
     num_add: Optional[int] = None,
     activation: Optional[str] = None,
 ):
-    """This function modifies the last dense layer in the passed keras model.
+    """
+    This function modifies the last dense layer in the passed keras model.
     The modification includes adding units and optionally changing the
     activation function.
 
-    Parameters
-    ----------
-    modelIn : keras model
-        Keras model to be modified.
-    mode : string
-        Mode to modify the layer. It could be:
-        'abstain' for adding an arbitrary number of units for the abstention optimization strategy.
-        'qtl' for quantile regression which needs the outputs to be tripled.
-        'het' for heteroscedastic regression which needs the outputs to be doubled.
-    num_add : integer
-        Number of units to add. This only applies to the 'abstain' mode.
-    activation : string
-        String with keras specification of activation function (e.g. 'relu', 'sigomid', 'softmax', etc.)
+    :param modelIn: keras model. Keras model to be modified.
+    :param string mode: Mode to modify the layer. It could be:
 
-    Return
-    ----------
-    modelOut : keras model
-        Keras model after last dense layer has been modified as specified. If there is no mode specified it returns the same model. If the mode is not one of 'abstain', 'qtl' or 'het' an exception is raised.
+        - 'abstain' for adding an arbitrary number of units for the abstention optimization strategy.
+        - 'qtl' for quantile regression which needs the outputs to be tripled.
+        - 'het' for heteroscedastic regression which needs the outputs to be doubled.
+    :param int num_add: Number of units to add. This only applies to the 'abstain' mode.
+    :param string activation: String with keras specification of activation function (e.g. 'relu', 'sigomid', 'softmax', etc.)
+
+    :return: Keras model after last dense layer has been modified as specified. \
+        If there is no mode specified it returns the same model. \
+        If the mode is not one of 'abstain', 'qtl' or 'het' an exception is raised.
+    :rtype: Keras model
+
     """
 
     if mode is None:
@@ -669,24 +607,19 @@ def add_model_output(
 
 
 def r2_heteroscedastic_metric(nout: int):
-    """This function computes the r2 for the heteroscedastic model. The r2 is
+    """
+    This function computes the r2 for the heteroscedastic model. The r2 is
     computed over the prediction of the mean and the standard deviation
     prediction is not taken into account.
 
-    Parameters
-    ----------
-    nout : int
-        Number of outputs without uq augmentation
+    :param int nout: Number of outputs without uq augmentation
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : Keras tensor
-            Keras tensor including the ground truth
-        y_pred : Keras tensor
-            Keras tensor including the predictions of a heteroscedastic model. The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
+        :param y_true: Keras tensor. Keras tensor including the ground truth
+        :param y_pred: Keras tensor. Keras tensor including the predictions of a heteroscedastic model. \
+            The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
         """
 
         if nout > 1:
@@ -703,24 +636,19 @@ def r2_heteroscedastic_metric(nout: int):
 
 
 def mae_heteroscedastic_metric(nout: int):
-    """This function computes the mean absolute error (mae) for the
+    """
+    This function computes the mean absolute error (mae) for the
     heteroscedastic model. The mae is computed over the prediction of the mean
     and the standard deviation prediction is not taken into account.
 
-    Parameters
-    ----------
-    nout : int
-        Number of outputs without uq augmentation
+    :param int nout: Number of outputs without uq augmentation
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : Keras tensor
-            Keras tensor including the ground truth
-        y_pred : Keras tensor
-            Keras tensor including the predictions of a heteroscedastic model. The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
+        :param y_true: Keras tensor. Keras tensor including the ground truth
+        :param y_pred: Keras tensor. Keras tensor including the predictions of a heteroscedastic model. \
+            The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
         """
         if nout > 1:
             y_out = K.reshape(y_pred[:, 0::nout], K.shape(y_true))
@@ -734,24 +662,19 @@ def mae_heteroscedastic_metric(nout: int):
 
 
 def mse_heteroscedastic_metric(nout: int):
-    """This function computes the mean squared error (mse) for the
+    """
+    This function computes the mean squared error (mse) for the
     heteroscedastic model. The mse is computed over the prediction of the mean
     and the standard deviation prediction is not taken into account.
 
-    Parameters
-    ----------
-    nout : int
-        Number of outputs without uq augmentation
+    :param int nout: Number of outputs without uq augmentation
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : Keras tensor
-            Keras tensor including the ground truth
-        y_pred : Keras tensor
-            Keras tensor including the predictions of a heteroscedastic model. The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
+        :param y_true: Keras tensor. Keras tensor including the ground truth
+        :param y_pred: Keras tensor. Keras tensor including the predictions of a heteroscedastic model. \
+            The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
         """
         if nout > 1:
             y_out = K.reshape(y_pred[:, 0::nout], K.shape(y_true))
@@ -765,24 +688,19 @@ def mse_heteroscedastic_metric(nout: int):
 
 
 def meanS_heteroscedastic_metric(nout: int):
-    """This function computes the mean log of the variance (log S) for the
+    """
+    This function computes the mean log of the variance (log S) for the
     heteroscedastic model. The mean log is computed over the standard deviation
     prediction and the mean prediction is not taken into account.
 
-    Parameters
-    ----------
-    nout : int
-        Number of outputs without uq augmentation
+    :param int nout: Number of outputs without uq augmentation
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : Keras tensor
-            Keras tensor including the ground truth
-        y_pred : Keras tensor
-            Keras tensor including the predictions of a heteroscedastic model. The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
+        :param y_true: Keras tensor. Keras tensor including the ground truth
+        :param y_pred: Keras tensor. Keras tensor including the predictions of a heteroscedastic model. \
+            The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
         """
         if nout > 1:
             log_sig2 = y_pred[:, 1::nout]
@@ -796,24 +714,20 @@ def meanS_heteroscedastic_metric(nout: int):
 
 
 def heteroscedastic_loss(nout: int):
-    """This function computes the heteroscedastic loss for the heteroscedastic
+    """
+    This function computes the heteroscedastic loss for the heteroscedastic
     model. Both mean and standard deviation predictions are taken into account.
 
-    Parameters
-    ----------
-    nout : int
-        Number of outputs without uq augmentation
+    :param int nout: Number of outputs without uq augmentation
     """
 
     def loss(y_true, y_pred):
-        """This function computes the heteroscedastic loss.
+        """
+        This function computes the heteroscedastic loss.
 
-        Parameters
-        ----------
-        y_true : Keras tensor
-            Keras tensor including the ground truth
-        y_pred : Keras tensor
-            Keras tensor including the predictions of a heteroscedastic model. The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
+        :param y_true: Keras tensor. Keras tensor including the ground truth
+        :param y_pred: Keras tensor. Keras tensor including the predictions of a heteroscedastic model. \
+            The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
         """
         y_shape = K.shape(y_true)
 
@@ -833,16 +747,12 @@ def heteroscedastic_loss(nout: int):
 
 
 def quantile_loss(quantile: float, y_true, y_pred):
-    """This function computes the quantile loss for a given quantile fraction.
+    """
+    This function computes the quantile loss for a given quantile fraction.
 
-    Parameters
-    ----------
-    quantile : float in (0, 1)
-        Quantile fraction to compute the loss.
-    y_true : Keras tensor
-        Keras tensor including the ground truth
-    y_pred : Keras tensor
-        Keras tensor including the predictions of a quantile model.
+    :param quantile: float in (0, 1). Quantile fraction to compute the loss.
+    :param y_true: Keras tensor. Keras tensor including the ground truth
+    :param y_pred: Keras tensor. Keras tensor including the predictions of a quantile model.
     """
 
     error = y_true - y_pred
@@ -850,29 +760,25 @@ def quantile_loss(quantile: float, y_true, y_pred):
 
 
 def triple_quantile_loss(nout: int, lowquantile: float, highquantile: float):
-    """This function computes the quantile loss for the median and low and high
+    """
+    This function computes the quantile loss for the median and low and high
     quantiles. The median is given twice the weight of the other components.
 
-    Parameters
-    ----------
-    nout : int
-        Number of outputs without uq augmentation
-    lowquantile: float in (0, 1)
-        Fraction corresponding to the low quantile
-    highquantile: float in (0, 1)
-        Fraction corresponding to the high quantile
+    :param int nout: Number of outputs without uq augmentation
+    :param lowquantile: float in (0, 1). Fraction corresponding to the low quantile
+    :param highquantile: float in (0, 1). Fraction corresponding to the high quantile
     """
 
     def loss(y_true, y_pred):
-        """This function computes the quantile loss, considering the median and
+        """
+        This function computes the quantile loss, considering the median and
         low and high quantiles.
 
-        Parameters
-        ----------
-        y_true : Keras tensor
-            Keras tensor including the ground truth
-        y_pred : Keras tensor
-            Keras tensor including the predictions of a heteroscedastic model. The predictions follow the order: (q50_0, qlow_0, qhigh_0, q50_1, qlow_1, qhigh_1, ...) with q50_i the median of the ith output and qlow_i and qhigh_i the low and high specified quantiles of the ith output.
+        :param y_true: Keras tensor. Keras tensor including the ground truth
+        :param y_pred: Keras tensor. Keras tensor including the predictions of a heteroscedastic model. \
+            The predictions follow the order: (q50_0, qlow_0, qhigh_0, q50_1, qlow_1, qhigh_1, ...) \
+            with q50_i the median of the ith output and qlow_i and qhigh_i the low and high specified \
+            quantiles of the ith output.
         """
 
         y_shape = K.shape(y_true)
@@ -895,28 +801,23 @@ def triple_quantile_loss(nout: int, lowquantile: float, highquantile: float):
 
 
 def quantile_metric(nout: int, index: int, quantile: float):
-    """This function computes the quantile metric for a given quantile and
+    """
+    This function computes the quantile metric for a given quantile and
     corresponding output index. This is provided as a metric to track evolution
     while training.
 
-    Parameters
-    ----------
-    nout : int
-        Number of outputs without uq augmentation
-    index : int
-        Index of output corresponding to the given quantile.
-    quantile: float in (0, 1)
-        Fraction corresponding to the quantile
+    :param int nout: Number of outputs without uq augmentation
+    :param int index: Index of output corresponding to the given quantile.
+    :param quantile: float in (0, 1). Fraction corresponding to the quantile
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : Keras tensor
-            Keras tensor including the ground truth
-        y_pred : Keras tensor
-            Keras tensor including the predictions of a quantile model. The predictions follow the order: (q50_0, qlow_0, qhigh_0, q50_1, qlow_1, qhigh_1, ...) with q50_i the median of the ith output and qlow_i and qhigh_i the low and high specified quantiles of the ith output.
+        :param y_true: Keras tensor. Keras tensor including the ground truth
+        :param y_pred: Keras tensor. Keras tensor including the predictions of a quantile model. \
+            The predictions follow the order: (q50_0, qlow_0, qhigh_0, q50_1, qlow_1, qhigh_1, ...) \
+            with q50_i the median of the ith output and qlow_i and qhigh_i the low and high specified \
+            quantiles of the ith output.
         """
         y_shape = K.shape(y_true)
         if nout > 1:
@@ -935,13 +836,11 @@ def quantile_metric(nout: int, index: int, quantile: float):
 
 
 def add_index_to_output(y_train: Array) -> Array:
-    """This function adds a column to the training output to store the indices
+    """
+    This function adds a column to the training output to store the indices
     of the corresponding samples in the training set.
 
-    Parameters
-    ----------
-    y_train : ndarray
-        Numpy array of the output in the training set
+    :param ndarray y_train: Numpy array of the output in the training set
     """
     # Add indices to y
     y_train_index = range(y_train.shape[0])
@@ -955,7 +854,8 @@ def add_index_to_output(y_train: Array) -> Array:
 
 
 def contamination_loss(nout: int, T_k, a, sigmaSQ, gammaSQ):
-    """Function to compute contamination loss. It is composed by two terms: (i)
+    """
+    Function to compute contamination loss. It is composed by two terms: (i)
     the loss with respect to the normal distribution that models the
     distribution of the training data samples, (ii) the loss with respect to
     the Cauchy distribution that models the distribution of the outlier
@@ -963,28 +863,24 @@ def contamination_loss(nout: int, T_k, a, sigmaSQ, gammaSQ):
     not make sense for any data different to the training set. This is because
     latent variables are only defined for samples in the training set.
 
-    Parameters
-    ----------
-    nout : int
-        Number of outputs without uq augmentation (in the contamination model the augmentation corresponds to the data index in training).
-    T_k : Keras tensor
-        Tensor containing latent variables (probability of membership to normal and Cauchy distributions) for each of the samples in the training set. (Validation data is usually augmented too to be able to run training with validation set, however loss in validation should not be used as a criterion for early stopping training since the latent variables are defined for the training only, and thus, are not valid when used in combination with data different from training).
-    a : Keras variable
-        Probability of belonging to the normal distribution
-    sigmaSQ : Keras variable
-        Variance estimated for the normal distribution
-    gammaSQ : Keras variable
-        Scale estimated for the Cauchy distribution
+    :param int nout: Number of outputs without uq augmentation (in the contamination model \
+        the augmentation corresponds to the data index in training).
+    :param T_k: Keras tensor. Tensor containing latent variables (probability of membership \
+        to normal and Cauchy distributions) for each of the samples in the training set. \
+        (Validation data is usually augmented too to be able to run training with validation set, \
+        however loss in validation should not be used as a criterion for early stopping training \
+        since the latent variables are defined for the training only, and thus, are not valid \
+        when used in combination with data different from training).
+    :param a: Keras variable. Probability of belonging to the normal distribution
+    :param sigmaSQ: Keras variable. Variance estimated for the normal distribution
+    :param gammaSQ: Keras variable. Scale estimated for the Cauchy distribution
     """
 
     def loss(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : keras tensor
-            True values to predict. It is assumed that this keras tensor includes extra columns to store the index of the data sample in the training set.
-        y_pred : keras tensor
-            Prediction made by the model.
+        :param y_true: keras tensor. True values to predict. It is assumed that this keras tensor \
+            includes extra columns to store the index of the data sample in the training set.
+        :param y_pred: keras tensor. Prediction made by the model.
         """
         y_shape = K.shape(y_pred)
         y_true_ = K.reshape(y_true[:, :-1], y_shape)
@@ -1016,7 +912,8 @@ def contamination_loss(nout: int, T_k, a, sigmaSQ, gammaSQ):
 
 
 class Contamination_Callback(Callback):
-    """This callback is used to update the parameters of the contamination
+    """
+    This callback is used to update the parameters of the contamination
     model.
 
     This functionality follows the EM algorithm: in the E-step latent
@@ -1032,14 +929,10 @@ class Contamination_Callback(Callback):
 
     def __init__(self, x, y, a_max=0.99):
         """Initializer of the Contamination_Callback.
-        Parameters
-        ----------
-        x : ndarray
-            Array of samples (= input features) in training set.
-        y : ndarray
-            Array of sample outputs in training set.
-        a_max : float
-            Maximum value of a variable to allow
+
+        :param ndarray x: Array of samples (= input features) in training set.
+        :param ndarray y: Array of sample outputs in training set.
+        :param flaot a_max: Maximum value of a variable to allow
         """
         super(Contamination_Callback, self).__init__()
         if y.ndim > 1:
@@ -1074,7 +967,8 @@ class Contamination_Callback(Callback):
         self.gammaSQvalues = []  # array to store gammaSQ evolution
 
     def on_epoch_end(self, epoch: int, logs={}):
-        """Updates the parameters of the distributions in the contamination
+        """
+        Updates the parameters of the distributions in the contamination
         model on epoch end. The parameters updated are: 'a' for the global
         weight of the membership to the normal distribution, 'sigmaSQ' for the
         variance of the normal distribution and 'gammaSQ' for the scale of the
@@ -1084,12 +978,8 @@ class Contamination_Callback(Callback):
         of membership to the Cauchy distribution i.e. outlier. Stores evolution
         of global parameters (a, sigmaSQ and gammaSQ).
 
-        Parameters
-        ----------
-        epoch : integer
-            Current epoch in training.
-        logs : keras logs
-            Metrics stored during current keras training.
+        :param int epoch: Current epoch in training.
+        :param logs: keras logs. Metrics stored during current keras training.
         """
         y_pred = self.model.predict(self.x)
         error = self.y.squeeze() - y_pred.squeeze()
@@ -1138,19 +1028,15 @@ def mse_contamination_metric(nout: int):
     contamination model. The mse is computed over the prediction. Therefore,
     the augmentation for the index variable is ignored.
 
-    Parameters
-    ----------
-    nout : int
+    :param int nout: \
         Number of outputs without uq augmentation (in the contamination model the augmentation corresponds to the data index in training).
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : Keras tensor
+        :param y_true: Keras tensor. \
             Keras tensor including the ground truth. Since the keras tensor includes an extra column to store the index of the data sample in the training set this column is ignored.
-        y_pred : Keras tensor
+        :param y_pred: Keras tensor. \
             Keras tensor with the predictions of the contamination model (no data index).
         """
 
@@ -1161,23 +1047,20 @@ def mse_contamination_metric(nout: int):
 
 
 def mae_contamination_metric(nout: int):
-    """This function computes the mean absolute error (mae) for the
+    """
+    This function computes the mean absolute error (mae) for the
     contamination model. The mae is computed over the prediction. Therefore,
     the augmentation for the index variable is ignored.
 
-    Parameters
-    ----------
-    nout : int
+    :param int nout: \
         Number of outputs without uq augmentation (in the contamination model the augmentation corresponds to the data index in training).
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : Keras tensor
+        :param y_true: Keras tensor. \
             Keras tensor including the ground truth. Since the keras tensor includes an extra column to store the index of the data sample in the training set this column is ignored.
-        y_pred : Keras tensor
+        :param y_pred: Keras tensor. \
             Keras tensor with the predictions of the contamination model (no data index).
         """
 
@@ -1188,23 +1071,20 @@ def mae_contamination_metric(nout: int):
 
 
 def r2_contamination_metric(nout: int):
-    """This function computes the r2 for the contamination model. The r2 is
+    """
+    This function computes the r2 for the contamination model. The r2 is
     computed over the prediction. Therefore, the augmentation for the index
     variable is ignored.
 
-    Parameters
-    ----------
-    nout : int
+    :param int nout: \
         Number of outputs without uq augmentation (in the contamination model the augmentation corresponds to the data index in training).
     """
 
     def metric(y_true, y_pred):
         """
-        Parameters
-        ----------
-        y_true : Keras tensor
+        :param y_true: Keras tensor. \
             Keras tensor including the ground truth. Since the keras tensor includes an extra column to store the index of the data sample in the training set this column is ignored.
-        y_pred : Keras tensor
+        :param y_pred: Keras tensor. \
             Keras tensor with the predictions of the contamination model (no data index).
         """
         # if nout > 1:

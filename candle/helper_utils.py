@@ -11,28 +11,21 @@ import numpy as np
 from .file_utils import get_file
 
 
-def fetch_file(link: str, subdir: str, unpack: bool = False, md5_hash: str = None):
-    """Convert URL to file path and download the file if it is not already
+def fetch_file(link: str, subdir: str, unpack: bool = False, md5_hash: str = None) -> str:
+    """
+    Convert URL to file path and download the file if it is not already
     present in spedified cache.
 
-    Parameters
-    ----------
-    link : link path
-        URL of the file to download
-    subdir : directory path
-        Local path to check for cached file.
-    unpack : boolean
-        Flag to specify if the file to download should
-        be decompressed too.
+    :param string link: URL of the file to download
+    :param string subdir: Local path to check for cached file.
+    :param bool unpack: Flag to specify if the file to download should be decompressed too. \
         (default: False, no decompression)
-    md5_hash : MD5 hash
-        Hash used as a checksum to verify data integrity.
-        Verification is carried out if a hash is provided.
+    :param string md5_hash: MD5 hash used as a checksum to verify data integrity. \
+        Verification is carried out if a hash is provided. \
         (default: None, no verification)
 
-    Return
-    ----------
-    local path to the downloaded, or cached, file.
+    :return: local path to the downloaded, or cached, file.
+    :rtype: string
     """
 
     fname = os.path.basename(link)
@@ -42,14 +35,12 @@ def fetch_file(link: str, subdir: str, unpack: bool = False, md5_hash: str = Non
 
 
 def verify_path(path: str) -> None:
-    """Verify if a directory path exists locally. If the path does not exist,
+    """
+    Verify if a directory path exists locally. If the path does not exist,
     but is a valid path, it recursivelly creates the specified directory path
     structure.
 
-    Parameters
-    ----------
-    path : directory path
-        Description of local directory path
+    :param string path: Description of local directory path
     """
     folder = os.path.dirname(path)
     if folder and not os.path.exists(folder):
@@ -63,22 +54,18 @@ def set_up_logger(
     fmt_line: str = "[%(asctime)s %(process)d] %(message)s",
     fmt_date: str = "%Y-%m-%d %H:%M:%S",
 ) -> None:
-    """Set up the event logging system. Two handlers are created. One to send
+    """
+    Set up the event logging system. Two handlers are created. One to send
     log records to a specified file and one to send log records to the
     (defaulf) sys.stderr stream. The logger and the file handler are set to
     DEBUG logging level. The stream handler is set to INFO logging level, or to
     DEBUG logging level if the verbose flag is specified. Logging messages
     which are less severe than the level set will be ignored.
 
-    Parameters
-    ----------
-    logfile : filename
-        File to store the log records
-    logger : logger object
-        Python object for the logging interface
-    verbose : boolean
-        Flag to increase the logging level from INFO to DEBUG. It
-        only applies to the stream handler.
+    :param string logfile: File to store the log records
+    :param Logger logger: Python object for the logging interface
+    :param boolean verbose: Flag to increase the logging level from INFO to DEBUG. \
+        It only applies to the stream handler.
     """
     verify_path(logfile)
     fh = logging.FileHandler(logfile)
@@ -175,24 +162,22 @@ def eval_string_as_list_of_lists(
 
 
 def str2bool(v: str) -> bool:
-    """This is taken from:
+    """
+    This is taken from:
     https://stackoverflow.com/questions/15008758/parsing-boolean-values-with-
     argparse Because type=bool is not interpreted as a bool and
     action='store_true' cannot be undone.
 
-    Parameters
-    ----------
-    v : string
-        String to interpret
+    :param string v: String to interpret
 
-    Return
-    ----------
-    Boolean value. It raises and exception if the provided string cannot
-    be interpreted as a boolean type.
-    Strings recognized as boolean True :
-        'yes', 'true', 't', 'y', '1' and uppercase versions (where applicable).
-    Strings recognized as boolean False :
-        'no', 'false', 'f', 'n', '0' and uppercase versions (where applicable).
+    :return: Boolean value. It raises and exception if the provided string cannot \
+        be interpreted as a boolean type.
+
+        - Strings recognized as boolean True : \
+            'yes', 'true', 't', 'y', '1' and uppercase versions (where applicable).
+        - Strings recognized as boolean False : \
+            'no', 'false', 'f', 'n', '0' and uppercase versions (where applicable).
+    :rtype: boolean
     """
     if v.lower() in ("yes", "true", "t", "y", "1"):
         return True
@@ -203,7 +188,8 @@ def str2bool(v: str) -> bool:
 
 
 def keras_default_config() -> Dict:
-    """Defines parameters that intervine in different functions using the keras
+    """
+    Defines parameters that intervine in different functions using the keras
     defaults.
 
     This helps to keep consistency in parameters between frameworks.

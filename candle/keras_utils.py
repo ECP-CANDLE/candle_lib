@@ -26,8 +26,10 @@ import os
 
 
 def set_parallelism_threads():
-    """Set the number of parallel threads according to the number available on
-    the hardware."""
+    """
+    Set the number of parallel threads according to the number available on
+    the hardware.
+    """
 
     if (
         K.backend() == "tensorflow"
@@ -46,12 +48,10 @@ def set_parallelism_threads():
 
 
 def set_seed(seed: int):
-    """Set the random number seed to the desired value.
+    """
+    Set the random number seed to the desired value.
 
-    Parameters
-    ----------
-    seed : integer
-        Random number seed.
+    :param int seed: Random number seed.
     """
 
     set_seed_defaultUtils(seed)
@@ -76,27 +76,18 @@ def get_function(name: str):
 
 
 def build_optimizer(optimizer, lr, kerasDefaults):
-    """Set the optimizer to the appropriate Keras optimizer function based on
+    """
+    Set the optimizer to the appropriate Keras optimizer function based on
     the input string and learning rate. Other required values are set to the
     Keras default values.
 
-    Parameters
-    ----------
-    optimizer : string
-        String to choose the optimizer
-
-        Options recognized: 'sgd', 'rmsprop', 'adagrad', adadelta', 'adam'
+    :param string optimizer: String to choose the optimizer \
+        Options recognized: 'sgd', 'rmsprop', 'adagrad', adadelta', 'adam' \
         See the Keras documentation for a full description of the options
+    :param float lr: Learning rate
+    :param List kerasDefaults: List of default parameter values to ensure consistency between frameworks
 
-    lr : float
-        Learning rate
-
-    kerasDefaults : list
-        List of default parameter values to ensure consistency between frameworks
-
-    Returns
-    ----------
-    The appropriate Keras optimizer function
+    :return: The appropriate Keras optimizer function
     """
 
     if optimizer == "sgd":
@@ -141,32 +132,20 @@ def build_optimizer(optimizer, lr, kerasDefaults):
 def build_initializer(
     initializer: str, kerasDefaults: Dict, seed: int = None, constant: float = 0.0
 ):
-    """Set the initializer to the appropriate Keras initializer function based
+    """
+    Set the initializer to the appropriate Keras initializer function based
     on the input string and learning rate. Other required values are set to the
     Keras default values.
 
-    Parameters
-    ----------
-    initializer : string
-        String to choose the initializer
-
-        Options recognized: 'constant', 'uniform', 'normal',
-        'glorot_uniform', 'lecun_uniform', 'he_normal'
-
+    :param string initializer: String to choose the initializer \
+        Options recognized: 'constant', 'uniform', 'normal', \
+        'glorot_uniform', 'lecun_uniform', 'he_normal' \
         See the Keras documentation for a full description of the options
+    :param List kerasDefaults: List of default parameter values to ensure consistency between frameworks
+    :param int seed: Random number seed
+    :param float constant: Constant value (for the constant initializer only)
 
-    kerasDefaults : list
-        List of default parameter values to ensure consistency between frameworks
-
-    seed : integer
-        Random number seed
-
-    constant : float
-        Constant value (for the constant initializer only)
-
-    Return
-    ----------
-    The appropriate Keras initializer function
+    :return: The appropriate Keras initializer function
     """
 
     if initializer == "constant":
@@ -267,13 +246,12 @@ class LoggingCallback(Callback):
 
 
 def compute_trainable_params(model):
-    """Extract number of parameters from the given Keras model
-    Parameters
-    -----------
-    model : Keras model
-    Return
-    ----------
-    python dictionary that contains trainable_params, non_trainable_params and total_params
+    """
+    Extract number of parameters from the given Keras model
+
+    :param model: Keras model
+
+    :return: python dictionary that contains trainable_params, non_trainable_params and total_params
     """
     if str(type(model)).startswith("<class 'keras."):
         from keras import backend as K
@@ -293,18 +271,18 @@ def compute_trainable_params(model):
 
 
 class TerminateOnTimeOut(Callback):
-    """This class implements timeout on model training.
+    """
+    This class implements timeout on model training.
 
     When the script reaches timeout,
     this class sets model.stop_training = True
     """
 
     def __init__(self, timeout_in_sec=10):
-        """Initialize TerminateOnTimeOut class.
-        Parameters
-        -----------
-        timeout_in_sec : int
-            seconds to timeout
+        """
+        Initialize TerminateOnTimeOut class.
+
+        :param int timeout_in_sec: seconds to timeout
         """
 
         super(TerminateOnTimeOut, self).__init__()
@@ -332,7 +310,9 @@ class TerminateOnTimeOut(Callback):
 
 
 class CandleRemoteMonitor(Callback):
-    """Capture Run level output and store/send for monitoring."""
+    """
+    Capture Run level output and store/send for monitoring.
+    """
 
     def __init__(self, params=None):
         super(CandleRemoteMonitor, self).__init__()

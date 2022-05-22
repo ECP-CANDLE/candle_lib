@@ -1,4 +1,5 @@
-"""CKPT KERAS UTILS.
+"""
+CKPT KERAS UTILS.
 
 CANDLE checkpoint/restart utilities for Keras
 
@@ -137,21 +138,19 @@ class ParamRequired:
 
 
 class CandleCheckpointCallback(Callback):
-    """Keras Callback for CANDLE-compliant Benchmarks to use for checkpointing
+    """
+    Keras Callback for CANDLE-compliant Benchmarks to use for checkpointing
     Creates a JSON file alongside the weights and optimizer checkpoints that
     includes important metadata, particularly for restarting and tracking
-    complex workflows."""
+    complex workflows.
+    """
 
     def __init__(self, gParameters: Dict, logger="DEFAULT", verbose=True):
         """
-        Parameters
-        ----------
-            logger : Logger
-                The logger to use.
-                May be None to disable or "DEFAULT" to use the default.
-            verbose : boolean
-                If True, more verbose logging
-                Passed to helper_utils.set_up_logger(verbose) for this logger
+        :param Logger logger: The logger to use.
+            May be None to disable or "DEFAULT" to use the default.
+        :param boolean verbose: If True, more verbose logging
+            Passed to helper_utils.set_up_logger(verbose) for this logger
         """
         self.logger = logger
         if self.logger == "DEFAULT":
@@ -173,7 +172,9 @@ class CandleCheckpointCallback(Callback):
         self.report_initial()
 
     def report_initial(self):
-        """Simply report that we are ready to run."""
+        """
+        Simply report that we are ready to run.
+        """
         self.info("Callback initialized.")
         if self.save_interval == 0:
             self.info("Checkpoint save interval == 0 " + "-> checkpoints are disabled.")
@@ -186,7 +187,9 @@ class CandleCheckpointCallback(Callback):
         self.info("ckpt_directory: %s" % Path(self.ckpt_directory).resolve())
 
     def scan_params(self, gParameters: Dict):
-        """Simply translate gParameters into instance fields."""
+        """
+        Simply translate gParameters into instance fields.
+        """
         self.epoch_max = param(
             gParameters, "epochs", ParamRequired(), ParamType.INTEGER_NN
         )
@@ -237,14 +240,14 @@ class CandleCheckpointCallback(Callback):
         Note: We immediately increment epoch
         from index-from-0 to index-from-1
         to match the TensorFlow output.
-        Normally, ckpts/best is the best saved state,
-              and ckpts/last is the last saved state.
+        Normally, ckpts/best is the best saved state, and ckpts/last is the last saved state.
+
         Procedure:
-        1. Write current state to ckpts/work
-        2. Rename ckpts/work to ckpts/epoch/NNN
-        3. If best, link ckpts/best to ckpts/epoch/NNN
-        4. Link ckpts/last to ckpts/epoch/NNN
-        5. Clean up old ckpts according to keep policy
+            1. Write current state to ckpts/work
+            2. Rename ckpts/work to ckpts/epoch/NNN
+            3. If best, link ckpts/best to ckpts/epoch/NNN
+            4. Link ckpts/last to ckpts/epoch/NNN
+            5. Clean up old ckpts according to keep policy
         """
 
         epoch += 1
@@ -275,8 +278,10 @@ class CandleCheckpointCallback(Callback):
         self.clean(epoch)
 
     def save_check(self, logs, epoch: int):
-        """Make sure we want to save this epoch based on the model metrics in
-        given logs Also updates epoch_best if appropriate."""
+        """
+        Make sure we want to save this epoch based on the model metrics in
+        given logs Also updates epoch_best if appropriate.
+        """
         if self.save_interval == 0:
             return False  # Checkpoints are disabled.
         # skip early epochs to improve speed
@@ -417,7 +422,8 @@ class CandleCheckpointCallback(Callback):
             fp.write("\n")
 
     def clean(self, epoch_now: int):
-        """Clean old epoch directories in accordance with ckpt_keep policies.
+        """
+        Clean old epoch directories in accordance with ckpt_keep policies.
 
         Return number of checkpoints kept and deleted
         """
@@ -489,11 +495,11 @@ class CandleCheckpointCallback(Callback):
 
 
 def restart(gParameters: Dict, model, verbose=True):
-    """Possibly restarts model from CheckpointCallback according to given
+    """
+    Possibly restarts model from CheckpointCallback according to given
     settings and the ckpt-info.json.
 
-    return        The JSON dict if the restart happened or        None
-    if the restart did not happen.
+    :return: The JSON dict if the restart happened or None if the restart did not happen.
     """
     import logging
 

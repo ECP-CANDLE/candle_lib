@@ -76,14 +76,14 @@ def func_reconstruct_closure(values):
 
 
 class Progbar(object):
+    """
+    Progress bar
+    """
+
     def __init__(self, target, width=30, verbose=1, interval=0.01):
         """
-        Parameters
-        ------------
-        target: int
-            total number of steps expected
-        interval: float
-            minimum visual progress update interval (in seconds)
+        :param int target: total number of steps expected
+        :param float interval: minimum visual progress update interval (in seconds)
         """
         self.width = width
         self.target = target
@@ -98,14 +98,10 @@ class Progbar(object):
 
     def update(self, current, values=[], force=False):
         """
-        Parameters
-        ------------
-        current : int
-            index of current step
-        values : list of tuples (name, value_for_last_step).
+        :param int current: index of current step
+        :param List values: list of tuples (name, value_for_last_step). \
             The progress bar will display averages for these values.
-        force : boolean
-            force visual progress update
+        :param bool force: force visual progress update
         """
         for k, v in values:
             if k not in self.sum_values:

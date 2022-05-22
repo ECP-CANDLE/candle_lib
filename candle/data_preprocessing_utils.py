@@ -7,19 +7,16 @@ from scipy import stats
 
 
 def quantile_normalization(data):
-    """This function does quantile normalization to input data. After
+    """
+    This function does quantile normalization to input data. After
     normalization, the samples (rows) in output data follow the same
     distribution, which is the average distribution calculated based on all
     samples. This function allows missing values, and assume missing values
     occur at random.
 
-    Parameters:
-    -----------
-    data: numpy array or pandas data frame of numeric values, with a shape of [n_samples, n_features].
+    :param data: numpy array or pandas data frame of numeric values, with a shape of [n_samples, n_features].
 
-    Returns:
-    --------
-    norm_data: numpy array or pandas data frame containing the data after quantile normalization.
+    :return: numpy array or pandas data frame containing the data after quantile normalization.
     """
 
     colnames = None
@@ -62,24 +59,21 @@ def quantile_normalization(data):
 def generate_cross_validation_partition(
     group_label, n_folds=5, n_repeats=1, portions=None, random_seed=None
 ):
-    """This function generates partition indices of samples for cross-
+    """
+    This function generates partition indices of samples for cross-
     validation analysis.
 
-    Parameters:
-    -----------
-    group_label: 1-D array or list of group labels of samples. If there are no groups in samples, a list of
+    :param group_label: 1-D array or list of group labels of samples. If there are no groups in samples, a list of
         sample indices can be supplied for generating partitions based on individual samples rather than sample groups.
-    n_folds: positive integer larger than 1, indicating the number of folds for cross-validation. Default is 5.
-    n_repeats: positive integer, indicating how many times the n_folds cross-validation should be repeated.
+    :param int n_folds: positive integer larger than 1, indicating the number of folds for cross-validation. Default is 5.
+    :param int n_repeats: positive integer, indicating how many times the n_folds cross-validation should be repeated.
         So the total number of cross-validation trials is n_folds * n_repeats. Default is 1.
-    portions: 1-D array or list of positive integers, indicating the number of data folds in each set
+    :param portions: 1-D array or list of positive integers, indicating the number of data folds in each set
         (e.g. training set, testing set, or validation set) after partitioning. The summation of elements
         in portions must be equal to n_folds. Default is [1, n_folds - 1].
-    random_seed: positive integer, the seed for random generator. Default is None.
+    :param int random_seed: positive integer, the seed for random generator. Default is None.
 
-    Returns:
-    --------
-    partition: list of n_folds * n_repeats lists, each of which contains len(portions) sample index lists for
+    :return: list of n_folds * n_repeats lists, each of which contains len(portions) sample index lists for
         a cross-validation trial.
     """
 

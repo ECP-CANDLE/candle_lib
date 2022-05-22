@@ -7,18 +7,15 @@ from astropy.stats import median_absolute_deviation
 
 
 def select_features_by_missing_values(data, threshold=0.1):
-    """This function returns the indices of the features whose missing rates
+    """
+    This function returns the indices of the features whose missing rates
     are smaller than the threshold.
 
-    Parameters:
-    -----------
-    data: numpy array or pandas data frame of numeric values, with a shape of [n_samples, n_features]
-    threshold: float in the range of [0, 1]. Features with a missing rate smaller than threshold will be selected.
+    :param data: numpy array or pandas data frame of numeric values, with a shape of [n_samples, n_features]
+    :param float threshold: range of [0, 1]. Features with a missing rate smaller than threshold will be selected. \
         Default is 0.1
 
-    Returns:
-    --------
-    indices: 1-D numpy array containing the indices of selected features
+    :return: 1-D numpy array containing the indices of selected features
     """
 
     if isinstance(data, pd.DataFrame):
@@ -44,29 +41,26 @@ def select_features_by_variation(
     bins=100,
     log=False,
 ):
-    """This function evaluates the variations of individual features and
+    """
+    This function evaluates the variations of individual features and
     returns the indices of features with large variations. Missing values are
     ignored in evaluating variation.
 
-    Parameters:
-    -----------
-    data: numpy array or pandas data frame of numeric values, with a shape of [n_samples, n_features].
-    variation_metric: string indicating the metric used for evaluating feature variation. 'var' indicates variance;
+    :param data: numpy array or pandas data frame of numeric values, with a shape of [n_samples, n_features].
+    :param string variation_metric: string indicating the metric used for evaluating feature variation. 'var' indicates variance; \
         'std' indicates standard deviation; 'mad' indicates median absolute deviation. Default is 'var'.
-    threshold: float. Features with a variation larger than threshold will be selected. Default is None.
-    portion: float in the range of [0, 1]. It is the portion of features to be selected based on variation.
-        The number of selected features will be the smaller of int(portion * n_features) and the total number of
-        features with non-missing variations. Default is None. threshold and portion can not take real values
+    :param float threshold: Features with a variation larger than threshold will be selected. Default is None.
+    :param float portion: float in the range of [0, 1]. It is the portion of features to be selected based on variation. \
+        The number of selected features will be the smaller of int(portion * n_features) and the total number of \
+        features with non-missing variations. Default is None. threshold and portion can not take real values \
         and be used simultaneously.
-    draw_histogram: boolean, whether to draw a histogram of feature variations. Default is False.
-    bins: positive integer, the number of bins in the histogram. Default is the smaller of 50 and the number of
+    :param bool draw_histogram: whether to draw a histogram of feature variations. Default is False.
+    :param int bins: positive integer, the number of bins in the histogram. Default is the smaller of 50 and the number of \
         features with non-missing variations.
-    log: boolean, indicating whether the histogram should be drawn on log scale.
+    :param bool log: whether the histogram should be drawn on log scale.
 
 
-    Returns:
-    --------
-    indices: 1-D numpy array containing the indices of selected features. If both threshold and
+    :return: 1-D numpy array containing the indices of selected features. If both threshold and \
         portion are None, indices will be an empty array.
     """
 
@@ -118,28 +112,27 @@ def select_features_by_variation(
 def select_decorrelated_features(
     data, method="pearson", threshold=None, random_seed=None
 ):
-    """This function selects features whose mutual absolute correlation
+    """
+    This function selects features whose mutual absolute correlation
     coefficients are smaller than a threshold. It allows missing values in
     data. The correlation coefficient of two features are calculated based on
     the observations that are not missing in both features. Features with only
     one or no value present and features with a zero standard deviation are not
     considered for selection.
 
-    Parameters:
-    -----------
-    data: numpy array or pandas data frame of numeric values, with a shape of [n_samples, n_features].
-    method: string indicating the method used for calculating correlation coefficient. 'pearson' indicates Pearson
-        correlation coefficient; 'kendall' indicates Kendall Tau correlation coefficient; 'spearman' indicates
-        Spearman rank correlation coefficient. Default is 'pearson'.
-    threshold: float. If two features have an absolute correlation coefficient higher than threshold,
-        one of the features is removed. If threshold is None, a feature is removed only when the two features
+    :param data: numpy array or pandas data frame of numeric values, with a shape of [n_samples, n_features].
+    :param string method: indicating the method used for calculating correlation coefficient. Default is 'pearson'.
+
+        - pearson: Pearson correlation coefficient
+        - kendall: Kendall Tau correlation coefficient
+        - spearman: Spearman rank correlation coefficient
+    :param float threshold: If two features have an absolute correlation coefficient higher than threshold,\
+        one of the features is removed. If threshold is None, a feature is removed only when the two features \
         are exactly identical. Default is None.
-    random_seed: positive integer, seed of random generator for ordering the features. If it is None, features
+    :param int random_seed: seed of random generator for ordering the features. If it is None, features \
         are not re-ordered before feature selection and thus the first feature is always selected. Default is None.
 
-    Returns:
-    --------
-    indices: 1-D numpy array containing the indices of selected features.
+    :return: 1-D numpy array containing the indices of selected features.
     """
 
     if isinstance(data, np.ndarray):

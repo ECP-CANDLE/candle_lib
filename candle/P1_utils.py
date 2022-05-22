@@ -95,38 +95,35 @@ def coxen_single_drug_gene_selection(
     num_generalizable_gene=50,
     multi_drug_mode=False,
 ):
-    """This function selects genes for drug response prediction using the COXEN
+    """
+    This function selects genes for drug response prediction using the COXEN
     approach. The COXEN approach is designed for selecting genes to predict the
     response of tumor cells to a specific drug. This function assumes no
     missing data exist.
 
-    Parameters:
-    -----------
-    source_data: pandas data frame of gene expressions of tumors, for which drug response is known. Its size is
-        [n_source_samples, n_features].
-    target_data: pandas data frame of gene expressions of tumors, for which drug response needs to be predicted.
-        Its size is [n_target_samples, n_features]. source_data and target_data have the same set
+    :param source_data: pandas data frame of gene expressions of tumors, for which drug response is known.\
+        Its size is [n_source_samples, n_features].
+    :param target_data: pandas data frame of gene expressions of tumors, for which drug response needs to be predicted. \
+        Its size is [n_target_samples, n_features]. source_data and target_data have the same set \
         of features and the orders of features must match.
-    drug_response_data: pandas data frame of drug response values for a drug. It must include a column of drug
-        response values and a column of tumor IDs.
-    drug_response_col: non-negative integer or string. If integer, it is the column index of drug response in
+    :param drug_response_data: pandas data frame of drug response values for a drug. \
+        It must include a column of drug response values and a column of tumor IDs.
+    :param drug_response_col: non-negative integer or string. If integer, it is the column index of drug response in \
         drug_response_data. If string, it is the column name of drug response.
-    tumor_col: non-negative integer or string. If integer, it is the column index of tumor IDs in drug_response_data.
+    :param tumor_col: non-negative integer or string. If integer, it is the column index of tumor IDs in drug_response_data. \
         If string, it is the column name of tumor IDs.
-    prediction_power_measure: string. 'pearson' uses the absolute value of Pearson correlation coefficient to
-        measure prediction power of gene; 'mutual_info' uses the mutual information to measure prediction power
+    :param string prediction_power_measure: 'pearson' uses the absolute value of Pearson correlation coefficient to \
+        measure prediction power of gene; 'mutual_info' uses the mutual information to measure prediction power \
         of gene. Default is 'pearson'.
-    num_predictive_gene: positive integer indicating the number of predictive genes to be selected.
-    generalization_power_measure: string. 'pearson' indicates the Pearson correlation coefficient;
+    :param int num_predictive_gene: the number of predictive genes to be selected.
+    :param string generalization_power_measure: 'pearson' indicates the Pearson correlation coefficient; \
         'ccc' indicates the concordance correlation coefficient. Default is 'ccc'.
-    num_generalizable_gene: positive integer indicating the number of generalizable genes to be selected.
-    multi_drug_mode: boolean, indicating whether the function runs as an auxiliary function of COXEN
+    :param int num_generalizable_gene: the number of generalizable genes to be selected. \
+    :param bool multi_drug_mode: indicating whether the function runs as an auxiliary function of COXEN \
         gene selection for multiple drugs. Default is False.
 
-    Returns:
-    --------
-    indices: 1-D numpy array containing the indices of selected genes, if multi_drug_mode is False;
-    1-D numpy array of indices of sorting all genes according to their prediction power, if multi_drug_mode is True.
+    :return: 1-D numpy array containing the indices of selected genes, if multi_drug_mode is False; \
+        1-D numpy array of indices of sorting all genes according to their prediction power, if multi_drug_mode is True.
     """
 
     if isinstance(drug_response_col, str):
@@ -234,7 +231,8 @@ def coxen_multi_drug_gene_selection(
     num_generalizable_gene=50,
     union_of_single_drug_selection=False,
 ):
-    """This function uses the COXEN approach to select genes for predicting the
+    """
+    This function uses the COXEN approach to select genes for predicting the
     response of multiple drugs. It assumes no missing data exist. It works in
     three modes. (1) If union_of_single_drug_selection is True,
     prediction_power_measure must be either 'pearson' or 'mutual_info'. This
@@ -255,34 +253,31 @@ def coxen_multi_drug_gene_selection(
     and its size must be at least num_predictive_gene. Then,
     num_generalizable_gene generalizable genes will be selected.
 
-    Parameters:
-    -----------
-    source_data: pandas data frame of gene expressions of tumors, for which drug response is known. Its size is
-        [n_source_samples, n_features].
-    target_data: pandas data frame of gene expressions of tumors, for which drug response needs to be predicted.
-        Its size is [n_target_samples, n_features]. source_data and target_data have the same set
+    :param source_data: pandas data frame of gene expressions of tumors, for which drug response is known. \
+        Its size is [n_source_samples, n_features].
+    :param target_data: pandas data frame of gene expressions of tumors, for which drug response needs to be predicted. \
+        Its size is [n_target_samples, n_features]. source_data and target_data have the same set \
         of features and the orders of features must match.
-    drug_response_data: pandas data frame of drug response that must include a column of drug response values,
-        a column of tumor IDs, and a column of drug IDs.
-    drug_response_col: non-negative integer or string. If integer, it is the column index of drug response in
-        drug_response_data. If string, it is the column name of drug response.
-    tumor_col: non-negative integer or string. If integer, it is the column index of tumor IDs in drug_response_data.
-        If string, it is the column name of tumor IDs.
-    drug_col: non-negative integer or string. If integer, it is the column index of drugs in drug_response_data.
+    :param drug_response_data: pandas data frame of drug response that must include a column of \
+        drug response values, a column of tumor IDs, and a column of drug IDs.
+    :param drug_response_col: non-negative integer or string. If integer, it is the column index of \
+        drug response in drug_response_data. If string, it is the column name of drug response.
+    :param tumor_col: non-negative integer or string. If integer, it is the column index of tumor IDs \
+        in drug_response_data. If string, it is the column name of tumor IDs.
+    :param drug_col: non-negative integer or string. \
+        If integer, it is the column index of drugs in drug_response_data. \
         If string, it is the column name of drugs.
-    prediction_power_measure: string. 'pearson' uses the absolute value of Pearson correlation coefficient to
-        measure prediction power of a gene; 'mutual_info' uses the mutual information to measure prediction power
+    :param string prediction_power_measure: 'pearson' uses the absolute value of Pearson correlation coefficient to \
+        measure prediction power of a gene; 'mutual_info' uses the mutual information to measure prediction power \
         of a gene; 'lm' uses the linear regression model to select predictive genes for multiple drugs. Default is 'lm'.
-    num_predictive_gene: positive integer indicating the number of predictive genes to be selected.
-    generalization_power_measure: string. 'pearson' indicates the Pearson correlation coefficient;
+    :param int num_predictive_gene: the number of predictive genes to be selected.
+    :param string generalization_power_measure: 'pearson' indicates the Pearson correlation coefficient; \
         'ccc' indicates the concordance correlation coefficient. Default is 'ccc'.
-    num_generalizable_gene: positive integer indicating the number of generalizable genes to be selected.
-    union_of_single_drug_selection: boolean, indicating whether the final gene set should be the union of genes
+    :param int num_generalizable_gene: the number of generalizable genes to be selected.
+    :param bool union_of_single_drug_selection: whether the final gene set should be the union of genes \
         selected for every drug.
 
-    Returns:
-    --------
-    indices: 1-D numpy array containing the indices of selected genes.
+    :return: 1-D numpy array containing the indices of selected genes.
     """
 
     if isinstance(drug_response_col, str):
@@ -435,31 +430,28 @@ def generate_gene_set_data(
     standardize=False,
     data_dir="../../Data/examples/Gene_Sets/MSigDB.v7.0/",
 ):
-    """This function generates genomic data summarized at the gene set level.
+    """
+    This function generates genomic data summarized at the gene set level.
 
-    Parameters:
-    -----------
-    data: numpy array or pandas data frame of numeric values, with a shape of [n_samples, n_features].
-    genes: 1-D array or list of gene names with a length of n_features. It indicates which gene a genomic
+    :param data: numpy array or pandas data frame of numeric values, with a shape of [n_samples, n_features].
+    :param genes: 1-D array or list of gene names with a length of n_features. It indicates which gene a genomic \
         feature belongs to.
-    gene_name_type: string, indicating the type of gene name used in genes. 'entrez' indicates Entrez gene ID and
+    :param string gene_name_type: the type of gene name used in genes. 'entrez' indicates Entrez gene ID and \
         'symbols' indicates HGNC gene symbol. Default is 'symbols'.
-    gene_set_category: string, indicating the gene sets for which data will be calculated. 'c2.cgp' indicates gene sets
-        affected by chemical and genetic perturbations; 'c2.cp.biocarta' indicates BioCarta gene sets; 'c2.cp.kegg'
-        indicates KEGG gene sets; 'c2.cp.pid' indicates PID gene sets; 'c2.cp.reactome' indicates Reactome gene sets;
-        'c5.bp' indicates GO biological processes; 'c5.cc' indicates GO cellular components; 'c5.mf' indicates
+    :param string gene_set_category: the gene sets for which data will be calculated. 'c2.cgp' indicates gene sets \
+        affected by chemical and genetic perturbations; 'c2.cp.biocarta' indicates BioCarta gene sets; 'c2.cp.kegg' \
+        indicates KEGG gene sets; 'c2.cp.pid' indicates PID gene sets; 'c2.cp.reactome' indicates Reactome gene sets; \
+        'c5.bp' indicates GO biological processes; 'c5.cc' indicates GO cellular components; 'c5.mf' indicates \
         GO molecular functions; 'c6.all' indicates oncogenic signatures. Default is 'c6.all'.
-    metric: string, indicating the way to calculate gene-set-level data. 'mean' calculates the mean of gene
-        features belonging to the same gene set. 'sum' calculates the summation of gene features belonging
-        to the same gene set. 'max' calculates the maximum of gene features. 'min' calculates the minimum
-        of gene features. 'abs_mean' calculates the mean of absolute values. 'abs_maximum' calculates
+    :param string metric: the way to calculate gene-set-level data. 'mean' calculates the mean of gene \
+        features belonging to the same gene set. 'sum' calculates the summation of gene features belonging \
+        to the same gene set. 'max' calculates the maximum of gene features. 'min' calculates the minimum \
+        of gene features. 'abs_mean' calculates the mean of absolute values. 'abs_maximum' calculates \
         the maximum of absolute values. Default is 'mean'.
-    standardize: boolean, indicating whether to standardize features before calculation. Standardization transforms
+    :param bool standardize: whether to standardize features before calculation. Standardization transforms \
         each feature to have a zero mean and a unit standard deviation.
 
-    Returns:
-    --------
-    gene_set_data: a data frame of calculated gene-set-level data. Column names are the gene set names.
+    :return: a data frame of calculated gene-set-level data. Column names are the gene set names.
     """
 
     sample_name = None
@@ -601,23 +593,20 @@ def postvar(sum2, n, a, b):
 def combat_batch_effect_removal(
     data, batch_labels, model=None, numerical_covariates=None
 ):
-    """This function corrects for batch effect in data.
+    """
+    This function corrects for batch effect in data.
 
-    Parameters:
-    -----------
-    data: pandas data frame of numeric values, with a size of (n_features, n_samples)
-    batch_labels: pandas series, with a length of n_samples. It should provide the batch labels of samples.
+    :param data: pandas data frame of numeric values, with a size of (n_features, n_samples)
+    :param batch_labels: pandas series, with a length of n_samples. It should provide the batch labels of samples. \
         Its indices are the same as the column names (sample names) in "data".
-    model: an object of patsy.design_info.DesignMatrix. It is a design matrix describing the covariate
-        information on the samples that could cause batch effects. If not provided, this function
+    :param model: an object of patsy.design_info.DesignMatrix. It is a design matrix describing the covariate \
+        information on the samples that could cause batch effects. If not provided, this function \
         will attempt to coarsely correct just based on the information provided in "batch".
-    numerical_covariates: a list of the names of covariates in "model" that are numerical rather than
+    :param numerical_covariates: a list of the names of covariates in "model" that are numerical rather than \
         categorical.
 
-    Returns:
-    --------
-    corrected : pandas data frame of numeric values, with a size of (n_features, n_samples). It is
-        the data with batch effects corrected.
+    :return: pandas data frame of numeric values, with a size of (n_features, n_samples). \
+        It is the data with batch effects corrected.
     """
 
     if isinstance(numerical_covariates, str):

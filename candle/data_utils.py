@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import numpy as np
 import pandas as pd
+from typing import List
 
 # Adding conditional import for compatibility between
 # sklearn versions
@@ -609,18 +610,19 @@ def load_Xy_one_hot_data(
 
 
 def load_Xy_one_hot_data2(
-    train_file,
-    test_file,
-    class_col=None,
-    drop_cols=None,
-    n_cols=None,
-    shuffle=False,
-    scaling=None,
-    validation_split=0.1,
+    train_file: str,
+    test_file: str,
+    class_col: int = None,
+    drop_cols: List = None,
+    n_cols: int = None,
+    shuffle: bool = False,
+    scaling: str = None,
+    validation_split: float = 0.1,
     dtype=DEFAULT_DATATYPE,
-    seed=DEFAULT_SEED,
+    seed: int = DEFAULT_SEED,
 ):
-    """Load training and testing data from the files specified, with a column
+    """
+    Load training and testing data from the files specified, with a column
     indicated to use as label. Further split trainig data into training and
     validation partitions, and construct corresponding training, validation and
     testing pandas DataFrames, separated into data (i.e. features) and labels.
@@ -630,66 +632,47 @@ def load_Xy_one_hot_data2(
     preserved, but training is split into training and validation partitions.
     This function assumes that the files contain a header with column names.
 
-    Parameters
-    ----------
-    train_file : filename
-        Name of the file to load the training data.
-    test_file : filename
-        Name of the file to load the testing data.
-    class_col : integer
-        Index of the column to use as the label.
-        (Default: None, this would cause the function to fail, a label
+    :param string train_file: Name of the file to load the training data.
+    :param string test_file: Name of the file to load the testing data.
+    :param int class_col: Index of the column to use as the label. \
+        (Default: None, this would cause the function to fail, a label \
         has to be indicated at calling).
-    drop_cols : list
-        List of column names to drop from the files being loaded.
+    :param List drop_cols: List of column names to drop from the files being loaded. \
         (Default: None, all the columns are used).
-    n_cols : integer
-        Number of columns to load from the files.
+    :param int n_cols: Number of columns to load from the files. \
         (Default: None, all the columns are used).
-    shuffle : boolean
-        Boolean flag to indicate row shuffling. If True the rows are
-        re-ordered, if False the order in which rows are loaded is
-        preserved.
+    :param boolean shuffle: Boolean flag to indicate row shuffling. If True the rows are \
+        re-ordered, if False the order in which rows are loaded is preserved. \
         (Default: False, no permutation of the loading row order).
-    scaling : string
-        String describing type of scaling to apply.
+    :param string scaling: String describing type of scaling to apply. \
         Options recognized: 'maxabs', 'minmax', 'std'.
-        'maxabs' : scales data to range [-1 to 1].
-        'minmax' : scales data to range [-1 to 1].
-        'std'    : scales data to normal variable with mean 0 and standard deviation 1.
-        (Default: None, no scaling).
-    validation_split : float
-        Fraction of training data to set aside for validation.
-        (Default: 0.1, ten percent of the training data is
-        used for the validation partition).
-    dtype : data type
-        Data type to use for the output pandas DataFrames.
+
+        - maxabs: scales data to range [-1 to 1].
+        - minmax: scales data to range [-1 to 1].
+        - std: scales data to normal variable with mean 0 and standard deviation 1. \
+            (Default: None, no scaling).
+    :param float validation_split: Fraction of training data to set aside for validation. \
+        (Default: 0.1, ten percent of the training data is used for the validation partition).
+    :param dtype: Data type to use for the output pandas DataFrames. \
         (Default: DEFAULT_DATATYPE defined in default_utils).
-    seed : int
-        Value to intialize or re-seed the generator.
+    :param int seed: Value to intialize or re-seed the generator. \
         (Default: DEFAULT_SEED defined in default_utils).
 
 
-    Return
-    ----------
-    X_train : pandas DataFrame
-        Data features for training loaded in a pandas DataFrame and
-        pre-processed as specified.
-    y_train : pandas DataFrame
-        Data labels for training loaded in a pandas DataFrame.
-        One-hot encoding (categorical) is used.
-    X_val : pandas DataFrame
-        Data features for validation loaded in a pandas DataFrame and
-        pre-processed as specified.
-    y_val : pandas DataFrame
-        Data labels for validation loaded in a pandas DataFrame.
-        One-hot encoding (categorical) is used.
-    X_test : pandas DataFrame
-        Data features for testing loaded in a pandas DataFrame and
-        pre-processed as specified.
-    y_test : pandas DataFrame
-        Data labels for testing loaded in a pandas DataFrame.
-        One-hot encoding (categorical) is used.
+    :return: Tuple of pandas DataFrames where
+
+        - X_train: Data features for training loaded in a pandas DataFrame and \
+            pre-processed as specified.
+        - y_train: Data labels for training loaded in a pandas DataFrame. \
+            One-hot encoding (categorical) is used.
+        - X_val: Data features for validation loaded in a pandas DataFrame and \
+            pre-processed as specified.
+        - y_val: Data labels for validation loaded in a pandas DataFrame. \
+            One-hot encoding (categorical) is used.
+        - X_test: Data features for testing loaded in a pandas DataFrame and \
+            pre-processed as specified.
+        - y_test: Data labels for testing loaded in a pandas DataFrame. \
+            One-hot encoding (categorical) is used.
     """
 
     assert class_col is not None
@@ -844,9 +827,15 @@ def load_Xy_data2(
 
 
 def load_Xy_data_noheader(
-    train_file, test_file, classes, usecols=None, scaling=None, dtype=DEFAULT_DATATYPE
+    train_file: str,
+    test_file: str,
+    classes: int,
+    usecols: List = None,
+    scaling: str = None,
+    dtype=DEFAULT_DATATYPE
 ):
-    """Load training and testing data from the files specified, with the first
+    """
+    Load training and testing data from the files specified, with the first
     column to use as label. Construct corresponding training and testing pandas
     DataFrames, separated into data (i.e. features) and labels. Labels to
     output are one-hot encoded (categorical). Columns to load can be selected.
@@ -854,43 +843,32 @@ def load_Xy_data_noheader(
     respective files) are preserved. This function assumes that the files do
     not contain a header.
 
-    Parameters
-    ----------
-    train_file : filename
-        Name of the file to load the training data.
-    test_file : filename
-        Name of the file to load the testing data.
-    classes : integer
-        Number of total classes to consider when
+    :param string train_file: Name of the file to load the training data.
+    :param string test_file: Name of the file to load the testing data.
+    :param int classes: Number of total classes to consider when
         building the categorical (one-hot) label encoding.
-    usecols : list
-        List of column indices to load from the files.
+    :param usecols: List of column indices to load from the files.
         (Default: None, all the columns are used).
-    scaling : string
-        String describing type of scaling to apply.
+    :param string scaling: String describing type of scaling to apply.
         Options recognized: 'maxabs', 'minmax', 'std'.
-        'maxabs' : scales data to range [-1 to 1].
-        'minmax' : scales data to range [-1 to 1].
-        'std'    : scales data to normal variable with mean 0 and standard deviation 1.
+
+        - maxabs: scales data to range [-1 to 1].
+        - minmax: scales data to range [-1 to 1].
+        - std   : scales data to normal variable with mean 0 and standard deviation 1. \
         (Default: None, no scaling).
-    dtype : data type
-        Data type to use for the output pandas DataFrames.
+    :param dtype: Data type to use for the output pandas DataFrames.
         (Default: DEFAULT_DATATYPE defined in default_utils).
 
-    Return
-    ----------
-    X_train : pandas DataFrame
-        Data features for training loaded in a pandas DataFrame and
-        pre-processed as specified.
-    Y_train : pandas DataFrame
-        Data labels for training loaded in a pandas DataFrame.
-        One-hot encoding (categorical) is used.
-    X_test : pandas DataFrame
-        Data features for testing loaded in a pandas DataFrame and
-        pre-processed as specified.
-    Y_test : pandas DataFrame
-        Data labels for testing loaded in a pandas DataFrame.
-        One-hot encoding (categorical) is used.
+    :return: Tuple of pandas DataFrames where
+
+        - X_train - Data features for training loaded in a pandas DataFrame and \
+            pre-processed as specified.
+        - Y_train - Data labels for training loaded in a pandas DataFrame. \
+            One-hot encoding (categorical) is used.
+        - X_test - Data features for testing loaded in a pandas DataFrame and \
+            pre-processed as specified.
+        - Y_test - Data labels for testing loaded in a pandas DataFrame. \
+            One-hot encoding (categorical) is used.
     """
     df_train = (pd.read_csv(train_file, header=None, usecols=usecols).values).astype(
         dtype
@@ -925,25 +903,26 @@ def load_Xy_data_noheader(
 
 
 def load_csv_data(
-    train_path,
-    test_path=None,
-    sep=",",
-    nrows=None,
-    x_cols=None,
-    y_cols=None,
-    drop_cols=None,
-    onehot_cols=None,
-    n_cols=None,
-    random_cols=False,
-    shuffle=False,
-    scaling=None,
+    train_path: str,
+    test_path: str = None,
+    sep: str = ",",
+    nrows: int = None,
+    x_cols: List = None,
+    y_cols: List = None,
+    drop_cols: List = None,
+    onehot_cols: List = None,
+    n_cols: int = None,
+    random_cols: bool = False,
+    shuffle: bool = False,
+    scaling: str = None,
     dtype=None,
-    validation_split=None,
-    return_dataframe=True,
-    return_header=False,
-    seed=DEFAULT_SEED,
+    validation_split: float = None,
+    return_dataframe: bool = True,
+    return_header: bool = False,
+    seed: int = DEFAULT_SEED,
 ):
-    """Load data from the files specified. Columns corresponding to data
+    """
+    Load data from the files specified. Columns corresponding to data
     features and labels can be specified. A one-hot encoding can be used for
     either features or labels. If validation_split is specified, trainig data
     is further split into training and validation partitions. pandas DataFrames
@@ -954,72 +933,41 @@ def load_csv_data(
     dropped. Order of rows can be shuffled. Data can be rescaled. This function
     assumes that the files contain a header with column names.
 
-    Parameters
-    ----------
-    train_path : filename
-        Name of the file to load the training data.
-    test_path : filename
-        Name of the file to load the testing data. (Optional).
-    sep : character
-        Character used as column separator.
-        (Default: ',', comma separated values).
-    nrows : integer
-        Number of rows to load from the files.
-        (Default: None, all the rows are used).
-    x_cols : list
-        List of columns to use as features.
-        (Default: None).
-    y_cols : list
-        List of columns to use as labels.
-        (Default: None).
-    drop_cols : list
-        List of columns to drop from the files being loaded.
-        (Default: None, all the columns are used).
-    onehot_cols : list
-        List of columns to one-hot encode.
-        (Default: None).
-    n_cols : integer
-        Number of columns to load from the files.
-        (Default: None).
-    random_cols : boolean
-        Boolean flag to indicate random selection of columns.
+    :param train_path: Name of the file to load the training data.
+    :param test_path: Name of the file to load the testing data. (Optional).
+    :param sep: Character used as column separator. (Default: ',', comma separated values).
+    :param int nrows: Number of rows to load from the files. (Default: None, all the rows are used).
+    :param x_cols: List of columns to use as features. (Default: None).
+    :param y_cols: List of columns to use as labels. (Default: None).
+    :param drop_cols: List of columns to drop from the files being loaded. (Default: None, all the columns are used).
+    :param onehot_cols: List of columns to one-hot encode. (Default: None).
+    :param int n_cols: Number of columns to load from the files. (Default: None).
+    :param boolean random_cols: Boolean flag to indicate random selection of columns.
         If True a number of n_cols columns is randomly selected, if False
-        the specified columns are used.
-        (Default: False).
-    shuffle : boolean
-        Boolean flag to indicate row shuffling. If True the rows are
-        re-ordered, if False the order in which rows are read is
-        preserved.
+        the specified columns are used. (Default: False).
+    :param boolean shuffle: Boolean flag to indicate row shuffling. If True the rows are
+        re-ordered, if False the order in which rows are read is preserved.
         (Default: False, no permutation of the loading row order).
-    scaling : string
-        String describing type of scaling to apply.
+    :param string scaling: String describing type of scaling to apply.
         Options recognized: 'maxabs', 'minmax', 'std'.
-        'maxabs' : scales data to range [-1 to 1].
-        'minmax' : scales data to range [-1 to 1].
-        'std'    : scales data to normal variable with mean 0 and standard deviation 1.
-        (Default: None, no scaling).
-    dtype : data type
-        Data type to use for the output pandas DataFrames.
-        (Default: None).
-    validation_split : float
-        Fraction of training data to set aside for validation.
+
+        - maxabs: scales data to range [-1 to 1].
+        - minmax: scales data to range [-1 to 1].
+        - std   : scales data to normal variable with mean 0 and standard deviation 1. (Default: None, no scaling).
+    :param dtype: Data type to use for the output pandas DataFrames. (Default: None).
+    :param float validation_split: Fraction of training data to set aside for validation.
         (Default: None, no validation partition is constructed).
-    return_dataframe : boolean
-        Boolean flag to indicate that the pandas DataFrames
+    :param boolean return_dataframe: Boolean flag to indicate that the pandas DataFrames
         used for data pre-processing are to be returned.
         (Default: True, pandas DataFrames are returned).
-    return_header : boolean
-        Boolean flag to indicate if the column headers are
+    :param boolean return_header: Boolean flag to indicate if the column headers are
         to be returned.
         (Default: False, no column headers are separetely returned).
-    seed : int
+    :param int seed:
         Value to intialize or re-seed the generator.
         (Default: DEFAULT_SEED defined in default_utils).
 
-
-    Return
-    ----------
-    Tuples of data features and labels are returned, for \
+    :return: Tuples of data features and labels are returned, for \
     train, validation and testing partitions, together with the column \
     names (headers). The specific objects to return depend \
     on the options selected.

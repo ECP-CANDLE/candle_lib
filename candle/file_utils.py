@@ -17,29 +17,21 @@ def get_file(
     cache_subdir: str = "common",
     datadir: str = None,
 ) -> str:
-    """Downloads a file from a URL if it not already in the cache. Passing the
+    """
+    Downloads a file from a URL if it not already in the cache. Passing the
     MD5 hash will verify the file after download as well as if it is already
     present in the cache.
 
-    Parameters
-    ----------
-    fname : string
-        name of the file
-    origin : string
-        original URL of the file
-    unpack : boolean
-        whether the file should be decompressed
-    md5_hash : string
-        MD5 hash of the file for verification
-    cache_subdir : string
-        directory being used as the cache
-    datadir : string
-        if set, datadir becomes its setting (which could be e.g. an absolute path) and cache_subdir no longer matters
+    :param string fname: name of the file
+    :param string origin: original URL of the file
+    :param bool unpack: whether the file should be decompressed
+    :param string md5_hash: MD5 hash of the file for verification
+    :param string cache_subdir: directory being used as the cache
+    :param string datadir: if set, datadir becomes its setting (which could be e.g. an absolute path) \
+        and cache_subdir no longer matters
 
-    Returns
-    ----------
-    string
-        Path to the downloaded file
+    :return: Path to the downloaded file
+    :rtype: string
     """
     if datadir is None and os.environ["CANDLE_DATA_DIR"] is not None:
         datadir = os.environ["CANDLE_DATA_DIR"]
@@ -147,19 +139,14 @@ def get_file(
 
 
 def validate_file(fpath: str, md5_hash: str) -> bool:
-    """Validates a file against a MD5 hash.
+    """
+    Validates a file against a MD5 hash.
 
-    Parameters
-    ----------
-    fpath : string
-        path to the file being validated
-    md5_hash : string
-        the MD5 hash being validated against
+    :param string fpath: path to the file being validated
+    :param string md5_hash: the MD5 hash being validated against
 
-    Returns
-    ----------
-    boolean
-        Whether the file is valid
+    :return: Whether the file is valid
+    :rtype: boolean
     """
     hasher = hashlib.md5()
     with open(fpath, "rb") as f:
@@ -172,19 +159,14 @@ def validate_file(fpath: str, md5_hash: str) -> bool:
 
 
 def directory_from_parameters(params: Dict, commonroot: str = "Output") -> str:
-    """Construct output directory path with unique IDs from parameters.
+    """
+    Construct output directory path with unique IDs from parameters.
 
-    Parameters
-    ----------
-    params : python dictionary
-        Dictionary of parameters read
-    commonroot : string
-        String to specify the common folder to store results.
+    :param Dict params: Dictionary of parameters read
+    :param string commonroot: String to specify the common folder to store results.
 
-    Returns
-    ----------
-    string
-        Path to the output directory
+    :return: Path to the output directory
+    :rtype: string
     """
 
     if commonroot in set([".", "./"]):  # Same directory --> convert to absolute path

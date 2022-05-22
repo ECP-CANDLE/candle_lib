@@ -25,7 +25,8 @@ DEFAULT_DATATYPE = np.float32
 
 
 class ArgumentStruct:
-    """Class that converts a python dictionary into an object with named
+    """
+    Class that converts a python dictionary into an object with named
     entries given by the dictionary keys.
 
     This structure simplifies the calling convention for accessing the
@@ -649,15 +650,13 @@ CONFLICT_LIST = [["clr_flag", "warmup_lr"], ["clr_flag", "reduce_lr"]]
 
 
 def check_flag_conflicts(params: ConfigDict):
-    """Check if parameters that must be exclusive are used in conjunction. The
+    """
+    Check if parameters that must be exclusive are used in conjunction. The
     check is made against CONFLICT_LIST, a global list that describes parameter
     pairs that should be exclusive. Raises an exception if pairs of parameters
     in CONFLICT_LIST are specified simulataneously.
 
-    Parameters
-    ----------
-    params : python dictionary
-       list to extract keywords from
+    :param Dict params: list to extract keywords from
     """
     key_set: Set[str] = set(params.keys())
     # check for conflicts
@@ -725,18 +724,13 @@ def check_file_parameters_exists(
 
 
 def finalize_parameters(bmk):
-    """Utility to parse parameters in common as well as parameters particular
+    """
+    Utility to parse parameters in common as well as parameters particular
     to each benchmark.
 
-    Parameters
-    ----------
-    bmk : benchmark object
-        Object that has benchmark filepaths and specifications
+    :param Benchmark bmk: Object that has benchmark filepaths and specifications
 
-    Return
-    ----------
-    gParameters : python dictionary
-        Dictionary with all the parameters necessary to run the benchmark.
+    :return: Dictionary with all the parameters necessary to run the benchmark.\
         Command line overwrites config file specifications
     """
 
@@ -838,13 +832,14 @@ def get_choice(name: str):
 
 
 def parse_from_dictlist(dictlist: List[ParseDict], parser):
-    """Functionality to parse options.
-    Parameters
-    ----------
-    pardict : python list of dictionaries
-        Specification of parameters
-    parser : ArgumentParser object
-        Current parser
+    """
+    Functionality to parse options.
+
+    :param List pardict: Specification of parameters
+    :param ArgumentParser parser: Current parser
+
+    :return: consolidated parameters
+    :rtype: ArgumentParser
     """
 
     for d in dictlist:

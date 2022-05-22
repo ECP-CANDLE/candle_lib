@@ -99,22 +99,16 @@ from matplotlib.colors import LogNorm
 
 
 def plot_density_observed_vs_predicted(Ytest, Ypred, pred_name=None, figprefix=None):
-    """Functionality to plot a 2D histogram of the distribution of observed
+    """
+    Functionality to plot a 2D histogram of the distribution of observed
     (ground truth) values vs. predicted values. The plot generated is stored in
     a png file.
 
-    Parameters
-    ----------
-    Ytest : numpy array
-      Array with (true) observed values
-    Ypred : numpy array
-      Array with predicted values.
-    pred_name : string
-      Name of data colum or quantity predicted (e.g. growth, AUC, etc.)
-    figprefix : string
-      String to prefix the filename to store the figure generated.
-      A '_density_predictions.png' string will be appended to the
-      figprefix given.
+    :param numpy array Ytest: Array with (true) observed values
+    :param numpy array Ypred: Array with predicted values.
+    :param string pred_name: Name of data colum or quantity predicted (e.g. growth, AUC, etc.)
+    :param string figprefix: String to prefix the filename to store the figure generated.
+      A '_density_predictions.png' string will be appended to the figprefix given.
     """
 
     xbins = 51
@@ -140,25 +134,16 @@ def plot_density_observed_vs_predicted(Ytest, Ypred, pred_name=None, figprefix=N
 
 
 def plot_2d_density_sigma_vs_error(sigma, yerror, method=None, figprefix=None):
-    """Functionality to plot a 2D histogram of the distribution of the standard
-    deviations computed for the predictions vs. the.
+    """
+    Functionality to plot a 2D histogram of the distribution of the standard
+    deviations computed for the predictions vs. the computed errors (i.e. values of observed - predicted).
+    The plot generated is stored in a png file.
 
-       computed errors (i.e. values of observed - predicted).
-       The plot generated is stored in a png file.
-
-    Parameters
-    ----------
-    sigma : numpy array
-      Array with standard deviations computed.
-    yerror : numpy array
-      Array with errors computed (observed - predicted).
-    method : string
-      Method used to comput the standard deviations (i.e. dropout,
-      heteroscedastic, etc.).
-    figprefix : string
-      String to prefix the filename to store the figure generated.
-      A '_density_sigma_error.png' string will be appended to the
-      figprefix given.
+    :param numpy array sigma: Array with standard deviations computed.
+    :param numpy array yerror: Array with errors computed (observed - predicted).
+    :param string method: Method used to comput the standard deviations (i.e. dropout, heteroscedastic, etc.).
+    :param string figprefix: String to prefix the filename to store the figure generated. \
+      A '_density_sigma_error.png' string will be appended to the figprefix given.
     """
 
     xbins = 51
@@ -182,28 +167,20 @@ def plot_2d_density_sigma_vs_error(sigma, yerror, method=None, figprefix=None):
 
 
 def plot_histogram_error_per_sigma(sigma, yerror, method=None, figprefix=None):
-    """Functionality to plot a 1D histogram of the distribution of.
+    """
+    Functionality to plot a 1D histogram of the distribution of computed errors 
+    (i.e. values of observed - predicted) observed
+    for specific values of standard deviations computed. The range of
+    standard deviations computed is split in xbins values and the
+    1D histograms of error distributions for the smallest six
+    standard deviations are plotted.
+    The plot generated is stored in a png file.
 
-       computed errors (i.e. values of observed - predicted) observed
-       for specific values of standard deviations computed. The range of
-       standard deviations computed is split in xbins values and the
-       1D histograms of error distributions for the smallest six
-       standard deviations are plotted.
-       The plot generated is stored in a png file.
-
-    Parameters
-    ----------
-    sigma : numpy array
-      Array with standard deviations computed.
-    yerror : numpy array
-      Array with errors computed (observed - predicted).
-    method : string
-      Method used to comput the standard deviations (i.e. dropout,
-      heteroscedastic, etc.).
-    figprefix : string
-      String to prefix the filename to store the figure generated.
-      A '_histogram_error_per_sigma.png' string will be appended to
-      the figprefix given.
+    :param numpy array sigma: Array with standard deviations computed.
+    :param numpy array yerror: Array with errors computed (observed - predicted).
+    :param string method: Method used to comput the standard deviations (i.e. dropout, heteroscedastic, etc.).
+    :param string figprefix: String to prefix the filename to store the figure generated.\
+      A '_histogram_error_per_sigma.png' string will be appended to the figprefix given.
     """
 
     xbins = 21
@@ -241,25 +218,17 @@ def plot_histogram_error_per_sigma(sigma, yerror, method=None, figprefix=None):
 def plot_decile_predictions(
     Ypred, Ypred_Lp, Ypred_Hp, decile_list, pred_name=None, figprefix=None
 ):
-    """Functionality to plot the mean of the deciles predicted. The plot
+    """
+    Functionality to plot the mean of the deciles predicted. The plot
     generated is stored in a png file.
 
-    Parameters
-    ----------
-    Ypred : numpy array
-      Array with median predicted values.
-    Ypred_Lp : numpy array
-      Array with low decile predicted values.
-    Ypred_Hp : numpy array
-      Array with high decile predicted values.
-    decile_list : string list
-      List of deciles predicted (e.g. '1st', '9th', etc.)
-    pred_name : string
-      Name of data colum or quantity predicted (e.g. growth, AUC, etc.)
-    figprefix : string
-      String to prefix the filename to store the figure generated.
-      A '_decile_predictions.png' string will be appended to the
-      figprefix given.
+    :param numpy array Ypred: Array with median predicted values.
+    :param numpy array Ypred_Lp: Array with low decile predicted values.
+    :param numpy array Ypred_Hp: Array with high decile predicted values.
+    :param List decile_list: List of deciles predicted (e.g. '1st', '9th', etc.)
+    :param string pred_name: Name of data colum or quantity predicted (e.g. growth, AUC, etc.)
+    :param string figprefix: String to prefix the filename to store the figure generated. \
+      A '_decile_predictions.png' string will be appended to the figprefix given.
     """
 
     index_ = np.argsort(Ypred)
@@ -283,41 +252,31 @@ def plot_decile_predictions(
 def plot_calibration_interpolation(
     mean_sigma, error, splineobj1, splineobj2, method="", figprefix=None, steps=False
 ):
-    """Functionality to plot empirical calibration curves estimated by
+    """
+    Functionality to plot empirical calibration curves estimated by
     interpolation of the computed standard deviations and errors. Since the
     estimations are very noisy, two levels of smoothing are used. Both can be
     plotted independently, if requested. The plot(s) generated is(are) stored
     in png file(s).
 
-    Parameters
-    ----------
-    mean_sigma : numpy array
-      Array with the mean standard deviations computed in inference.
-    error : numpy array
-      Array with the errors computed from the means predicted in inference.
-    splineobj1 : scipy.interpolate python object
-      A python object from scipy.interpolate that computes a
-      cubic Hermite spline (PchipInterpolator) to express
-      the interpolation after the first smoothing. This
-      spline is a partial result generated during the empirical
+    :param numpy array mean_sigma: Array with the mean standard deviations computed in inference.
+    :param numpy array error: Array with the errors computed from the means predicted in inference.
+    :param scipy.interpolate python object splineobj1: A python object from scipy.interpolate that computes a \
+      cubic Hermite spline (PchipInterpolator) to express \
+      the interpolation after the first smoothing. This \
+      spline is a partial result generated during the empirical \
       calibration procedure.
-    splineobj2 : scipy.interpolate python object
-      A python object from scipy.interpolate that computes a
-      cubic Hermite spline (PchipInterpolator) to express
-      the mapping from standard deviation to error. This
-      spline is generated for interpolating the predictions
-      after a process of smoothing-interpolation-smoothing
+    :param scipy.interpolate python object splineobj2: A python object from scipy.interpolate that computes a \
+      cubic Hermite spline (PchipInterpolator) to express \
+      the mapping from standard deviation to error. This \
+      spline is generated for interpolating the predictions \
+      after a process of smoothing-interpolation-smoothing \
       computed during the empirical calibration procedure.
-    method : string
-      Method used to comput the standard deviations (i.e. dropout,
-      heteroscedastic, etc.).
-    figprefix : string
-      String to prefix the filename to store the figure generated.
-      A '_empirical_calibration_interpolation.png' string will be appended to
-      the figprefix given.
-    steps : boolean
-      Besides the complete empirical calibration (including the interpolating
-      spline), also generates partial plots with only the spline of
+    :param string method: Method used to comput the standard deviations (i.e. dropout, heteroscedastic, etc.).
+    :param string figprefix: String to prefix the filename to store the figure generated. \
+      A '_empirical_calibration_interpolation.png' string will be appended to the figprefix given.
+    :param bool steps: Besides the complete empirical calibration (including the interpolating \
+      spline), also generates partial plots with only the spline of \
       the interpolating spline after the first smoothing level (smooth1).
     """
 
@@ -371,27 +330,19 @@ def plot_calibration_interpolation(
 def plot_calibrated_std(
     y_test, y_pred, std_calibrated, thresC, pred_name=None, figprefix=None
 ):
-    """Functionality to plot values in testing set after calibration. An
+    """
+    Functionality to plot values in testing set after calibration. An
     estimation of the lower-confidence samples is made. The plot generated is
     stored in a png file.
 
-    Parameters
-    ----------
-    y_test : numpy array
-      Array with (true) observed values.
-    y_pred : numpy array
-      Array with predicted values.
-    std_calibrated : numpy array
-      Array with standard deviation values after calibration.
-    thresC : float
-      Threshold to label low confidence predictions (low
+    :param numpy array y_test: Array with (true) observed values.
+    :param numpy array y_pred: Array with predicted values.
+    :param numpy array std_calibrated: Array with standard deviation values after calibration.
+    :param float thresC: Threshold to label low confidence predictions (low \
       confidence predictions are the ones with std > thresC).
-    pred_name : string
-      Name of data colum or quantity predicted (e.g. growth, AUC, etc.).
-    figprefix : string
-      String to prefix the filename to store the figure generated.
-      A '_calibrated.png' string will be appended to the
-      figprefix given.
+    :param string pred_name: Name of data colum or quantity predicted (e.g. growth, AUC, etc.).
+    :param string figprefix: String to prefix the filename to store the figure generated. \
+      A '_calibrated.png' string will be appended to the figprefix given.
     """
 
     N = y_test.shape[0]
@@ -432,7 +383,8 @@ def plot_calibrated_std(
 def plot_contamination(
     y_true, y_pred, sigma, T=None, thresC=0.1, pred_name=None, figprefix=None
 ):
-    """Functionality to plot results for the contamination model. This includes
+    """
+    Functionality to plot results for the contamination model. This includes
     the latent variables T if they are given (i.e. if the results provided
     correspond to training results). Global parameters for the normal
     distribution are used for shading 80% confidence interval. If results for
@@ -441,27 +393,16 @@ def plot_contamination(
     (Cauchy) is greater than the threshold given) are highlighted. The plot(s)
     generated is(are) stored in a png file.
 
-    Parameters
-    ----------
-    y_true : numpy array
-      Array with observed values.
-    y_pred : numpy array
-      Array with predicted values.
-    sigma : float
-      Standard deviation of the normal distribution.
-    T : numpy array
-      Array with latent variables (i.e. membership to normal and heavy-tailed
+    :param numpy array y_true: Array with observed values.
+    :param numpy array y_pred: Array with predicted values.
+    :param float sigma: Standard deviation of the normal distribution.
+    :param numpy array T: Array with latent variables (i.e. membership to normal and heavy-tailed \
       distributions). If in testing T is not available (i.e. None)
-    thresC : float
-      Threshold to label outliers (outliers are the ones
-      with probability of membership to heavy-tailed distribution,
-      i.e. T[:,1] > thresC).
-    pred_name : string
-      Name of data colum or quantity predicted (e.g. growth, AUC, etc.).
-    figprefix : string
-      String to prefix the filename to store the figures generated.
-      A '_contamination.png' string will be appended to the
-      figprefix given.
+    :param float thresC: Threshold to label outliers (outliers are the ones \
+      with probability of membership to heavy-tailed distribution, i.e. T[:,1] > thresC).
+    :param string pred_name: Name of data colum or quantity predicted (e.g. growth, AUC, etc.).
+    :param string figprefix: String to prefix the filename to store the figures generated. \
+      A '_contamination.png' string will be appended to the figprefix given.
     """
 
     N = y_true.shape[0]
