@@ -168,7 +168,7 @@ def plot_2d_density_sigma_vs_error(sigma, yerror, method=None, figprefix=None):
 
 def plot_histogram_error_per_sigma(sigma, yerror, method=None, figprefix=None):
     """
-    Functionality to plot a 1D histogram of the distribution of computed errors 
+    Functionality to plot a 1D histogram of the distribution of computed errors
     (i.e. values of observed - predicted) observed
     for specific values of standard deviations computed. The range of
     standard deviations computed is split in xbins values and the
