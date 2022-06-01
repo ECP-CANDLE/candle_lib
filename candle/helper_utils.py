@@ -11,7 +11,9 @@ import numpy as np
 from .file_utils import get_file
 
 
-def fetch_file(link: str, subdir: str, unpack: bool = False, md5_hash: str = None) -> str:
+def fetch_file(
+    link: str, subdir: str, unpack: bool = False, md5_hash: str = None
+) -> str:
     """
     Convert URL to file path and download the file if it is not already
     present in spedified cache.

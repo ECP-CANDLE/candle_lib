@@ -48,7 +48,7 @@ def generate_index_distribution(
     :param Dict params: Contains the keywords that control the behavior of the function \
         (uq_train_fr, uq_valid_fr, uq_test_fr for fraction specification, \
         uq_train_vec, uq_valid_vec, uq_test_vec for block list specification, and \
-        uq_train_bks, uq_valid_bks, uq_test_bks for block number specification) 
+        uq_train_bks, uq_valid_bks, uq_test_bks for block number specification)
 
     :return: Tuple of numpy arrays
 

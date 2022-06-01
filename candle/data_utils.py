@@ -1,8 +1,9 @@
 from __future__ import absolute_import
 
+from typing import List
+
 import numpy as np
 import pandas as pd
-from typing import List
 
 # Adding conditional import for compatibility between
 # sklearn versions
@@ -832,7 +833,7 @@ def load_Xy_data_noheader(
     classes: int,
     usecols: List = None,
     scaling: str = None,
-    dtype=DEFAULT_DATATYPE
+    dtype=DEFAULT_DATATYPE,
 ):
     """
     Load training and testing data from the files specified, with the first
