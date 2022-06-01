@@ -93,6 +93,11 @@ try:
 except ImportError:
     pass
 
+try:
+    import torch
+except ImportError:
+    pass
+
 if "tensorflow" in sys.modules:
     print("Importing candle utils for keras")
 
