@@ -62,7 +62,7 @@ from .parsing_utils import (
     finalize_parameters,
     parse_from_dictlist,
     input_output_conf,
-    data_preprocess_conf
+    data_preprocess_conf,
     model_conf,
     training_conf,
     cyclic_learning_conf,
