@@ -10,7 +10,8 @@ from candle.parsing_utils import (
     ParseDict,
     parse_common,
     parse_from_dictlist,
-    registered_conf,
+    basic_conf,
+    logging_conf,
 )
 
 DType = Any
@@ -70,7 +71,8 @@ class Benchmark:
         self.framework = framework
 
         self.registered_conf: List[ParseDict] = []
-        for lst in registered_conf:
+        self.registered_group_conf = [basic_conf, logging_conf]
+        for lst in self.registered_group_conf:
             self.registered_conf.extend(lst)
 
         self.required: Set[str] = set([])
@@ -88,7 +90,7 @@ class Benchmark:
         """
         # Parse has been split between arguments that are common with the default neon parser
         # and all the other options
-        self.parser = parse_common(self.parser)
+        self.parser = parse_common(self.parser, self.registered_group_conf)
         self.parser = parse_from_dictlist(self.additional_definitions, self.parser)
 
         # Set default configuration file

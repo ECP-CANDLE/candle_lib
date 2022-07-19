@@ -147,7 +147,6 @@ class ConfigDict(TypedDict):
     verbose: bool
     logfile: str
     scaling: str
-    shuffle: bool
     feature_subsample: int
     dense: Union[List[int], int]
     conv: Union[List[int], int]
@@ -168,6 +167,7 @@ class ConfigDict(TypedDict):
     early_stop: bool
     momentum: float
     initialization: str
+    shuffle: bool
     val_split: float
     train_steps: int
     val_steps: int
@@ -330,12 +330,6 @@ data_preprocess_conf = [
         "help": "type of feature scaling; 'minabs': to [-1,1]; 'minmax': to [0,1], 'std': standard unit normalization; 'none': no normalization.",
     },
     {
-        "name": "shuffle",
-        "type": str2bool,
-        "default": False,
-        "help": "randomly shuffle data set (produces different training and testing partitions each run depending on the seed)",
-    },
-    {
         "name": "feature_subsample",
         "type": int,
         "default": argparse.SUPPRESS,
@@ -478,6 +472,12 @@ training_conf = [
         "help": "type of weight initialization; 'constant': to 0; 'uniform': to [-0.05,0.05], 'normal': mean 0, stddev 0.05; 'glorot_uniform': [-lim,lim] with lim = sqrt(6/(fan_in+fan_out)); 'lecun_uniform' : [-lim,lim] with lim = sqrt(3/fan_in); 'he_normal' : mean 0, stddev sqrt(2/fan_in).",
     },
     {
+        "name": "shuffle",
+        "type": str2bool,
+        "default": False,
+        "help": "randomly shuffle data set (produces different training and testing partitions each run depending on the seed)",
+    },
+    {
         "name": "val_split",
         "type": float,
         "default": argparse.SUPPRESS,
@@ -614,7 +614,7 @@ ckpt_conf = [
     },
 ]
 
-registered_conf = [
+registered_group_conf = [
     basic_conf,
     input_output_conf,
     logging_conf,
@@ -643,7 +643,7 @@ def extract_keywords(lst_dict, kw):
 
 # Extract list of parameters in registered configuration
 PARAMETERS_CANDLE = [
-    item for lst in registered_conf for item in extract_keywords(lst, "name")
+    item for lst in registered_group_conf for item in extract_keywords(lst, "name")
 ]
 
 CONFLICT_LIST = [["clr_flag", "warmup_lr"], ["clr_flag", "reduce_lr"]]
@@ -977,15 +977,17 @@ def parse_from_dictlist(dictlist: List[ParseDict], parser):
     return parser
 
 
-def parse_common(parser):
+def parse_common(parser, bmk_registered_group_conf):
     """Functionality to parse options.
     Parameters
     ----------
     parser : ArgumentParser object
         Current parser
+    bmk_registered_group_conf : List of lists of dictionaries
+        List of parameters groups active in a given benchmark
     """
 
-    for lst in registered_conf:
+    for lst in bmk_registered_group_conf:
         parser = parse_from_dictlist(lst, parser)
 
     return parser
