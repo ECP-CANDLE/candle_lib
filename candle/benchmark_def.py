@@ -11,7 +11,9 @@ from candle.parsing_utils import (
     parse_common,
     parse_from_dictlist,
     basic_conf,
+    training_conf,
     logging_conf,
+    input_output_conf,
 )
 
 DType = Any
@@ -71,7 +73,7 @@ class Benchmark:
         self.framework = framework
 
         self.registered_conf: List[ParseDict] = []
-        self.registered_group_conf = [basic_conf, logging_conf]
+        self.registered_group_conf = [basic_conf, logging_conf, training_conf, input_output_conf]
         for lst in self.registered_group_conf:
             self.registered_conf.extend(lst)
 
