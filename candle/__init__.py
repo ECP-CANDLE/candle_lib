@@ -154,7 +154,7 @@ if "tensorflow" in sys.modules:
     )
     from .viz_utils import plot_metrics
 
-elif "torch" in sys.modules:
+if "torch" in sys.modules:
     print("Importing candle utils for pytorch")
     from .pytorch_utils import (
         build_pytorch_activation,
@@ -167,8 +167,8 @@ elif "torch" in sys.modules:
         set_pytorch_threads,
     )
 
-else:
-    raise Exception("No backend has been specified.")
+# else:
+#     raise Exception("No backend has been specified.")
 
 
 __all__ = [
