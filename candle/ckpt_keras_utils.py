@@ -67,6 +67,11 @@ Usage:
     if J is not None:
         initial_epoch = J['epoch']
 
+  Note: If J is not None, the restart() function will load the model
+        with the checkpointed model weights and provide metadata in J.
+        It is up to the caller to use the metadata in J in later calls
+        to the training API.
+
   Set up a callback for checkpoints:
 
     ckpt = candle.CandleCheckpointCallback(gParameters)
