@@ -33,7 +33,7 @@ def get_file(
     :return: Path to the downloaded file
     :rtype: string
     """
-    if datadir is None and os.environ["CANDLE_DATA_DIR"] is not None:
+    if datadir is None and "CANDLE_DATA_DIR" in os.environ:
         datadir = os.environ["CANDLE_DATA_DIR"]
     elif datadir is None and os.environ["CANDLE_DATA_DIR"] is None:
         raise ValueError(

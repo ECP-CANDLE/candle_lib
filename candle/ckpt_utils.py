@@ -151,7 +151,7 @@ class ParamType(Enum):
 
 class CandleCkpt:
 
-    def __init__(self, gParameters, logger="DEFAULT", verbose=True):
+    def __init__(self, gParameters=None, logger="DEFAULT", verbose=True):
         """
         :param Logger logger: The logger to use.
             May be None to disable or "DEFAULT" to use the default.
@@ -169,7 +169,8 @@ class CandleCkpt:
                 verbose=verbose,
                 fmt_line="%(asctime)s CandleCheckpoint: %(message)s",
             )
-        self.scan_params(gParameters)
+        if gParameters is not None:
+            self.scan_params(gParameters)
         # List of epoch integers this instance has written.
         # Sorted from smallest to largest.
         self.epochs = []
@@ -179,47 +180,47 @@ class CandleCkpt:
 
     def scan_params(self, gParameters):
         """Simply translate gParameters into instance fields"""
-        self.epoch_max = param(
+        self.epoch_max = self.param(
             gParameters, "epochs", ParamRequired(), ParamType.INTEGER_NN
         )
-        self.skip_epochs = param(
+        self.skip_epochs = self.param(
             gParameters, "ckpt_skip_epochs", 0, ParamType.INTEGER_NN
         )
-        self.ckpt_directory = param(
+        self.ckpt_directory = self.param(
             gParameters, "ckpt_directory", "./save", ParamType.STRING
         )
-        self.save_best = param(gParameters, "ckpt_save_best", True, ParamType.BOOLEAN)
-        self.save_best_metric = param(
+        self.save_best = self.param(gParameters, "ckpt_save_best", True, ParamType.BOOLEAN)
+        self.save_best_metric = self.param(
             gParameters, "ckpt_save_best_metric", None, ParamType.STRING
         )
-        self.best_metric_last = param(
+        self.best_metric_last = self.param(
             gParameters, "ckpt_best_metric_last", None, ParamType.FLOAT
         )
         if self.best_metric_last is None:
             import math
 
             self.best_metric_last = math.inf
-        self.save_interval = param(
+        self.save_interval = self.param(
             gParameters, "ckpt_save_interval", 1, ParamType.INTEGER_NN
         )
-        self.save_weights_only = param(
+        self.save_weights_only = self.param(
             gParameters, "ckpt_save_weights_only", True, ParamType.BOOLEAN
         )
-        self.checksum_enabled = param(
+        self.checksum_enabled = self.param(
             gParameters, "ckpt_checksum", False, ParamType.BOOLEAN
         )
-        self.keep_mode = param(
+        self.keep_mode = self.param(
             gParameters,
             "ckpt_keep_mode",
             "linear",
             ParamType.STRING,
             allowed=[None, "all", "linear"],
         )
-        self.keep_limit = param(
+        self.keep_limit = self.param(
             gParameters, "ckpt_keep_limit", 1000000, ParamType.INTEGER_GZ
         )
-        self.metadata = param(gParameters, "metadata", None, ParamType.STRING)
-        self.timestamp_last = param(
+        self.metadata = self.param(gParameters, "metadata", None, ParamType.STRING)
+        self.timestamp_last = self.param(
             gParameters, "ckpt_timestamp_last", None, ParamType.STRING
         )
         self.cwd = os.getcwd()
@@ -238,7 +239,7 @@ class CandleCkpt:
         self.info("PWD: " + os.getcwd())
         self.info("ckpt_directory: %s" % PosixPath(self.ckpt_directory).resolve())
 
-    def ckpt_epoch(epoch, logs):
+    def ckpt_epoch(self, epoch, logs):
         """
         Note: We immediately increment epoch
         from index-from-0 to index-from-1
@@ -410,132 +411,126 @@ class CandleCkpt:
         self.info("checkpoints kept: %i" % len(self.epochs))
         self.info("checkpoints list: %s" % str(self.epochs))
 
+    def param(self, gParameters, key, dflt, type_=ParamType.STRING, allowed=None):
+        """Pull key from parameters with type checks and conversions"""
+        if key in gParameters:
+            result = gParameters[key]
+        else:
+            if isinstance(dflt, ParamRequired):
+                raise Exception("param key must be provided: '%s'" % key)
+            result = dflt
+        result = self.param_type_check(key, result, type_)
+        self.param_allowed(key, result, allowed)
+        return result
 
-def param(gParameters, key, dflt, type_=ParamType.STRING, allowed=None):
-    """Pull key from parameters with type checks and conversions"""
-    if key in gParameters:
-        result = gParameters[key]
-    else:
-        if isinstance(dflt, ParamRequired):
-            raise Exception("param key must be provided: '%s'" % key)
-        result = dflt
-    result = param_type_check(key, result, type_)
-    param_allowed(key, result, allowed)
-    return result
+    def param_type_check(self, key, value, type_):
+        """
+        Check that value is convertable to given type:
+              if not, raise TypeError
+        Return the value as converted to given type
+        """
+        if value is None:
+            return value
+        if type_ is ParamType.STRING:
+            return str(value)
+        if type_ is ParamType.BOOLEAN:
+            return self.param_type_check_bool(key, value)
+        if (
+            type_ is ParamType.INTEGER
+            or type_ is ParamType.INTEGER_NN
+            or type_ is ParamType.INTEGER_GZ
+        ):
+            return self.param_type_check_int(key, value, type_)
+        if type_ is ParamType.FLOAT or type_ is ParamType.FLOAT_NN:
+            return self.param_type_check_float(key, value, type_)
+        raise TypeError("param_type_check(): unknown type: '%s'" % str(type_))
 
+    def param_type_check_bool(self, key, value):
+        if isinstance(value, bool):
+            return value
+        try:
+            v = str2bool(value)
+        except TypeError:
+            raise TypeError(
+                "parameter: '%s' is '%s' but must be a %s" % key,
+                str(value),
+                str(ParamType.BOOLEAN),
+            )
+        return v
 
-def param_type_check(key, value, type_):
-    """
-    Check that value is convertable to given type:
-          if not, raise TypeError
-    Return the value as converted to given type
-    """
-    if value is None:
-        return value
-    if type_ is ParamType.STRING:
-        return str(value)
-    if type_ is ParamType.BOOLEAN:
-        return param_type_check_bool(key, value)
-    if (
-        type_ is ParamType.INTEGER
-        or type_ is ParamType.INTEGER_NN
-        or type_ is ParamType.INTEGER_GZ
-    ):
-        return param_type_check_int(key, value, type_)
-    if type_ is ParamType.FLOAT or type_ is ParamType.FLOAT_NN:
-        return param_type_check_float(key, value, type_)
-    raise TypeError("param_type_check(): unknown type: '%s'" % str(type_))
+    def param_type_check_int(self, key, value, type_):
+        if isinstance(value, int):
+            result = value
+        else:
+            try:
+                result = int(value)
+            except TypeError:
+                raise TypeError(
+                    "parameter: '%s' is '%s' but must be a %s"
+                    % (key, str(value), str(type_))
+                )
+        if type_ == ParamType.INTEGER_NN:
+            if result < 0:
+                raise TypeError(
+                    ("parameter: '%s' is '%s' " + "but must be non-negative")
+                    % (key, str(value))
+                )
+        if type_ == ParamType.INTEGER_GZ:
+            if result <= 0:
+                raise TypeError(
+                    ("parameter: '%s' is '%s' " + "but must be greater-than-zero")
+                    % (key, str(value))
+                )
+        return result
 
+    def param_type_check_float(self, key, value, type_):
+        if isinstance(value, float):
+            result = value
+        else:
+            try:
+                result = float(value)
+            except TypeError:
+                raise TypeError(
+                    "parameter: '%s' is '%s' but must be a %s"
+                    % (key, str(value), str(type_))
+                )
+        if type_ == ParamType.FLOAT_NN:
+            if result < 0:
+                raise TypeError(
+                    ("parameter: '%s' is '%s' " + "but must be non-negative")
+                    % (key, str(value))
+                )
+        return result
 
-def param_type_check_bool(key, value):
-    if isinstance(value, bool):
-        return value
-    try:
-        v = str2bool(value)
-    except TypeError:
-        raise TypeError(
-            "parameter: '%s' is '%s' but must be a %s" % key,
-            str(value),
-            str(ParamType.BOOLEAN),
+    def checksum_file(self, filename):
+        """Read file, compute checksum, return it as a string."""
+        import zlib
+
+        start = time.time()
+        chunk_size = 10 * 1024 * 1024
+        total = 0
+        with open(filename, "rb") as fp:
+            checksum = 0
+            while True:
+                chunk = fp.read(chunk_size)
+                if not chunk:
+                    break
+                total += len(chunk)
+                checksum = zlib.crc32(chunk, checksum)
+        stop = time.time()
+        MB = total / (1024 * 1024)
+        duration = stop - start
+        rate = MB / duration
+        self.info(
+            "checksummed: %0.3f MB in %.3f seconds (%.2f MB/s)." % (MB, duration, rate)
         )
-    return v
+        return str(checksum)
 
-
-def param_type_check_int(key, value, type_):
-    if isinstance(value, int):
-        result = value
-    else:
-        try:
-            result = int(value)
-        except TypeError:
-            raise TypeError(
-                "parameter: '%s' is '%s' but must be a %s"
-                % (key, str(value), str(type_))
-            )
-    if type_ == ParamType.INTEGER_NN:
-        if result < 0:
-            raise TypeError(
-                ("parameter: '%s' is '%s' " + "but must be non-negative")
-                % (key, str(value))
-            )
-    if type_ == ParamType.INTEGER_GZ:
-        if result <= 0:
-            raise TypeError(
-                ("parameter: '%s' is '%s' " + "but must be greater-than-zero")
-                % (key, str(value))
-            )
-    return result
-
-
-def param_type_check_float(key, value, type_):
-    if isinstance(value, float):
-        result = value
-    else:
-        try:
-            result = float(value)
-        except TypeError:
-            raise TypeError(
-                "parameter: '%s' is '%s' but must be a %s"
-                % (key, str(value), str(type_))
-            )
-    if type_ == ParamType.FLOAT_NN:
-        if result < 0:
-            raise TypeError(
-                ("parameter: '%s' is '%s' " + "but must be non-negative")
-                % (key, str(value))
-            )
-    return result
-
-
-def checksum_file(logger, filename):
-    """Read file, compute checksum, return it as a string."""
-    import zlib
-
-    start = time.time()
-    chunk_size = 10 * 1024 * 1024
-    total = 0
-    with open(filename, "rb") as fp:
-        checksum = 0
-        while True:
-            chunk = fp.read(chunk_size)
-            if not chunk:
-                break
-            total += len(chunk)
-            checksum = zlib.crc32(chunk, checksum)
-    stop = time.time()
-    MB = total / (1024 * 1024)
-    duration = stop - start
-    rate = MB / duration
-    logger.info(
-        "checksummed: %0.3f MB in %.3f seconds (%.2f MB/s)." % (MB, duration, rate)
-    )
-    return str(checksum)
-
-    def restart_json(gParameters, logger, directory):
+    def restart_json(self, gParameters, directory):
         json_file = directory + "/ckpt-info.json"
         if not os.path.exists(json_file):
             msg = "restart_json(): in: %s model exists but not json!" % directory
-            logger.info(msg)
+            self.info(msg)
             if not disabled(gParameters, "require_json"):
                 raise Exception(msg)
         with open(json_file) as fp:
@@ -560,18 +555,18 @@ def checksum_file(logger, filename):
                The JSON dict if the restart happened or
                None if the restart did not happen.
         """
-        import logging
+        # import logging
 
-        logger = logging.getLogger("Candle.restart")
-        directory = param(gParameters, "ckpt_directory", "./save")
-        set_up_logger(
-            directory + "/ckpt.log",
-            logger,
-            verbose=verbose,
-            fmt_line="%(asctime)s CANDLE restart(): %(message)s",
-        )
+        # logger = logging.getLogger("Candle.restart")
+        # directory = param(gParameters, "ckpt_directory", "./save")
+        # set_up_logger(
+        #     directory + "/ckpt.log",
+        #     logger,
+        #     verbose=verbose,
+        #     fmt_line="%(asctime)s CANDLE restart(): %(message)s",
+        # )
 
-        param_ckpt_mode = param(
+        param_ckpt_mode = self.param(
             gParameters, "ckpt_restart_mode", "auto", allowed=["off", "auto", "required"]
         )
         if param_ckpt_mode == "off":
@@ -587,9 +582,9 @@ def checksum_file(logger, filename):
             # We must be under AUTO - proceed without restart
             assert param_ckpt_mode == "auto"
             return None
-        logger.info("restarting: '%s'" % model_file)
-        result = restart_json(gParameters, logger, dir_last)
-        logger.info(
+        self.info("restarting: '%s'" % model_file)
+        result = self.restart_json(gParameters, logger, dir_last)
+        self.info(
             "restarting: epoch=%i timestamp=%s", result["epoch"], result["timestamp"]
         )
         start = time.time()
@@ -602,7 +597,7 @@ def checksum_file(logger, filename):
         stop = time.time()
         duration = stop - start
         rate = MB / duration
-        logger.info(
+        self.info(
             "restarting: model read:  %0.3f MB in %0.3f seconds (%0.2f MB/s).",
             MB,
             duration,
@@ -610,32 +605,29 @@ def checksum_file(logger, filename):
         )
         return result
 
-    def build_model(model_file):
+    def build_model(self, model_file):
         raise Exception("Backend must override this method!")
 
+    def param_allowed(self, key, value, allowed):
+        """
+        Check that the value is in the list of allowed values
+        If allowed is None, there is no check, simply success
+        """
+        if allowed is None:
+            return
+        if value not in allowed:
+            raise ValueError(
+                ("hyperparameter '%s'='%s' is not in the " + "list of allowed values: %s")
+                % (key, value, str(allowed))
+            )
 
-def param_allowed(key, value, allowed):
-    """
-    Check that the value is in the list of allowed values
-    If allowed is None, there is no check, simply success
-    """
-    if allowed is None:
-        return
-    if value not in allowed:
-        raise ValueError(
-            ("hyperparameter '%s'='%s' is not in the " + "list of allowed values: %s")
-            % (key, value, str(allowed))
-        )
+    def enabled(self, gParameters, key):
+        """Is this parameter set to True?"""
+        return key in gParameters and gParameters[key]
 
-
-def enabled(gParameters, key):
-    """Is this parameter set to True?"""
-    return key in gParameters and gParameters[key]
-
-
-def disabled(gParameters, key):
-    """Is this parameter set to False?"""
-    return key in gParameters and not gParameters[key]
+    def disabled(self, gParameters, key):
+        """Is this parameter set to False?"""
+        return key in gParameters and not gParameters[key]
 
 
 def ckpt_parser(parser):
@@ -702,7 +694,7 @@ def ckpt_parser(parser):
     return parser
 
 
-def ckpt_defs(defs):
+def ckpt_defs(self, defs):
     # defs is an existing list
     # global
     new_defs = [

@@ -34,7 +34,10 @@ class CandleCkptKeras(Callback, CandleCkpt):
     """
 
     def __init__(self, gParameters: Dict, logger="DEFAULT", verbose=True):
-        super().__init__(gParameters, logger, verbose)
+        super().__init__()
+        if logger != "DEFAULT":
+            self.logger = logger
+        self.scan_params(gParameters)
 
     # Keras Callback API:
     def on_epoch_end(self, epoch, logs=None):
