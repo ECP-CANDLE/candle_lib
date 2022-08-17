@@ -14,7 +14,7 @@ from tensorflow.keras.callbacks import Callback, ModelCheckpoint
 from tensorflow.keras.models import Model
 
 # CANDLE imports
-from ckpt_utils import CandleCkpt
+from .ckpt_utils import CandleCkpt
 
 
 class MultiGPUCheckpoint(ModelCheckpoint):

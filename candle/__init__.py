@@ -101,7 +101,8 @@ except ImportError:
 if "tensorflow" in sys.modules:
     print("Importing candle utils for keras")
 
-    from .ckpt_keras_utils import CandleCheckpointCallback, MultiGPUCheckpoint, restart
+    from .ckpt_utils import ModelType, CandleCkpt
+    from .ckpt_keras_utils import MultiGPUCheckpoint, CandleCkptKeras
     from .clr_keras_utils import CyclicLR, clr_callback, clr_check_args, clr_set_args
     from .keras_utils import (
         CandleRemoteMonitor,

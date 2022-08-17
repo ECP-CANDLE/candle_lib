@@ -70,7 +70,7 @@ Usage:
 
   Set up a callback for checkpoints:
 
-    ckpt = candle.CandleCheckpointCallback(gParameters)
+    ckpt = candle.CandleCkpt(gParameters)
     history = model.fit(epochs=gParameters['epochs'],
                         initial_epoch=initial_epoch,
                         ...
