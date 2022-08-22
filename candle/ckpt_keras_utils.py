@@ -41,8 +41,38 @@ class CandleCkptKeras(Callback, CandleCkpt):
 
     # Keras Callback API:
     def on_epoch_end(self, epoch, logs=None):
-        ckpt_metric = logs[self.save_best_metric]
-        self.ckpt_epoch(self.model, epoch, ckpt_metric)
+        if self.save_best_metric not in logs.keys():
+            raise Exception(
+                (
+                    "CandleCheckpointCallback: "
+                    + "save_best_metric='%s' "
+                    + "not in list of model metrics: %s"
+                )
+                % (self.save_best_metric, str(logs.keys()))
+            )
+
+        # Known metrics and direction of progress
+        known_metrics = {
+            "loss": "-",
+            "accuracy": "+",
+            "val_loss": "-",
+            "val_accuracy": "+",
+            "lr": "-",
+        }
+
+        if self.save_best_metric not in known_metrics.keys():
+            raise Exception(
+                (
+                    "CandleCheckpointCallback: "
+                    + "save_best_metric='%s' "
+                    + "not in list of known_metrics: %s"
+                )
+                % (self.save_best_metric, str(known_metrics.keys()))
+            )
+
+        metric_value = logs[self.save_best_metric]
+        direction = known_metrics[self.save_best_metric]
+        self.ckpt_epoch(epoch, direction, metric_value)
 
     def write_model_backend(self, model):
         # Keras-specific method

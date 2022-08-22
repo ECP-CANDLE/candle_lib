@@ -113,14 +113,12 @@ import json
 import os
 import shutil
 import time
-from argparse import ArgumentParser
-from logging import Logger
-from pathlib import Path
-from typing import Dict, List
+from pathlib import PosixPath
 
 from enum import Enum, auto, unique
 
 from .helper_utils import set_up_logger
+from .helper_utils import str2bool
 
 
 class ModelType(Enum):
@@ -225,7 +223,6 @@ class CandleCkpt:
         )
         self.cwd = os.getcwd()
 
-
     def report_initial(self):
         """Simply report that we are ready to run"""
         self.info("Callback initialized.")
@@ -239,7 +236,7 @@ class CandleCkpt:
         self.info("PWD: " + os.getcwd())
         self.info("ckpt_directory: %s" % PosixPath(self.ckpt_directory).resolve())
 
-    def ckpt_epoch(self, epoch, logs):
+    def ckpt_epoch(self, epoch: int, direction: str, metric_value: float):
         """
         Note: We immediately increment epoch
         from index-from-0 to index-from-1
@@ -263,7 +260,7 @@ class CandleCkpt:
         dir_epochs = dir_root / "ckpts/epochs"
         dir_this = dir_epochs / ("%03i" % epoch)
 
-        if not self.save_check(logs, epoch):
+        if not self.save_check(epoch, direction, metric_value):
             return
         if os.path.exists(dir_this):
             self.debug("remove:  '%s'" % self.relpath(dir_this))
@@ -282,6 +279,72 @@ class CandleCkpt:
             self.symlink(dir_this, dir_best)
         self.symlink(dir_this, dir_last)
         self.clean(epoch)
+
+    def save_check(self, epoch: int, direction: str, metric_value):
+        """
+        Make sure we want to save this epoch based on the model metrics in
+        given logs Also updates epoch_best if appropriate.
+        epoch: The current epoch (just completed)
+        direction: either "+" (metric_value should increase)
+                       or "-" (should decrease)
+        metric_value: The current ckpt metric value
+        """
+        if self.save_interval == 0:
+            return False  # Checkpoints are disabled.
+        # skip early epochs to improve speed
+        if epoch < self.skip_epochs:
+            self.debug("model saving disabled until epoch %d" % self.skip_epochs)
+            return False
+        # Do this first- it may set epoch_best:
+        if self.save_check_best(epoch, direction, metric_value):
+            # The model improved- save!
+            self.epoch_best = epoch
+            return True
+        if epoch == self.epoch_max:
+            self.info("writing final epoch %i ..." % epoch)
+            return True  # Final epoch - save!
+        if epoch % self.save_interval == 0:
+            return True  # We are on the save_interval: save!
+        # else- not saving:
+        self.debug("not writing this epoch.")
+        return False
+
+    def save_check_best(self, epoch: int, direction, metric_value):
+        if not self.save_best:
+            return False
+
+        # Logging:
+        if metric_value < self.best_metric_last:
+            symbol = "<"
+        elif metric_value > self.best_metric_last:
+            symbol = ">"
+        else:
+            symbol = "="
+        self.debug(
+            "metrics: %s: current=%f %s last=%f"
+            % (
+                self.save_best_metric,
+                metric_value,
+                symbol,
+                self.best_metric_last,
+            )
+        )
+
+        # Check for improvement:
+        improved = False  # did the metric improve this epoch?
+        if direction == "-":
+            if metric_value < self.best_metric_last:
+                improved = True
+        elif direction == "+":
+            if metric_value > self.best_metric_last:
+                improved = True
+        else:
+            assert False
+        if improved:
+            self.best_metric_last = metric_value
+            self.epoch_best = epoch
+            return True
+        return False
 
     def write_model(self, dir_work, epoch):
         """
@@ -313,7 +376,7 @@ class CandleCkpt:
         dir_work: A PosixPath
         """
         if self.checksum_enabled:
-            self.cksum_model = checksum_file(self.logger, dir_work / "model.h5")
+            self.cksum_model = self.checksum_file(self.logger, dir_work / "model.h5")
         else:
             self.cksum_model = "__DISABLED__"
 
@@ -531,16 +594,16 @@ class CandleCkpt:
         if not os.path.exists(json_file):
             msg = "restart_json(): in: %s model exists but not json!" % directory
             self.info(msg)
-            if not disabled(gParameters, "require_json"):
+            if not self.disabled(gParameters, "require_json"):
                 raise Exception(msg)
         with open(json_file) as fp:
             J = json.load(fp)
         # print(str(J))
-        logger.debug("ckpt-info.json contains:")
-        logger.debug(json.dumps(J, indent=2))
-        logger.info("restarting from epoch: %i" % J["epoch"])
-        if param(gParameters, "ckpt_checksum", False, ParamType.BOOLEAN):
-            checksum = checksum_file(logger, directory + "/model.h5")
+        self.logger.debug("ckpt-info.json contains:")
+        self.logger.debug(json.dumps(J, indent=2))
+        self.logger.info("restarting from epoch: %i" % J["epoch"])
+        if self.param(gParameters, "ckpt_checksum", False, ParamType.BOOLEAN):
+            checksum = self.checksum_file(directory + "/model.h5")
             if checksum != J["checksum"]:
                 raise Exception("checksum mismatch! directory: " % directory)
 
@@ -583,7 +646,7 @@ class CandleCkpt:
             assert param_ckpt_mode == "auto"
             return None
         self.info("restarting: '%s'" % model_file)
-        result = self.restart_json(gParameters, logger, dir_last)
+        result = self.restart_json(gParameters, dir_last)
         self.info(
             "restarting: epoch=%i timestamp=%s", result["epoch"], result["timestamp"]
         )
