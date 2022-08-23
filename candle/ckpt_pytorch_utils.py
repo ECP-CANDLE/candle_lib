@@ -41,7 +41,7 @@ class CandleCkptPyTorch(CandleCkpt):
         # PyTorch-specific method
         torch.save({
             "epoch": epoch,
-            "model_state_dict": self.model["net"].state_dict(),
+            "model_state_dict": self.model["model"].state_dict(),
             "optimizer_state_dict": self.model["optimizer"].state_dict(),
             "loss": 0
         }, self.model_file)
