@@ -149,7 +149,7 @@ class ParamType(Enum):
 
 class CandleCkpt:
 
-    def __init__(self, gParameters=None, logger="DEFAULT", verbose=True):
+    def __init__(self, gParameters=None, logger:str = "DEFAULT", verbose:bool = True):
         """
         :param Logger logger: The logger to use.
             May be None to disable or "DEFAULT" to use the default.
@@ -159,13 +159,12 @@ class CandleCkpt:
         self.logger = logger
         if self.logger == "DEFAULT":
             import logging
-
             self.logger = logging.getLogger("CandleCkpt")
             set_up_logger(
                 "save/ckpt.log",
                 self.logger,
                 verbose=verbose,
-                fmt_line="%(asctime)s CandleCheckpoint: %(message)s",
+                fmt_line="%(asctime)s CandleCkpt: %(message)s",
             )
         if gParameters is not None:
             self.scan_params(gParameters)
@@ -174,52 +173,54 @@ class CandleCkpt:
         self.epochs = []
         # The best epoch wrt metric.  Do not delete this!
         self.epoch_best = 0
+        # A backend-specific model data structure
+        self.model = None
         self.report_initial()
 
-    def scan_params(self, gParameters):
+    def scan_params(self, gParams):
         """Simply translate gParameters into instance fields"""
+        self.gParams = gParams
         self.epoch_max = self.param(
-            gParameters, "epochs", ParamRequired(), ParamType.INTEGER_NN
+            "epochs", ParamRequired(), ParamType.INTEGER_NN
         )
         self.skip_epochs = self.param(
-            gParameters, "ckpt_skip_epochs", 0, ParamType.INTEGER_NN
+            "ckpt_skip_epochs", 0, ParamType.INTEGER_NN
         )
         self.ckpt_directory = self.param(
-            gParameters, "ckpt_directory", "./save", ParamType.STRING
+            "ckpt_directory", "./save", ParamType.STRING
         )
-        self.save_best = self.param(gParameters, "ckpt_save_best", True, ParamType.BOOLEAN)
+        self.save_best = self.param("ckpt_save_best", True, ParamType.BOOLEAN)
         self.save_best_metric = self.param(
-            gParameters, "ckpt_save_best_metric", None, ParamType.STRING
+            "ckpt_save_best_metric", None, ParamType.STRING
         )
         self.best_metric_last = self.param(
-            gParameters, "ckpt_best_metric_last", None, ParamType.FLOAT
+            "ckpt_best_metric_last", None, ParamType.FLOAT
         )
         if self.best_metric_last is None:
             import math
-
             self.best_metric_last = math.inf
         self.save_interval = self.param(
-            gParameters, "ckpt_save_interval", 1, ParamType.INTEGER_NN
+            "ckpt_save_interval", 1, ParamType.INTEGER_NN
         )
+        self.info("save_interval: " + str(self.save_interval))
         self.save_weights_only = self.param(
-            gParameters, "ckpt_save_weights_only", True, ParamType.BOOLEAN
+            "ckpt_save_weights_only", True, ParamType.BOOLEAN
         )
         self.checksum_enabled = self.param(
-            gParameters, "ckpt_checksum", False, ParamType.BOOLEAN
+            "ckpt_checksum", False, ParamType.BOOLEAN
         )
         self.keep_mode = self.param(
-            gParameters,
             "ckpt_keep_mode",
             "linear",
             ParamType.STRING,
             allowed=[None, "all", "linear"],
         )
         self.keep_limit = self.param(
-            gParameters, "ckpt_keep_limit", 1000000, ParamType.INTEGER_GZ
+            "ckpt_keep_limit", 1000000, ParamType.INTEGER_GZ
         )
-        self.metadata = self.param(gParameters, "metadata", None, ParamType.STRING)
+        self.metadata = self.param("metadata", None, ParamType.STRING)
         self.timestamp_last = self.param(
-            gParameters, "ckpt_timestamp_last", None, ParamType.STRING
+            "ckpt_timestamp_last", None, ParamType.STRING
         )
         self.cwd = os.getcwd()
 
@@ -351,16 +352,16 @@ class CandleCkpt:
         Do the I/O, report stats
         dir_work: A PosixPath
         """
-        model_file = dir_work / "model.h5"
-        self.debug("writing model to: '%s'" % self.relpath(model_file))
+        self.model_file = dir_work / "model.h5"
+        self.debug("writing model to: '%s'" % self.relpath(self.model_file))
         start = time.time()
 
         # Call down to backend-specific model writer:
-        self.write_model_backend()
+        self.write_model_backend(self.model, epoch)
 
         stop = time.time()
         duration = stop - start
-        stats = os.stat(model_file)
+        stats = os.stat(self.model_file)
         MB = stats.st_size / (1024 * 1024)
         rate = MB / duration
         self.debug(
@@ -376,14 +377,14 @@ class CandleCkpt:
         dir_work: A PosixPath
         """
         if self.checksum_enabled:
-            self.cksum_model = self.checksum_file(self.logger, dir_work / "model.h5")
+            self.cksum_model = self.checksum_file(dir_work / "model.h5")
         else:
             self.cksum_model = "__DISABLED__"
 
     def write_json(self, jsonfile, epoch):
         from datetime import datetime
-
         now = datetime.now()
+        # The dict to dump():
         D = {}
         D["epoch"] = epoch
         D["save_best_metric"] = self.save_best_metric
@@ -474,10 +475,11 @@ class CandleCkpt:
         self.info("checkpoints kept: %i" % len(self.epochs))
         self.info("checkpoints list: %s" % str(self.epochs))
 
-    def param(self, gParameters, key, dflt, type_=ParamType.STRING, allowed=None):
+    def param(self, key, dflt, type_=ParamType.STRING, allowed=None):
         """Pull key from parameters with type checks and conversions"""
-        if key in gParameters:
-            result = gParameters[key]
+        self.gParams
+        if key in self.gParams:
+            result = self.gParams[key]
         else:
             if isinstance(dflt, ParamRequired):
                 raise Exception("param key must be provided: '%s'" % key)
@@ -565,12 +567,45 @@ class CandleCkpt:
                 )
         return result
 
+    def param_allowed(self, key, value, allowed):
+        """
+        Check that the value is in the list of allowed values
+        If allowed is None, there is no check, simply success
+        """
+        if allowed is None:
+            return
+        if value not in allowed:
+            raise ValueError(
+                ("hyperparameter '%s'='%s' is not in the " + "list of allowed values: %s")
+                % (key, value, str(allowed))
+            )
+
+    def restart_json(self, directory):
+        json_file = directory + "/ckpt-info.json"
+        if not os.path.exists(json_file):
+            msg = "restart_json(): in: %s model exists but not json!" % directory
+            self.info(msg)
+            if not self.disabled("require_json"):
+                raise Exception(msg)
+        with open(json_file) as fp:
+            J = json.load(fp)
+        # print(str(J))
+        self.logger.debug("ckpt-info.json contains:")
+        self.logger.debug(json.dumps(J, indent=2))
+        self.logger.info("restarting from epoch: %i" % J["epoch"])
+        if self.param("ckpt_checksum", False, ParamType.BOOLEAN):
+            checksum = self.checksum_file(directory + "/model.h5")
+            if checksum != J["checksum"]:
+                raise Exception("checksum mismatch! directory: " % directory)
+
+        return J
+
     def checksum_file(self, filename):
         """Read file, compute checksum, return it as a string."""
         import zlib
 
         start = time.time()
-        chunk_size = 10 * 1024 * 1024
+        chunk_size = 10 * 1024 * 1024  # 10 MB
         total = 0
         with open(filename, "rb") as fp:
             checksum = 0
@@ -589,26 +624,6 @@ class CandleCkpt:
         )
         return str(checksum)
 
-    def restart_json(self, gParameters, directory):
-        json_file = directory + "/ckpt-info.json"
-        if not os.path.exists(json_file):
-            msg = "restart_json(): in: %s model exists but not json!" % directory
-            self.info(msg)
-            if not self.disabled(gParameters, "require_json"):
-                raise Exception(msg)
-        with open(json_file) as fp:
-            J = json.load(fp)
-        # print(str(J))
-        self.logger.debug("ckpt-info.json contains:")
-        self.logger.debug(json.dumps(J, indent=2))
-        self.logger.info("restarting from epoch: %i" % J["epoch"])
-        if self.param(gParameters, "ckpt_checksum", False, ParamType.BOOLEAN):
-            checksum = self.checksum_file(directory + "/model.h5")
-            if checksum != J["checksum"]:
-                raise Exception("checksum mismatch! directory: " % directory)
-
-        return J
-
     def restart(self, gParameters, model, verbose=True):
         """
         Possibly restarts model from CheckpointCallback according to given
@@ -618,19 +633,8 @@ class CandleCkpt:
                The JSON dict if the restart happened or
                None if the restart did not happen.
         """
-        # import logging
-
-        # logger = logging.getLogger("Candle.restart")
-        # directory = param(gParameters, "ckpt_directory", "./save")
-        # set_up_logger(
-        #     directory + "/ckpt.log",
-        #     logger,
-        #     verbose=verbose,
-        #     fmt_line="%(asctime)s CANDLE restart(): %(message)s",
-        # )
-
         param_ckpt_mode = self.param(
-            gParameters, "ckpt_restart_mode", "auto", allowed=["off", "auto", "required"]
+            "ckpt_restart_mode", "auto", allowed=["off", "auto", "required"]
         )
         if param_ckpt_mode == "off":
             return None
@@ -671,26 +675,13 @@ class CandleCkpt:
     def build_model(self, model_file):
         raise Exception("Backend must override this method!")
 
-    def param_allowed(self, key, value, allowed):
-        """
-        Check that the value is in the list of allowed values
-        If allowed is None, there is no check, simply success
-        """
-        if allowed is None:
-            return
-        if value not in allowed:
-            raise ValueError(
-                ("hyperparameter '%s'='%s' is not in the " + "list of allowed values: %s")
-                % (key, value, str(allowed))
-            )
-
-    def enabled(self, gParameters, key):
+    def enabled(self, key):
         """Is this parameter set to True?"""
-        return key in gParameters and gParameters[key]
+        return key in self.gParams and self.gParams[key]
 
-    def disabled(self, gParameters, key):
+    def disabled(self, key):
         """Is this parameter set to False?"""
-        return key in gParameters and not gParameters[key]
+        return key in self.gParams and not self.gParams[key]
 
 
 def ckpt_parser(parser):

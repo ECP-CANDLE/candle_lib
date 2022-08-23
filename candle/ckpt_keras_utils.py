@@ -25,7 +25,7 @@ class MultiGPUCheckpoint(ModelCheckpoint):
             self.model = model
 
 
-class CandleCkptKeras(Callback, CandleCkpt):
+class CandleCkptKeras(CandleCkpt, Callback):
     """
     Keras Callback for CANDLE-compliant Benchmarks to use for checkpointing
     Creates a JSON file alongside the weights and optimizer checkpoints that
@@ -34,10 +34,11 @@ class CandleCkptKeras(Callback, CandleCkpt):
     """
 
     def __init__(self, gParameters: Dict, logger="DEFAULT", verbose=True):
-        super().__init__()
-        if logger != "DEFAULT":
-            self.logger = logger
-        self.scan_params(gParameters)
+        super().__init__(gParameters, logger, verbose)
+
+    def set_model(self, model):
+        """model: The Keras model"""
+        self.model = model
 
     # Keras Callback API:
     def on_epoch_end(self, epoch, logs=None):
@@ -74,7 +75,8 @@ class CandleCkptKeras(Callback, CandleCkpt):
         direction = known_metrics[self.save_best_metric]
         self.ckpt_epoch(epoch, direction, metric_value)
 
-    def write_model_backend(self, model):
+    def write_model_backend(self, model, epoch):
+        # epoch: unused by Keras
         # Keras-specific method
         model.save(self.model_file)  # save_format="h5"
 
