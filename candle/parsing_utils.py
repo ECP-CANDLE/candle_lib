@@ -113,6 +113,7 @@ class ParseDict(TypedDict):
     parameters."""
 
     name: str
+    # ABV = abbreviated form
     abv: Optional[str]
     action: Union[str, Type[ListOfListsAction]]
     type: Optional[Any]
