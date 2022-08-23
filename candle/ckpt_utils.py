@@ -59,6 +59,10 @@ ckpt_metadata : string
     May be None or an empty string.
     Default: None
 
+ckpt_best_metric_last : float | None
+    Last best metric value to use after restart.
+    Default: None
+
 Usage:
 
   Add before training:
