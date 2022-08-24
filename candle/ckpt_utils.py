@@ -628,7 +628,7 @@ class CandleCkpt:
         )
         return str(checksum)
 
-    def restart(self, gParameters, model, verbose=True):
+    def restart(self, model, verbose=True):
         """
         Possibly restarts model from CheckpointCallback according to given
         settings and the ckpt-info.json
