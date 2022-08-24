@@ -28,7 +28,7 @@ class CandleCkptPyTorch(CandleCkpt):
 
     def set_model(self, model):
         """
-        model: A dict with the model {'net':net, 'optimizer':optimizer}
+        model: A dict with the model {'model':model, 'optimizer':optimizer}
         """
         self.model = model
 
@@ -38,13 +38,20 @@ class CandleCkptPyTorch(CandleCkpt):
         super().ckpt_epoch(epoch, direction, metric_value)
 
     def write_model_backend(self, model, epoch):
-        # PyTorch-specific method
+        m = self.model["model"]
+        o = self.model["optimizer"]
+
         torch.save({
             "epoch": epoch,
-            "model_state_dict": self.model["model"].state_dict(),
-            "optimizer_state_dict": self.model["optimizer"].state_dict(),
+            "model_state_dict": m.state_dict(),
+            "optimizer_state_dict": o.state_dict(),
             "loss": 0
         }, self.model_file)
 
-    def build_model(self, model, model_file):
-        model.load_weights(model_file)
+    def build_model(self, model_file):
+        m = self.model["model"]
+        o = self.model["optimizer"]
+
+        checkpoint = torch.load(model_file)
+        m.load_state_dict(checkpoint['model_state_dict'])
+        o.load_state_dict(checkpoint['optimizer_state_dict'])

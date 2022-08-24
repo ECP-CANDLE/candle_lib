@@ -654,9 +654,9 @@ class CandleCkpt:
             assert param_ckpt_mode == "auto"
             return None
         self.info("restarting: '%s'" % model_file)
-        result = self.restart_json(gParameters, dir_last)
+        result = self.restart_json(dir_last)
         self.info(
-            "restarting: epoch=%i timestamp=%s", result["epoch"], result["timestamp"]
+            "restarting: epoch=%i timestamp=%s" % (result["epoch"], result["timestamp"])
         )
         start = time.time()
         stats = os.stat(model_file)
@@ -669,10 +669,8 @@ class CandleCkpt:
         duration = stop - start
         rate = MB / duration
         self.info(
-            "restarting: model read:  %0.3f MB in %0.3f seconds (%0.2f MB/s).",
-            MB,
-            duration,
-            rate,
+            "restarting: model read:  %0.3f MB in %0.3f seconds (%0.2f MB/s)." %
+            (MB, duration, rate)
         )
         return result
 

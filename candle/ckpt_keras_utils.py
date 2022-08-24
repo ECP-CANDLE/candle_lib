@@ -80,5 +80,5 @@ class CandleCkptKeras(CandleCkpt, Callback):
         # Keras-specific method
         model.save(self.model_file)  # save_format="h5"
 
-    def build_model(self, model, model_file):
-        model.load_weights(model_file)
+    def build_model(self, model_file):
+        self.model.load_weights(model_file)
