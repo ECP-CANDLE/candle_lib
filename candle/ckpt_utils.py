@@ -597,6 +597,7 @@ class CandleCkpt:
         self.logger.debug("ckpt-info.json contains:")
         self.logger.debug(json.dumps(J, indent=2))
         self.logger.info("restarting from epoch: %i" % J["epoch"])
+        self.best_metric_last = J["best_metric_last"]
         if self.param("ckpt_checksum", False, ParamType.BOOLEAN):
             checksum = self.checksum_file(directory + "/model.h5")
             if checksum != J["checksum"]:
