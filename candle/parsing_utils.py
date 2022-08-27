@@ -319,12 +319,7 @@ logging_conf = [
         "default": False,
         "help": "increase output verbosity.",
     },
-    {
-        "name": "logfile",
-        "abv": "l",
-        "type": str,
-        "default": None,
-        "help": "log file"},
+    {"name": "logfile", "abv": "l", "type": str, "default": None, "help": "log file"},
 ]
 
 data_preprocess_conf = [

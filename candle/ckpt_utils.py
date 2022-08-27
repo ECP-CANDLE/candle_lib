@@ -1,4 +1,3 @@
-
 """
 CKPT UTILS
 
@@ -117,12 +116,10 @@ import json
 import os
 import shutil
 import time
+from enum import Enum, auto, unique
 from pathlib import PosixPath
 
-from enum import Enum, auto, unique
-
-from .helper_utils import set_up_logger
-from .helper_utils import str2bool
+from .helper_utils import set_up_logger, str2bool
 
 
 class ModelType(Enum):
@@ -131,7 +128,7 @@ class ModelType(Enum):
 
 
 class CandleCkptModel:
-    def __init__(self, model_type:ModelType, *args):
+    def __init__(self, model_type: ModelType, *args):
         self.model_type = model_type
         self.payload = args
 
@@ -152,8 +149,7 @@ class ParamType(Enum):
 
 
 class CandleCkpt:
-
-    def __init__(self, gParameters=None, logger:str = "DEFAULT", verbose:bool = True):
+    def __init__(self, gParameters=None, logger: str = "DEFAULT", verbose: bool = True):
         """
         :param Logger logger: The logger to use.
             May be None to disable or "DEFAULT" to use the default.
@@ -163,6 +159,7 @@ class CandleCkpt:
         self.logger = logger
         if self.logger == "DEFAULT":
             import logging
+
             self.logger = logging.getLogger("CandleCkpt")
             set_up_logger(
                 "save/ckpt.log",
@@ -184,15 +181,9 @@ class CandleCkpt:
     def scan_params(self, gParams):
         """Simply translate gParameters into instance fields"""
         self.gParams = gParams
-        self.epoch_max = self.param(
-            "epochs", ParamRequired(), ParamType.INTEGER_NN
-        )
-        self.skip_epochs = self.param(
-            "ckpt_skip_epochs", 0, ParamType.INTEGER_NN
-        )
-        self.ckpt_directory = self.param(
-            "ckpt_directory", "./save", ParamType.STRING
-        )
+        self.epoch_max = self.param("epochs", ParamRequired(), ParamType.INTEGER_NN)
+        self.skip_epochs = self.param("ckpt_skip_epochs", 0, ParamType.INTEGER_NN)
+        self.ckpt_directory = self.param("ckpt_directory", "./save", ParamType.STRING)
         self.save_best = self.param("ckpt_save_best", True, ParamType.BOOLEAN)
         self.save_best_metric = self.param(
             "ckpt_save_best_metric", None, ParamType.STRING
@@ -202,30 +193,23 @@ class CandleCkpt:
         )
         if self.best_metric_last is None:
             import math
+
             self.best_metric_last = math.inf
-        self.save_interval = self.param(
-            "ckpt_save_interval", 1, ParamType.INTEGER_NN
-        )
+        self.save_interval = self.param("ckpt_save_interval", 1, ParamType.INTEGER_NN)
         self.info("save_interval: " + str(self.save_interval))
         self.save_weights_only = self.param(
             "ckpt_save_weights_only", True, ParamType.BOOLEAN
         )
-        self.checksum_enabled = self.param(
-            "ckpt_checksum", False, ParamType.BOOLEAN
-        )
+        self.checksum_enabled = self.param("ckpt_checksum", False, ParamType.BOOLEAN)
         self.keep_mode = self.param(
             "ckpt_keep_mode",
             "linear",
             ParamType.STRING,
             allowed=[None, "all", "linear"],
         )
-        self.keep_limit = self.param(
-            "ckpt_keep_limit", 1000000, ParamType.INTEGER_GZ
-        )
+        self.keep_limit = self.param("ckpt_keep_limit", 1000000, ParamType.INTEGER_GZ)
         self.metadata = self.param("metadata", None, ParamType.STRING)
-        self.timestamp_last = self.param(
-            "ckpt_timestamp_last", None, ParamType.STRING
-        )
+        self.timestamp_last = self.param("ckpt_timestamp_last", None, ParamType.STRING)
         self.cwd = os.getcwd()
 
     def report_initial(self):
@@ -387,6 +371,7 @@ class CandleCkpt:
 
     def write_json(self, jsonfile, epoch):
         from datetime import datetime
+
         now = datetime.now()
         # The dict to dump():
         D = {}
@@ -580,7 +565,10 @@ class CandleCkpt:
             return
         if value not in allowed:
             raise ValueError(
-                ("hyperparameter '%s'='%s' is not in the " + "list of allowed values: %s")
+                (
+                    "hyperparameter '%s'='%s' is not in the "
+                    + "list of allowed values: %s"
+                )
                 % (key, value, str(allowed))
             )
 
@@ -648,7 +636,8 @@ class CandleCkpt:
         if not os.path.exists(model_file):
             if param_ckpt_mode == "required":
                 raise Exception(
-                    "ckpt_restart_mode=='required' but no checkpoint " + "could be found!"
+                    "ckpt_restart_mode=='required' but no checkpoint "
+                    + "could be found!"
                 )
             # We must be under AUTO - proceed without restart
             assert param_ckpt_mode == "auto"
@@ -669,8 +658,8 @@ class CandleCkpt:
         duration = stop - start
         rate = MB / duration
         self.info(
-            "restarting: model read:  %0.3f MB in %0.3f seconds (%0.2f MB/s)." %
-            (MB, duration, rate)
+            "restarting: model read:  %0.3f MB in %0.3f seconds (%0.2f MB/s)."
+            % (MB, duration, rate)
         )
         return result
 
@@ -826,4 +815,5 @@ def ckpt_defs(self, defs):
 
 class ParamRequired:
     """Indicates that the user params must contain this key."""
+
     pass
