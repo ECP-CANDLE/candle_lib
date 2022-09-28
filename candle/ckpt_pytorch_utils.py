@@ -1,4 +1,3 @@
-
 """
 CKPT PYTORCH UTILS.
 
@@ -41,17 +40,20 @@ class CandleCkptPyTorch(CandleCkpt):
         m = self.model["model"]
         o = self.model["optimizer"]
 
-        torch.save({
-            "epoch": epoch,
-            "model_state_dict": m.state_dict(),
-            "optimizer_state_dict": o.state_dict(),
-            "loss": 0
-        }, self.model_file)
+        torch.save(
+            {
+                "epoch": epoch,
+                "model_state_dict": m.state_dict(),
+                "optimizer_state_dict": o.state_dict(),
+                "loss": 0,
+            },
+            self.model_file,
+        )
 
     def build_model(self, model_file):
         m = self.model["model"]
         o = self.model["optimizer"]
 
         checkpoint = torch.load(model_file)
-        m.load_state_dict(checkpoint['model_state_dict'])
-        o.load_state_dict(checkpoint['optimizer_state_dict'])
+        m.load_state_dict(checkpoint["model_state_dict"])
+        o.load_state_dict(checkpoint["optimizer_state_dict"])

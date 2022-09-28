@@ -1,4 +1,3 @@
-
 """
 CKPT KERAS UTILS.
 

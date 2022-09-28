@@ -101,8 +101,8 @@ except ImportError:
 if "tensorflow" in sys.modules:
     print("Importing candle utils for keras")
 
-    from .ckpt_utils import ModelType, CandleCkpt
-    from .ckpt_keras_utils import MultiGPUCheckpoint, CandleCkptKeras
+    from .ckpt_keras_utils import CandleCkptKeras, MultiGPUCheckpoint
+    from .ckpt_utils import CandleCkpt, ModelType
     from .clr_keras_utils import CyclicLR, clr_callback, clr_check_args, clr_set_args
     from .keras_utils import (
         CandleRemoteMonitor,
@@ -161,6 +161,7 @@ if "torch" in sys.modules:
         set_pytorch_seed,
         set_pytorch_threads,
     )
+
 from .ckpt_pytorch_utils import CandleCkptPyTorch
 
 # else:
