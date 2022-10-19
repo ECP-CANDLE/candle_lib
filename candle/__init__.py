@@ -161,8 +161,7 @@ if "torch" in sys.modules:
         set_pytorch_seed,
         set_pytorch_threads,
     )
-
-from .ckpt_pytorch_utils import CandleCkptPyTorch
+    from .ckpt_pytorch_utils import CandleCkptPyTorch
 
 # else:
 #     raise Exception("No backend has been specified.")
