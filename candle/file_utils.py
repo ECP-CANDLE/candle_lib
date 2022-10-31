@@ -172,7 +172,11 @@ def directory_from_parameters(params: Dict, commonroot: str = "Output") -> str:
     if commonroot in set([".", "./"]):  # Same directory --> convert to absolute path
         outdir = os.path.abspath(".")
     else:  # Create path specified
-        outdir = os.path.abspath(os.path.join(".", commonroot))
+        if os.getenv("CANDLE_DATA_DIR"):
+            outdir = os.getenv("CANDLE_DATA_DIR")
+        else:
+            outdir = os.path.abspath(os.path.join(".", commonroot))
+
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
