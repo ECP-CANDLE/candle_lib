@@ -752,7 +752,10 @@ def finalize_parameters(bmk):
         if os.path.isabs(conffile_txt):
             conffile = conffile_txt
         else:
-            conffile = os.path.join(bmk.file_path, conffile_txt)
+            if os.environ["CANDLE_DATA_DIR"] is not None:
+                conffile = os.path.join(os.environ["CANDLE_DATA_DIR"], conffile_txt)
+            else:
+                conffile = os.path.join(bmk.file_path, conffile_txt)
 
     # print("Configuration file: ", conffile)
     fileParameters = bmk.read_config_file(
