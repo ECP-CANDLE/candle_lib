@@ -172,10 +172,17 @@ def directory_from_parameters(params: Dict, commonroot: str = "Output") -> str:
     if commonroot in set([".", "./"]):  # Same directory --> convert to absolute path
         outdir = os.path.abspath(".")
     else:  # Create path specified
-        if os.getenv("CANDLE_DATA_DIR"):
+        # check if a separate output_dir is specified
+        if os.getenv("CANDLE_OUTPUT_DIR") is not None:
+            outdir = os.getenv("CANDLE_OUTPUT_DIR")
+        # otherwise use the input data dir is used
+        elif os.getenv("CANDLE_DATA_DIR") is not None:
             outdir = os.getenv("CANDLE_DATA_DIR")
-        else:
-            outdir = os.path.abspath(os.path.join(".", commonroot))
+
+        # append the model name to the path
+        outdir = os.path.abspath(os.path.join(outdir, params['model_name']))
+        # append commonroot to output paths
+        outdir = os.path.abspath(os.path.join(outdir, commonroot))
 
         if not os.path.exists(outdir):
             os.makedirs(outdir)
