@@ -756,6 +756,10 @@ def finalize_parameters(bmk):
                 conffile = os.path.join(os.environ["CANDLE_DATA_DIR"], conffile_txt)
             else:
                 conffile = os.path.join(bmk.file_path, conffile_txt)
+            if not os.path.isfile(conffile):
+                raise Exception(
+                    "ERROR ! Specified configuration file " + conffile + " not found ... Exiting"
+                )
 
     # print("Configuration file: ", conffile)
     fileParameters = bmk.read_config_file(

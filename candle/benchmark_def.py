@@ -56,6 +56,22 @@ class Benchmark:
             if 'neon' framework a NeonArgparser is passed. Otherwise an argparser is constructed.
         """
 
+        # Check that required system variable specifying path to data has been defined
+        if os.getenv("CANDLE_DATA_DIR") is None:
+            raise Exception(
+                "ERROR ! Required system variable not specified.  You must define CANDLE_DATA_DIR ... Exiting"
+            )
+
+        # Check that default model configuration exits
+        fname = os.path.join(filepath, defmodel)
+        if not os.path.isfile(fname):
+            raise Exception(
+                "ERROR ! Required default file not available.  File " + fname + " ... Exiting"
+            )
+
+        self.model_name = self.get_parameter_from_file(fname, "model_name")
+        print('model name: ', self.model_name)
+
         if parser is None:
             parser = argparse.ArgumentParser(
                 prog=prog,
@@ -167,6 +183,22 @@ class Benchmark:
         # print(fileParams)
 
         return fileParams
+
+    def get_parameter_from_file(self, absfname, param):
+        aux = ''
+        with open(absfname, 'r') as fp:
+            for line in fp:
+                # search string
+                if param in line:
+                    aux = line.split('=')[-1].strip("'\n ")
+                    # don't look for next lines
+                    break
+        if aux == '':
+            raise Exception(
+                "ERROR ! Parameter " + param + " was not found in file " + absfname + "... Exiting"
+            )
+
+        return aux
 
     def set_locals(self):
         """
