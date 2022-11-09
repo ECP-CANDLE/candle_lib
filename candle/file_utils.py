@@ -178,9 +178,11 @@ def directory_from_parameters(params: Dict, commonroot: str = "Output") -> str:
         # otherwise use the input data dir is used
         elif os.getenv("CANDLE_DATA_DIR") is not None:
             outdir = os.getenv("CANDLE_DATA_DIR")
+        else:
+            outdir = os.path.abspath(".")
 
         # append the model name to the path
-        outdir = os.path.abspath(os.path.join(outdir, params['model_name']))
+        outdir = os.path.abspath(os.path.join(outdir, params["model_name"]))
         # append commonroot to output paths
         outdir = os.path.abspath(os.path.join(outdir, commonroot))
 
