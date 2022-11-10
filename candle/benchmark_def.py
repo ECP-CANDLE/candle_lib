@@ -187,6 +187,17 @@ class Benchmark:
         return fileParams
 
     def get_parameter_from_file(self, absfname, param):
+        """
+        Functionality to extract the value of one parameter from the configuration file given. Execution is terminated if the parameter specified is not found in the configuration file.
+
+        :param string absfname: filename of the the configuration file including absolute path.
+
+        :param string param: parameter to extract from configuration file.
+
+        :return: a string with the value of the parameter read from the configuration file.
+        :rtype: string
+        """
+
         aux = ""
         with open(absfname, "r") as fp:
             for line in fp:
