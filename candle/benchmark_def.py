@@ -66,11 +66,13 @@ class Benchmark:
         fname = os.path.join(filepath, defmodel)
         if not os.path.isfile(fname):
             raise Exception(
-                "ERROR ! Required default file not available.  File " + fname + " ... Exiting"
+                "ERROR ! Required default file not available.  File "
+                + fname
+                + " ... Exiting"
             )
 
         self.model_name = self.get_parameter_from_file(fname, "model_name")
-        print('model name: ', self.model_name)
+        print("model name: ", self.model_name)
 
         if parser is None:
             parser = argparse.ArgumentParser(
@@ -185,17 +187,21 @@ class Benchmark:
         return fileParams
 
     def get_parameter_from_file(self, absfname, param):
-        aux = ''
-        with open(absfname, 'r') as fp:
+        aux = ""
+        with open(absfname, "r") as fp:
             for line in fp:
                 # search string
                 if param in line:
-                    aux = line.split('=')[-1].strip("'\n ")
+                    aux = line.split("=")[-1].strip("'\n ")
                     # don't look for next lines
                     break
-        if aux == '':
+        if aux == "":
             raise Exception(
-                "ERROR ! Parameter " + param + " was not found in file " + absfname + "... Exiting"
+                "ERROR ! Parameter "
+                + param
+                + " was not found in file "
+                + absfname
+                + "... Exiting"
             )
 
         return aux
