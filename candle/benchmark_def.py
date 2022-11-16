@@ -66,7 +66,7 @@ class Benchmark:
         fname = os.path.join(filepath, defmodel)
         if not os.path.isfile(fname):
             raise Exception(
-                "ERROR ! Required default file not available.  File "
+                "ERROR ! Required default configuration file not available.  File "
                 + fname
                 + " ... Exiting"
             )
