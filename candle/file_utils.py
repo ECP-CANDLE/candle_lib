@@ -1,7 +1,7 @@
 import hashlib
 import os
 import shutil
-from typing import Dict
+from typing import Dict, Tuple
 from urllib.error import HTTPError, URLError
 from urllib.request import urlretrieve
 
@@ -158,43 +158,61 @@ def validate_file(fpath: str, md5_hash: str) -> bool:
         return False
 
 
-def directory_from_parameters(params: Dict, commonroot: str = "Output") -> str:
+def directory_tree_from_parameters(
+    params: Dict, commonroot: str = "Output"
+) -> Tuple[str, str]:
     """
-    Construct output directory path with unique IDs from parameters.
+    Construct data directory and output directory trees with unique IDs from parameters.
 
     :param Dict params: Dictionary of parameters read
-    :param string commonroot: String to specify the common folder to store results.
+    :param string commonroot: String to specify the common output folder to store results.
 
-    :return: Path to the output directory
-    :rtype: string
+    :return: Paths to data and output directories
+    :rtype: (string, string)
     """
-
-    if commonroot in set([".", "./"]):  # Same directory --> convert to absolute path
-        outdir = os.path.abspath(".")
-    else:  # Create path specified
-        # check if a separate output_dir is specified
+    # check critical CANDLE directory specification
+    if os.getenv("CANDLE_DATA_DIR") is not None:
+        datadir = os.getenv("CANDLE_DATA_DIR")
+        # check if a separate system output dir is specified
         if os.getenv("CANDLE_OUTPUT_DIR") is not None:
             outdir = os.getenv("CANDLE_OUTPUT_DIR")
-        # otherwise use the input data dir is used
-        elif os.getenv("CANDLE_DATA_DIR") is not None:
-            outdir = os.getenv("CANDLE_DATA_DIR")
+        # otherwise use the input data dir
         else:
-            outdir = os.path.abspath(".")
+            outdir = os.getenv("CANDLE_DATA_DIR")
+    else:
+        raise Exception(
+            "ERROR ! Required system variable not specified.  You must define CANDLE_DATA_DIR ... Exiting"
+        )
 
-        # append the model name to the path
-        outdir = os.path.abspath(os.path.join(outdir, params["model_name"]))
-        # append commonroot to output paths
-        outdir = os.path.abspath(os.path.join(outdir, commonroot))
+    # Data directory tree part
+    # CANDLE_DATA_DIR/<model_name>/Data
+    datadir = os.path.abspath(os.path.join(datadir, params["model_name"], "Data"))
 
-        if not os.path.exists(outdir):
-            os.makedirs(outdir)
+    # Output directory tree part
+    # First part can be:
+    # CANDLE_OUTPUT_DIR or CANDLE_DATA_DIR
+    # Second part can be:
+    # <model_name>/<output_dir>/ or <model_name>/Output
+    # Final part:
+    # experiment_id/run_id
+    outdir = os.path.abspath(
+        os.path.join(
+            outdir,
+            params["model_name"],
+            commonroot,
+            params["experiment_id"],
+            params["run_id"],
+        )
+    )
 
-        outdir = os.path.abspath(os.path.join(outdir, params["experiment_id"]))
-        if not os.path.exists(outdir):
-            os.makedirs(outdir)
+    # Construct data directory trees recursively without
+    # complaining if they exists
+    if not os.path.exists(datadir):
+        os.makedirs(datadir, exist_ok=True)
 
-        outdir = os.path.abspath(os.path.join(outdir, params["run_id"]))
-        if not os.path.exists(outdir):
-            os.makedirs(outdir)
+    # Construct output directory trees recursively without
+    # complaining if they exists
+    if not os.path.exists(outdir):
+        os.makedirs(outdir, exist_ok=True)
 
-    return outdir
+    return datadir, outdir

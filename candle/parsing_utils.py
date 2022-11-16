@@ -15,7 +15,7 @@ else:
 
 from typing import Any, List, Optional, Set, Type, Union
 
-from .file_utils import directory_from_parameters
+from .file_utils import directory_tree_from_parameters
 from .helper_utils import str2bool
 
 # Seed for random generation -- default value
@@ -775,6 +775,9 @@ def finalize_parameters(bmk):
     check_file_parameters_exists(args, bmk_dict, fileParameters)
     # Consolidate parameter set. Command-line parameters overwrite file configuration
     gParameters = args_overwrite_config(args, fileParameters)
+    # Store directories in benchmark
+    bmk.model_data_dir = gParameters["data_dir"]
+    bmk.model_output_dir = gParameters["output_dir"]
     # Check that required set of parameters has been defined
     bmk.check_required_exists(gParameters)
     print("Params:")
@@ -812,9 +815,13 @@ def args_overwrite_config(args, config: ConfigDict):
             params["data_type"] = get_choice(params["data_type"])
 
     if "output_dir" not in params:
-        params["output_dir"] = directory_from_parameters(params)
+        params["data_dir"], params["output_dir"] = directory_tree_from_parameters(
+            params
+        )
     else:
-        params["output_dir"] = directory_from_parameters(params, params["output_dir"])
+        params["data_dir"], params["output_dir"] = directory_tree_from_parameters(
+            params, params["output_dir"]
+        )
 
     if "rng_seed" not in params:
         params["rng_seed"] = DEFAULT_SEED
