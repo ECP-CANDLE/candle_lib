@@ -206,12 +206,12 @@ def directory_tree_from_parameters(
     )
 
     # Construct data directory trees recursively without
-    # complaining if they exists
+    # complaining if they exist
     if not os.path.exists(datadir):
         os.makedirs(datadir, exist_ok=True)
 
     # Construct output directory trees recursively without
-    # complaining if they exists
+    # complaining if they exist
     if not os.path.exists(outdir):
         os.makedirs(outdir, exist_ok=True)
 
