@@ -775,9 +775,6 @@ def finalize_parameters(bmk):
     check_file_parameters_exists(args, bmk_dict, fileParameters)
     # Consolidate parameter set. Command-line parameters overwrite file configuration
     gParameters = args_overwrite_config(args, fileParameters)
-    # Store directories in benchmark
-    bmk.model_data_dir = gParameters["data_dir"]
-    bmk.model_output_dir = gParameters["output_dir"]
     # Check that required set of parameters has been defined
     bmk.check_required_exists(gParameters)
     print("Params:")

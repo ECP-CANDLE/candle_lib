@@ -94,9 +94,6 @@ class Benchmark:
         self.required: Set[str] = set([])
         self.additional_definitions: List[ParseDict] = []
         self.set_locals()
-        # To be completed after parsing
-        self.model_data_dir = None
-        self.model_output_dir = None
 
     def parse_parameters(self) -> None:
         """
