@@ -1,6 +1,7 @@
 import hashlib
 import os
 import shutil
+import warnings
 from typing import Dict, Tuple
 from urllib.error import HTTPError, URLError
 from urllib.request import urlretrieve
@@ -188,6 +189,11 @@ def directory_tree_from_parameters(
     # CANDLE_DATA_DIR/<model_name>/Data
     datadir = os.path.abspath(os.path.join(datadir, params["model_name"], "Data"))
 
+    # Construct data directory trees recursively without
+    # complaining if they exist
+    if not os.path.exists(datadir):
+        os.makedirs(datadir, exist_ok=True)
+
     # Output directory tree part
     # First part can be:
     # CANDLE_OUTPUT_DIR or CANDLE_DATA_DIR
@@ -196,23 +202,19 @@ def directory_tree_from_parameters(
     # Final part:
     # experiment_id/run_id
     outdir = os.path.abspath(
-        os.path.join(
-            outdir,
-            params["model_name"],
-            commonroot,
-            params["experiment_id"],
-            params["run_id"],
-        )
+        os.path.join(outdir, params["model_name"], commonroot, params["experiment_id"])
     )
-
-    # Construct data directory trees recursively without
-    # complaining if they exist
-    if not os.path.exists(datadir):
-        os.makedirs(datadir, exist_ok=True)
 
     # Construct output directory trees recursively without
     # complaining if they exist
     if not os.path.exists(outdir):
         os.makedirs(outdir, exist_ok=True)
+
+    # Warn if run_id subfolder exists
+    outdir = os.path.abspath(os.path.join(outdir, params["run_id"]))
+    if os.path.exists(outdir):
+        message = "Path: " + outdir + " already exists... overwriting."
+        warnings.warn(message, RuntimeWarning)
+    os.makedirs(outdir, exist_ok=True)
 
     return datadir, outdir
