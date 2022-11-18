@@ -4,10 +4,7 @@ __version__ = "0.0.1"
 # import framework dependent utils
 import sys
 
-from .benchmark_def import (
-    Benchmark,
-    create_params,
-)
+from .benchmark_def import Benchmark, create_params
 
 # import from data_preprocessing_utils
 from .data_preprocessing_utils import (
