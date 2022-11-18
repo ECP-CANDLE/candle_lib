@@ -8,10 +8,10 @@ from candle.helper_utils import eval_string_as_list_of_lists
 from candle.parsing_utils import (
     ConfigDict,
     ParseDict,
+    finalize_parameters,
     parse_common,
     parse_from_dictlist,
     registered_conf,
-    finalize_parameters,
 )
 
 DType = Any
@@ -257,17 +257,18 @@ class Benchmark:
 
 
 def create_params(
-        file_path=None,
-        default_model=None,
-        framework=None,
-        prog_name=None,
-        desc=None,
-        additional_definitions=None,
-        required=None):
+    file_path=None,
+    default_model=None,
+    framework=None,
+    prog_name=None,
+    desc=None,
+    additional_definitions=None,
+    required=None,
+):
 
     print("Generating parameters for standard benchmark\n")
 
-    #file_path = os.path.dirname(os.path.realpath(__file__))
+    # file_path = os.path.dirname(os.path.realpath(__file__))
     tmp_bmk = Benchmark(
         file_path,
         default_model,
@@ -275,7 +276,8 @@ def create_params(
         prog_name,
         desc,
         additional_definitions=additional_definitions,
-        required=required)
+        required=required,
+    )
 
     params = finalize_parameters(tmp_bmk)
 
