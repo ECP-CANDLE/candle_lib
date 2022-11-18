@@ -11,6 +11,7 @@ from candle.parsing_utils import (
     parse_common,
     parse_from_dictlist,
     registered_conf,
+    finalize_parameters,
 )
 
 DType = Any
@@ -37,6 +38,8 @@ class Benchmark:
         prog: str = None,
         desc: str = None,
         parser=None,
+        additional_definitions=None,
+        required=None,
     ) -> None:
         """
         Initialize Benchmark object.
@@ -91,8 +94,16 @@ class Benchmark:
         for lst in registered_conf:
             self.registered_conf.extend(lst)
 
-        self.required: Set[str] = set([])
-        self.additional_definitions: List[ParseDict] = []
+        if required is not None:
+            self.required = set(required)
+        else:
+            self.required: Set[str] = set([])
+        if additional_definitions is not None:
+            self.additional_definitions = additional_definitions
+        else:
+            self.additional_definitions: List[ParseDict] = []
+
+        # legacy call for compatibility with existing Benchmarks
         self.set_locals()
 
     def parse_parameters(self) -> None:
@@ -225,7 +236,6 @@ class Benchmark:
         - additional_definitions: list of dictionaries describing \
             the additional parameters for the benchmark.
         """
-
         pass
 
     def check_required_exists(self, gparam: ConfigDict) -> None:
@@ -244,3 +254,29 @@ class Benchmark:
                 + str(sorted(diff_set))
                 + "... Exiting"
             )
+
+
+def create_params(
+        file_path=None,
+        default_model=None,
+        framework=None,
+        prog_name=None,
+        desc=None,
+        additional_definitions=None,
+        required=None):
+
+    print("Generating parameters for standard benchmark\n")
+
+    #file_path = os.path.dirname(os.path.realpath(__file__))
+    tmp_bmk = Benchmark(
+        file_path,
+        default_model,
+        framework,
+        prog_name,
+        desc,
+        additional_definitions=additional_definitions,
+        required=required)
+
+    params = finalize_parameters(tmp_bmk)
+
+    return params
