@@ -623,7 +623,7 @@ def r2_heteroscedastic_metric(nout: int):
         """
 
         if nout > 1:
-            y_out = K.reshape(y_pred[:, 0::nout], K.shape(y_true))
+            y_out = K.reshape(y_pred[:, 0::2], K.shape(y_true))
         else:
             y_out = K.reshape(y_pred[:, 0], K.shape(y_true))
 
@@ -651,7 +651,7 @@ def mae_heteroscedastic_metric(nout: int):
             The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
         """
         if nout > 1:
-            y_out = K.reshape(y_pred[:, 0::nout], K.shape(y_true))
+            y_out = K.reshape(y_pred[:, 0::2], K.shape(y_true))
         else:
             y_out = K.reshape(y_pred[:, 0], K.shape(y_true))
 
@@ -677,7 +677,7 @@ def mse_heteroscedastic_metric(nout: int):
             The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
         """
         if nout > 1:
-            y_out = K.reshape(y_pred[:, 0::nout], K.shape(y_true))
+            y_out = K.reshape(y_pred[:, 0::2], K.shape(y_true))
         else:
             y_out = K.reshape(y_pred[:, 0], K.shape(y_true))
 
@@ -703,7 +703,7 @@ def meanS_heteroscedastic_metric(nout: int):
             The predictions follow the order: (mean_0, S_0, mean_1, S_1, ...) with S_i the log of the variance for the ith output.
         """
         if nout > 1:
-            log_sig2 = y_pred[:, 1::nout]
+            log_sig2 = y_pred[:, 1::2]
         else:
             log_sig2 = y_pred[:, 1]
 
@@ -732,7 +732,7 @@ def heteroscedastic_loss(nout: int):
         y_shape = K.shape(y_true)
 
         if nout > 1:
-            y_out = K.reshape(y_pred[:, 0::nout], y_shape)
+            y_out = K.reshape(y_pred[:, 0::2], y_shape)
             log_sig2 = K.reshape(y_pred[:, 1::nout], y_shape)
         else:
             y_out = K.reshape(y_pred[:, 0], y_shape)

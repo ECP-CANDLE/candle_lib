@@ -4,7 +4,7 @@ __version__ = "0.0.1"
 # import framework dependent utils
 import sys
 
-from .benchmark_def import Benchmark
+from .benchmark_def import Benchmark, create_params
 
 # import from data_preprocessing_utils
 from .data_preprocessing_utils import (
@@ -151,6 +151,7 @@ if "tensorflow" in sys.modules:
 
 if "torch" in sys.modules:
     print("Importing candle utils for pytorch")
+    from .ckpt_pytorch_utils import CandleCkptPyTorch
     from .pytorch_utils import (
         build_pytorch_activation,
         build_pytorch_optimizer,
@@ -161,7 +162,6 @@ if "torch" in sys.modules:
         set_pytorch_seed,
         set_pytorch_threads,
     )
-    from .ckpt_pytorch_utils import CandleCkptPyTorch
 
 # else:
 #     raise Exception("No backend has been specified.")

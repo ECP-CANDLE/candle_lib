@@ -15,7 +15,7 @@ else:
 
 from typing import Any, List, Optional, Set, Type, Union
 
-from .file_utils import directory_from_parameters
+from .file_utils import directory_tree_from_parameters
 from .helper_utils import str2bool
 
 # Seed for random generation -- default value
@@ -752,7 +752,16 @@ def finalize_parameters(bmk):
         if os.path.isabs(conffile_txt):
             conffile = conffile_txt
         else:
-            conffile = os.path.join(bmk.file_path, conffile_txt)
+            if os.environ["CANDLE_DATA_DIR"] is not None:
+                conffile = os.path.join(os.environ["CANDLE_DATA_DIR"], conffile_txt)
+            else:
+                conffile = os.path.join(bmk.file_path, conffile_txt)
+            if not os.path.isfile(conffile):
+                raise Exception(
+                    "ERROR ! Specified configuration file "
+                    + conffile
+                    + " not found ... Exiting"
+                )
 
     # print("Configuration file: ", conffile)
     fileParameters = bmk.read_config_file(
@@ -803,9 +812,13 @@ def args_overwrite_config(args, config: ConfigDict):
             params["data_type"] = get_choice(params["data_type"])
 
     if "output_dir" not in params:
-        params["output_dir"] = directory_from_parameters(params)
+        params["data_dir"], params["output_dir"] = directory_tree_from_parameters(
+            params
+        )
     else:
-        params["output_dir"] = directory_from_parameters(params, params["output_dir"])
+        params["data_dir"], params["output_dir"] = directory_tree_from_parameters(
+            params, params["output_dir"]
+        )
 
     if "rng_seed" not in params:
         params["rng_seed"] = DEFAULT_SEED

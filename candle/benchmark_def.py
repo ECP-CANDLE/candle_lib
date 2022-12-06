@@ -8,6 +8,7 @@ from candle.helper_utils import eval_string_as_list_of_lists
 from candle.parsing_utils import (
     ConfigDict,
     ParseDict,
+    finalize_parameters,
     parse_common,
     parse_from_dictlist,
     registered_conf,
@@ -37,6 +38,8 @@ class Benchmark:
         prog: str = None,
         desc: str = None,
         parser=None,
+        additional_definitions=None,
+        required=None,
     ) -> None:
         """
         Initialize Benchmark object.
@@ -56,6 +59,24 @@ class Benchmark:
             if 'neon' framework a NeonArgparser is passed. Otherwise an argparser is constructed.
         """
 
+        # Check that required system variable specifying path to data has been defined
+        if os.getenv("CANDLE_DATA_DIR") is None:
+            raise Exception(
+                "ERROR ! Required system variable not specified.  You must define CANDLE_DATA_DIR ... Exiting"
+            )
+
+        # Check that default model configuration exits
+        fname = os.path.join(filepath, defmodel)
+        if not os.path.isfile(fname):
+            raise Exception(
+                "ERROR ! Required default configuration file not available.  File "
+                + fname
+                + " ... Exiting"
+            )
+
+        self.model_name = self.get_parameter_from_file(fname, "model_name")
+        print("model name: ", self.model_name)
+
         if parser is None:
             parser = argparse.ArgumentParser(
                 prog=prog,
@@ -73,8 +94,16 @@ class Benchmark:
         for lst in registered_conf:
             self.registered_conf.extend(lst)
 
-        self.required: Set[str] = set([])
-        self.additional_definitions: List[ParseDict] = []
+        if required is not None:
+            self.required = set(required)
+        else:
+            self.required: Set[str] = set([])
+        if additional_definitions is not None:
+            self.additional_definitions = additional_definitions
+        else:
+            self.additional_definitions: List[ParseDict] = []
+
+        # legacy call for compatibility with existing Benchmarks
         self.set_locals()
 
     def parse_parameters(self) -> None:
@@ -168,6 +197,37 @@ class Benchmark:
 
         return fileParams
 
+    def get_parameter_from_file(self, absfname, param):
+        """
+        Functionality to extract the value of one parameter from the configuration file given. Execution is terminated if the parameter specified is not found in the configuration file.
+
+        :param string absfname: filename of the the configuration file including absolute path.
+
+        :param string param: parameter to extract from configuration file.
+
+        :return: a string with the value of the parameter read from the configuration file.
+        :rtype: string
+        """
+
+        aux = ""
+        with open(absfname, "r") as fp:
+            for line in fp:
+                # search string
+                if param in line:
+                    aux = line.split("=")[-1].strip("'\n ")
+                    # don't look for next lines
+                    break
+        if aux == "":
+            raise Exception(
+                "ERROR ! Parameter "
+                + param
+                + " was not found in file "
+                + absfname
+                + "... Exiting"
+            )
+
+        return aux
+
     def set_locals(self):
         """
         Functionality to set variables specific for the benchmark.
@@ -176,7 +236,6 @@ class Benchmark:
         - additional_definitions: list of dictionaries describing \
             the additional parameters for the benchmark.
         """
-
         pass
 
     def check_required_exists(self, gparam: ConfigDict) -> None:
@@ -195,3 +254,31 @@ class Benchmark:
                 + str(sorted(diff_set))
                 + "... Exiting"
             )
+
+
+def create_params(
+    file_path=None,
+    default_model=None,
+    framework=None,
+    prog_name=None,
+    desc=None,
+    additional_definitions=None,
+    required=None,
+):
+
+    print("Generating parameters for standard benchmark\n")
+
+    # file_path = os.path.dirname(os.path.realpath(__file__))
+    tmp_bmk = Benchmark(
+        file_path,
+        default_model,
+        framework,
+        prog_name,
+        desc,
+        additional_definitions=additional_definitions,
+        required=required,
+    )
+
+    params = finalize_parameters(tmp_bmk)
+
+    return params
