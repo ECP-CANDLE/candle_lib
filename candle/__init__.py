@@ -23,7 +23,7 @@ from .feature_selection_utils import (
 )
 
 # import from file_utils
-from .file_utils import get_file, validate_file
+from .file_utils import find_file, get_archive, get_file, get_file_v2, validate_file
 
 # import from generic_utils
 from .generic_utils import Progbar
