@@ -1,7 +1,14 @@
 import hashlib
+import io
 import os
 import shutil
+import socket
+import tarfile
+import tempfile
+import urllib.error as urlerror
+import urllib.request as urlrequest
 import warnings
+import zipfile
 from typing import Dict, Tuple
 from urllib.error import HTTPError, URLError
 from urllib.request import urlretrieve
@@ -137,6 +144,234 @@ def get_file(
         return unpack_fpath
 
     return fpath
+
+
+def url_get(url, maxtry: int = 3, timeout: int = 10) -> io.BytesIO:
+    """Get content of a file via a URL.
+
+    :param string url: original URL of the file
+    :param int maxtry: maximum number of download retries
+    :param int timeout: timeout in seconds for blocking operations like the connection attempt
+
+    :return: I/O stream
+    :rtype: io.BytesIO
+    """
+
+    if maxtry <= 0:
+        raise ValueError("Parameter maxtry should be greater than zero.")
+    for ntry in range(maxtry):
+        try:
+            rspns = urlrequest.urlopen(url, timeout=timeout)
+            cntnt = rspns.read()
+            break
+        except urlerror.URLError as e:
+            if not isinstance(e.reason, socket.timeout):
+                raise
+
+    return io.BytesIO(cntnt)
+
+
+def download_data(data_base_url: str, data_tar_file: str, path: str) -> str:
+    """
+    Downloads data from a URL.
+
+    :param string data_base_url: original URL of the file
+    :param string data_tar_file: file to download
+    :param string path: path to store the downloaded file
+
+    :return: Path to the directory where file has been downloaded
+    :rtype: string
+    """
+    # ensure path directory exists
+    if not os.path.isdir(path):
+        raise ValueError(f"Path {path} does not exist or is not a directory")
+    data = url_get(data_base_url + data_tar_file)
+    fpath = os.path.join(path, data_tar_file)
+    f = open(fpath, "wb")
+    f.write(data.read())
+    f.close()
+
+    return fpath
+
+
+def flatten_file_structure(base_path: str, out_fpath: str) -> str:
+    """
+    Takes a tree folder structure and returns all the files moved to a unique destination folder. Hidden system files (i.e. starting with .) are excluded.
+
+    :param string base_path: path to tree folder
+    :param string out_fpath: path to output folder
+    """
+
+    for (dirpath, dirnames, filenames) in os.walk(base_path):
+        for fn in filenames:
+            if fn[0] != ".":  # Filter out hidden files
+                origin = os.path.join(dirpath, fn)
+                destination = os.path.join(out_fpath, fn)
+                os.rename(origin, destination)
+
+
+def get_archive(
+    base_url: str,
+    remote_file: str,
+    datadir: str,
+    data_subdir: str = None,
+    md5_hash: str = None,
+) -> str:
+    """
+    Download and decompress file. The file is downloaded from a URL if it not already in the cache.
+    Passing the MD5 hash will verify the file after download as well as if it is already
+    present in the cache.
+    The decompressed contents are stored in the path specified, but the original folder structure of the compressed file is not preserved, it is flattened.
+
+    :param string base_url: original URL of the file
+    :param string remote_file: file to download
+    :param string datadir: path to download file
+    :param string data_subdir: optional sub directory to store file
+    :param string md5_hash: optional MD5 hash of the file for verification
+
+    :return: Path to the directory where file has been decompressed
+    :rtype: string
+    """
+    # Check if the file has been downloaded to fpath
+    # and check if is valid
+    fpath = os.path.join(datadir, remote_file)
+    downloaded_ok = False
+    if os.path.exists(fpath):
+        if md5_hash is not None:
+            downloaded_ok = validate_file(fpath, md5_hash)
+        else:  # If no way to validate, assume file is OK
+            downloaded_ok = True
+
+    # Download file (i.e. file not downloaded previously or validation failed)
+    if not downloaded_ok:
+        fpath = download_data(base_url, remote_file, datadir)
+        print("Downloaded ", fpath)
+
+    # Create subfolder to extract contents
+    # Warn if subfolder already exists
+    # If no subfolder specified use datadir
+    if data_subdir is not None:
+        unpack_fpath = os.path.join(datadir, data_subdir)
+        if os.path.exists(unpack_fpath):
+            message = (
+                "Path to decompress: "
+                + unpack_fpath
+                + " already exists... overwriting."
+            )
+            warnings.warn(message, RuntimeWarning)
+        else:
+            os.makedirs(os.path.dirname(unpack_fpath))
+    else:
+        unpack_fpath = datadir
+
+    # create temporary directory
+    temp_dir = tempfile.TemporaryDirectory()
+
+    if remote_file.split(".")[-1] == "zip":
+        # unzip data into temporary directory
+        with zipfile.ZipFile(fpath, "r") as zip_ref:
+            zip_ref.extractall(temp_dir.name)
+    else:
+        # untar data into temporary directory
+        with tarfile.open(fpath, "r") as tar_ref:
+            tar_ref.extractall(temp_dir.name)
+
+    # Move data from temporary directory to desired
+    # output path
+    flatten_file_structure(temp_dir.name, unpack_fpath)
+
+    return unpack_fpath
+
+
+def find_file(
+    path: str,
+    fname: str,
+) -> str:
+    """
+    Looks for a file in the specified folder path.
+
+    :param string path: path to folder location of the file
+    :param string fname: file to find
+
+    :return: Path to file found
+    :rtype: string
+    """
+    # Check that file resides as specified location
+    fpath = os.path.join(path, fname)
+
+    if not os.path.exists(fpath):
+        raise ValueError(f"File {fpath} does not exist")
+    return fpath
+
+
+def get_file_v2(
+    base_url: str,
+    remote_file: str,
+    local_file: str,
+    datadir: str,
+    data_subdir: str = None,
+    md5_hash: str = None,
+) -> str:
+    """
+    Downloads a file from a URL if it not already in the cache. Passing the
+    MD5 hash will verify the file after download as well as if it is already
+    present in the cache.
+
+    :param string base_url: original URL of the file
+    :param string remote_file: file to download
+    :param string local_file: file to extract from download
+    :param string datadir: path to download file
+    :param string data_subdir: optional sub directory to store file
+    :param string md5_hash: optional MD5 hash of the file for verification
+
+    :return: Path to the downloaded file
+    :rtype: string
+    """
+    # Create subfolder to extract contents (OK if already exists)
+    # If no subfolder specified use datadir
+    if data_subdir is not None:
+        unpack_fpath = os.path.join(datadir, data_subdir)
+    else:
+        unpack_fpath = datadir
+    os.makedirs(unpack_fpath, exist_ok=True)
+
+    fpath_out = os.path.join(unpack_fpath, local_file)
+    if os.path.exists(fpath_out):  # File locally available
+        # Validate hash if given and can be interpreted as belonging to local file
+        if remote_file == local_file:
+            valid = True  # File available
+            if md5_hash is not None:
+                valid = validate_file(fpath_out, md5_hash)
+            if valid:
+                return fpath_out
+
+    # Local file not available
+    # Check if the remote file has been downloaded to fpath_in
+    # and check if it is valid
+    fpath_in = os.path.join(datadir, remote_file)
+    downloaded_ok = False
+    if os.path.exists(fpath_in):
+        if md5_hash is not None:
+            downloaded_ok = validate_file(fpath_in, md5_hash)
+        else:  # If no way to validate, assume file is OK
+            downloaded_ok = True
+
+    # Download file (i.e. file not downloaded previously or validation failed)
+    if not downloaded_ok:
+        fpath_in = download_data(base_url, remote_file, datadir)
+        print("Downloaded ", fpath_in)
+
+    # Extract requested local_file from tar/zip file
+    if remote_file.split(".")[-1] == "zip":
+        # unzip data into temporary directory
+        with zipfile.ZipFile(fpath_in, "r") as zip_ref:
+            zip_ref.extractall(unpack_fpath, members=[local_file])
+    else:
+        # untar data into temporary directory
+        with tarfile.open(fpath_in, "r") as tar_ref:
+            tar_ref.extractall(unpack_fpath, members=[local_file])
+
+    return fpath_out
 
 
 def validate_file(fpath: str, md5_hash: str) -> bool:
