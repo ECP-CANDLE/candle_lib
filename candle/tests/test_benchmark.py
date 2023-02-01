@@ -25,7 +25,7 @@ class SetupTest:
         self.additional_definitions = additional_definitions1
         self.required = required1
         self.filepath = "./"
-        self.defmodel = ""
+        self.defmodel = "test_model.txt"
         self.framework = "keras"
         self.prog = "fake_bmk"
         self.desc = "Fake benchmark"

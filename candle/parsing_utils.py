@@ -751,7 +751,9 @@ def finalize_parameters(bmk):
     else:  # a 'config_file' has been set --> use this file
         if os.path.isabs(conffile_txt):
             conffile = conffile_txt
-        elif conffile_txt.startswith("./"):  # user is trying to use a builtin alternate model file
+        elif conffile_txt.startswith(
+            "./"
+        ):  # user is trying to use a builtin alternate model file
             conffile = os.path.join(bmk.file_path, conffile_txt)
         else:
             if os.environ["CANDLE_DATA_DIR"] is not None:
