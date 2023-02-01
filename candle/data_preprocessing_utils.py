@@ -8,7 +8,7 @@ from scipy import stats
 
 def quantile_normalization(data):
     """
-    fashis function does quantile normalization to input data. After
+    This function does quantile normalization to input data. After
     normalization, the samples (rows) in output data follow the same
     distribution, which is the average distribution calculated based on all
     samples. This function allows missing values, and assume missing values
