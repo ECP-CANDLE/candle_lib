@@ -13,7 +13,9 @@ import candle
 candle.get_file('lincs1000.tsv', 'https://ftp.mcs.anl.gov/pub/candle/public/benchmarks/P1B1/lincs1000.tsv', datadir='./data')
 candle.get_file(fname='P3B1_data.tar.gz', origin='https://ftp.mcs.anl.gov/pub/candle/public/benchmarks/P3B1/P3B1_data.tar.gz', unpack=True, datadir='./data')
 ```
+
 ### Pytest
+
 Testing candle library can be done by invoking the following command:
 
 ```
