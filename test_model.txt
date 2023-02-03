@@ -1,0 +1,2 @@
+[Global_Params]
+model_name="test_model"

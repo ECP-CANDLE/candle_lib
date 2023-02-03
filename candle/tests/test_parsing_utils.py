@@ -86,7 +86,7 @@ def test_indirect_finalize_parameters(testobj):
     Checking some functionality inside of it.
     """
     filepath = "./"
-    defmodel = ""
+    defmodel = "test_model.txt"
     framework = "keras"
     prog = "fake_bmk"
     desc = "Fake benchmark"
