@@ -1,0 +1,29 @@
+name: candle-docs
+channels:
+    - conda-forge
+dependencies:
+    - python=3.9
+    - numpy
+    - pathlib
+    - pre_commit
+    - pytest
+    - pytest-cov
+    - astropy
+    - matplotlib
+    - numpy
+    - pandas
+    - patsy
+    - requests
+    - scikit-learn
+    - scipy
+    - statsmodels
+    - tqdm
+    - pip
+    - ipykernel
+    - ipython
+    - jupyter_client
+    - matplotlib-base
+    - sphinx-book-theme
+    - myst-nb
+    - sphinx-design
+    - nbsphinx
