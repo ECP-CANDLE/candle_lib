@@ -3,6 +3,8 @@ channels:
     - conda-forge
 dependencies:
     - python=3.9
+    - tensorflow
+    - torch
     - numpy
     - pathlib
     - pre_commit
