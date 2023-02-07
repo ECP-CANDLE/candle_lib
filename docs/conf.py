@@ -8,7 +8,6 @@
 import os
 import sys
 import pathlib
-import yaml
 from sphinx.application import Sphinx
 from sphinx.util import logging
 from textwrap import dedent, indent
