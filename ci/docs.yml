@@ -5,7 +5,7 @@ channels:
 dependencies:
     - python=3.9
     - tensorflow
-    - torch
+    - pytorch=1.9.*
     - numpy
     - pathlib
     - pre_commit
