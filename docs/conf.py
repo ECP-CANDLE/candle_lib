@@ -138,7 +138,7 @@ autosummary_imported_members = True
 html_context = {
     "github_user": "candle_lib",
     "github_repo": "candle_lib",
-    "github_version": "master",
+    "github_version": "develop",
     "doc_path": "docs",
 }
 
@@ -149,7 +149,7 @@ html_theme_options = dict(
     # analytics_id=''  this is configured in rtfd.io
     # canonical_url="",
     repository_url="https://github.com/ECP-CANDLE/candle_lib",
-    repository_branch="master",
+    repository_branch="develop",
     path_to_docs="docs",
     use_edit_page_button=True,
     use_repository_button=True,
