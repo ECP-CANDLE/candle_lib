@@ -7,7 +7,6 @@ dependencies:
     - tensorflow
     - keras
     - pytorch=1.9.*
-    - cchardet
     - numpy
     - pathlib
     - pytest-cov
