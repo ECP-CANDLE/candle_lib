@@ -14,9 +14,9 @@ you are already or soon-to-be a candle library contributor, please keep reading!
 1. Overview
 ===========
 
-The CANDLE library enables users to run their own deep learning code on a set of 
-supported high-performance computers. With the current version of CANDLE, 
-users will be able to run a hyperparameter optimization task (mlrMBO workflow) 
+The CANDLE library enables users to run their own deep learning code on a set of
+supported high-performance computers. With the current version of CANDLE,
+users will be able to run a hyperparameter optimization task (mlrMBO workflow)
 or a parallel execution task (upf workflow).
 
 We invite other community members to become part of this
@@ -98,7 +98,7 @@ candle_lib employs a number of GitHub Actions workflows (please refer to the `Gi
 Actions <https://docs.github.com/en/actions>`_ guide for detailed information) to make
 sure our PRs, branches, etc. pass certain test scenarios such as the pre-commit hooks,
 code test suite, and documentation generation. The pre-commit hooks workflow ensures
-the code being proposed to be merged is complying with code standards. 
+the code being proposed to be merged is complying with code standards.
 
 .. note::
     We require PRs to pass all of these checks before getting merged in order to

@@ -5,7 +5,7 @@
 Installation
 ============
 
-This installation guide includes only the candle installation instructions. 
+This installation guide includes only the candle installation instructions.
 
 
 Installing candle lib from source (Github)
@@ -39,4 +39,4 @@ code repository using the following command (Explicit installation of the
 `pytest <https://docs.pytest.org/en/stable/>`_ package may be required, please
 see above)::
 
-    python -m pytest 
+    python -m pytest

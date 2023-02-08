@@ -4,5 +4,3 @@
 
 How to Cite candle_lib
 ======================
-
-

@@ -2,13 +2,13 @@ name: candle_build
 channels:
   - conda-forge
 dependencies:
-    - astropy
-    - matplotlib
-    - numpy
-    - pandas
-    - patsy
-    - requests
-    - scikit-learn
-    - scipy
-    - statsmodels
-    - tqdm
+  - astropy
+  - matplotlib
+  - numpy
+  - pandas
+  - patsy
+  - requests
+  - scikit-learn
+  - scipy
+  - statsmodels
+  - tqdm
