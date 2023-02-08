@@ -6,7 +6,7 @@
 .. module:: candle
 
 .. meta::
-   :description: candle Python module
+   :description: candle library for setting up AI and deep-learning cancer problems
    :keywords: cancer deep learning drug response gene
 
 
@@ -65,7 +65,7 @@ CANDLE Lib .
     Usage Examples <examples>
     API Reference <api>
     Tutorials <tutorials>
-    Cite CANDLE LIB <citation>
+    .. Cite CANDLE LIB <citation>
 
 .. toctree::
     :maxdepth: 2
