@@ -15,3 +15,6 @@ sphinx_design
 sphinx_book_theme
 nbsphinx
 
+Then run:
+
+make html
