@@ -1,7 +1,7 @@
 
 Documenter notes:
 
-Install
+Install:
 
 conda:
 
