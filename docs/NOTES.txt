@@ -1,0 +1,17 @@
+
+Documenter notes:
+
+Install
+
+conda:
+
+sphinx
+
+pip:
+
+candle
+myst_nb
+sphinx_design
+sphinx_book_theme
+nbsphinx
+
