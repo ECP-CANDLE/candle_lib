@@ -16,3 +16,4 @@ see the :doc:`contributing`.
    :hidden:
 
    examples/001-basic_candle_compliant_model.ipynb
+   examples/002-ckpt.ipynb
