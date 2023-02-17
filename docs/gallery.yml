@@ -1,3 +1,7 @@
 - title: Basic Candle Compliant Model
   path: examples/001-basic_candle_compliant_model.ipynb
   thumbnail: _static/thumbnails/default.svg
+
+- title: Checkpoint Examples
+  path: examples/002-ckpt.ipynb
+  thumbnail: _static/thumbnails/default.svg

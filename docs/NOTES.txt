@@ -18,3 +18,10 @@ nbsphinx
 Then run:
 
 make html
+
+Adding a new example:
+
+1. Add a 00<x-name>.ipynb file to the docs/examples folder
+2. Add a title/thumbnail for the example in docs/gallery.yml file
+3. Make sure that the example has a markdown heading. Eg. # Candle Compliance Example.
+Note the "#" - This is used for getting the entry in drop down.
