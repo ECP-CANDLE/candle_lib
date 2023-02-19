@@ -1,5 +1,9 @@
 # CANDLE Library
 
+## Documentation
+
+This repository builds documentation [here](https://candle-lib.readthedocs.io/en/latest/index.html)
+
 ## Install
 
 ```
