@@ -161,8 +161,13 @@ class CandleCkpt:
             import logging
 
             self.logger = logging.getLogger("CandleCkpt")
+            if gParameters["ckpt_directory"] is not None:
+                log_string = gParameters["ckpt_directory"] + "/ckpt.log"
+            else:
+                log_string = "save/ckpt.log"
+
             set_up_logger(
-                "save/ckpt.log",
+                log_string,
                 self.logger,
                 verbose=verbose,
                 fmt_line="%(asctime)s CandleCkpt: %(message)s",
