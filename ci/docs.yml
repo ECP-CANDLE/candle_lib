@@ -29,3 +29,4 @@ dependencies:
   - myst-nb
   - sphinx-design
   - nbsphinx
+  - protobuf=3.19
