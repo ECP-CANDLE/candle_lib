@@ -27,6 +27,7 @@ Let us know if you have any feedback!
    api_data_utils/index.rst
    api_helper_utils/index.rst
    api_file_utils/index.rst
+   api_modac_utils/index.rst
    api_noise_utils/index.rst
    api_parsing_utils/index.rst
    api_keras_utils/index.rst

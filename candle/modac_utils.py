@@ -220,16 +220,17 @@ def query_yes_no(question, default="yes"):
 def get_dataObject_modac_filesize(data_object_path):
     """
     Return the file size in bytes for a modac file
-        Parameters
-        ----------
-        data_object_path : string
-            The path of the file on MoDAC
+    Parameters
+    ----------
+    data_object_path : string
+        The path of the file on MoDAC
 
-        Returns
-        ----------
-        integer
-            file size in bytes
+    Returns
+    -------
+    integer
+        file size in bytes
     """
+
     self_dic = get_dataObject_modac_meta(data_object_path)
     if "source_file_size" in self_dic.keys():
         return int(self_dic["source_file_size"])
@@ -240,15 +241,15 @@ def get_dataObject_modac_filesize(data_object_path):
 def get_dataObject_modac_md5sum(data_object_path):
     """
     Return the md5sum for a modac file
-        Parameters
-        ----------
-        data_object_path : string
-            The path of the file on MoDAC
+    Parameters
+    ----------
+    data_object_path : string
+        The path of the file on MoDAC
 
-        Returns
-        ----------
-        string
-            The md5sum of the file
+    Returns
+    ----------
+    string
+        The md5sum of the file
     """
     self_dic = get_dataObject_modac_meta(data_object_path)
     if "checksum" in self_dic.keys():
@@ -260,16 +261,17 @@ def get_dataObject_modac_md5sum(data_object_path):
 def get_dataObject_modac_meta(data_object_path):
     """
     Return the self metadata values for a file (data_object)
-        Parameters
-        ----------
-        data_object_path : string
-            The path of the file on MoDAC
+    Parameters
+    ----------
+    data_object_path : string
+        The path of the file on MoDAC
 
-        Returns
-        ----------
-        dictionary
-            Dictonary of all metadata for the file in MoDAC
+    Returns
+    -------
+    dictionary
+        Dictonary of all metadata for the file in MoDAC
     """
+
     # data_object_path = encode_path(data_object_path)
     modac_user, modac_token = authenticate_modac()
     headers = {}
