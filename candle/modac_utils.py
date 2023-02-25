@@ -220,6 +220,7 @@ def query_yes_no(question, default="yes"):
 def get_dataObject_modac_filesize(data_object_path):
     """
     Return the file size in bytes for a modac file
+
     Parameters
     ----------
     data_object_path : string
@@ -241,6 +242,7 @@ def get_dataObject_modac_filesize(data_object_path):
 def get_dataObject_modac_md5sum(data_object_path):
     """
     Return the md5sum for a modac file
+
     Parameters
     ----------
     data_object_path : string
@@ -261,6 +263,7 @@ def get_dataObject_modac_md5sum(data_object_path):
 def get_dataObject_modac_meta(data_object_path):
     """
     Return the self metadata values for a file (data_object)
+
     Parameters
     ----------
     data_object_path : string
