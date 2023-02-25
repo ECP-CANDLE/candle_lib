@@ -18,18 +18,16 @@ of the code::
 
     git clone https://github.com/ECP-CANDLE/candle_lib.git
     cd candle_lib
-    pip install git+https://github.com/ECP-CANDLE/candle_lib.git
-
-
-
-
-Installing from source
-^^^^^^^^^^^^^^^^^^^^^^
-
-Once the dependencies listed above are installed, you can install
-candle with running the following command from the root-directory::
-
     pip install .
+
+
+Installing develop version using pip
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+One line installation using pip command::
+
+    pip install git+https://github.com/ECP-CANDLE/candle_lib@develop
+    
 
 Testing candle library source
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

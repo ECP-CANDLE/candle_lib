@@ -29,8 +29,10 @@ There are many different ways to contribute to candle_lib. Anyone can, for
 example,
 
 * Write or revise documentation (including this document)
-* Implement data analysis operators for unstructured grids from scratch
-  or from their workflows
+
+  * Documentation can be built locally by run running 'make html' from the docs folder
+  * Python dependencies can for this documentation are listed in docs/NOTES.txt
+  * After building documentation can be visualized locally using any browser from file docs/_build/html/index.html 
 * Develop example notebooks that demonstrate how a particular function
   is used
 * Answer a support question

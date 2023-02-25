@@ -10,7 +10,6 @@ Let us know if you have any feedback!
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
 
    api_data_preprocessing_utils/index.rst
    api_pytorch_utils/index.rst
