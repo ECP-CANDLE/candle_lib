@@ -26,13 +26,24 @@ collaboration at any level of contribution.
 ----------------------------
 
 There are many different ways to contribute to candle_lib. Anyone can, for
-example,
+example:
+
+* Adding new functionality
+  
+  *  python function <fname> in candle/ folder
+  *  Add the this file in docs/api_<fname>/index.rst
+  *  Specify the API functions for inclusion in ReadTheDocs (RTD)
+
+* Extending functionality of existing modules (say candle/file_utils.py)
+  
+  * Add the API functions in the corresponding index.rst file (eg. docs/api_file_utils/index.py)
 
 * Write or revise documentation (including this document)
 
   * Documentation can be built locally by run running 'make html' from the docs folder
   * Python dependencies can for this documentation are listed in docs/NOTES.txt
   * After building documentation can be visualized locally using any browser from file docs/_build/html/index.html
+  
 * Develop example notebooks that demonstrate how a particular function
   is used
 * Answer a support question
@@ -53,34 +64,6 @@ one project to another. As such, we will refer the reader to comprehensive
 resources for basic learning and detailed information about GitHub (such as the
 `Getting Started with Github <https://docs.github.com/en/get-started>`_ guide).
 
-
-
-$ python -m pytest test/<test_script_name>.py
-
-Not using ``pytest`` for implementation allows the unit tests to be also run
-by using (a number of benefits/conveniences coming from using ``pytest`` can be
-seen `here <https://docs.pytest.org/en/7.1.x/how-to/unittest.html#how-to-use-unittest-based-tests-with-pytest>`_
-though)::
-
-    $ python -m unittest tests/<test_script_name>.py
-
-Also, all of the test scripts can be run at once with the following command::
-
-    $ pytest test
-
-* Python's unit testing framework, `unittest
-  <https://docs.python.org/3/library/unittest.html>`_ is used for implementation of
-  the test scripts.
-
-* Reference results (i.e. expected output or ground truth for not all but the most cases)
-should not be magic values (i.e. they need to be justified and/or documented).
-
-* Recommended, but not mandatory, implementation approach is as follows:
-
-  - Common data structures, variables and functions,  as well as
-    expected outputs, which could be used by multiple test methods throughout
-    the test script, are defined either under a base test class or in the very
-    beginning of the test script for being used by multiple unit test cases.
 
   - Assertions are used for testing various cases such as array comparison.
 
@@ -103,8 +86,9 @@ code test suite, and documentation generation. The pre-commit hooks workflow ens
 the code being proposed to be merged is complying with code standards.
 
 .. note::
+    All PRs must be made to the ``develop`` branch.
     We require PRs to pass all of these checks before getting merged in order to
-    always ensure our ``main`` branch stability.
+    always ensure our ``develop`` branch stability.
 
 These checks can be extremely helpful for contributors to be sure about they are
 changing things in correct directions and their PRs are ready to be reviewed and
