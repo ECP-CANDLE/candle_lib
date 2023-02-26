@@ -15,15 +15,15 @@ Candle Library Documentation
 
 - The candle library was originally part of `CANDLE Benchmarks <https://github.com/ECP-CANDLE/Benchmarks.git>`_
 - It provides various standard methods to allow/enforce consistency across models
-  
+
   - Standardized model definition files and command line interface
   - Interoperability with `CANDLE Supervisor <https://github.com/ECP-CANDLE/Supervisor.git>`_ for automated workflows
-  
+
     - Standard run() method
     - Standard hyperparameters
- 
+
   - Functionality to incorporate standard methods at all stages of the workflow
-  
+
     - data preprocessing, partitioning, filtering
     - noise injection, abstention
     - checkpointing, restart, logging

@@ -27,7 +27,7 @@ Installing develop version using pip
 One line installation using pip command::
 
     pip install git+https://github.com/ECP-CANDLE/candle_lib@develop
-    
+
 
 Testing candle library source
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
