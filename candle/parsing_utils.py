@@ -344,6 +344,23 @@ data_preprocess_conf = [
     },
 ]
 
+extra_conf = [
+    {
+        "name": "jupyter",
+        "abv": "f",
+        "type": str,
+        "default": argparse.SUPPRESS,
+        "help": "Reserve abv f for Jupyter notebook",
+    },
+    {
+        "name": "HistoryManager.hist_file=:memory",
+        "abv": "HistoryManager.hist_file=:memory",
+        "type": str,
+        "default": argparse.SUPPRESS,
+        "help": "Reserve abv f for Jupyter notebook",
+    },
+]
+
 model_conf = [
     {
         "name": "dense",
@@ -624,6 +641,7 @@ registered_conf = [
     training_conf,
     cyclic_learning_conf,
     ckpt_conf,
+    extra_conf,
 ]
 
 
