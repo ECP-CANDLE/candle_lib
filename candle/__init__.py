@@ -99,7 +99,7 @@ except ImportError:
     pass
 
 if "tensorflow" in sys.modules:
-    print("Importing candle utils for keras")
+    print("Importing candle utils for Keras")
 
     from .ckpt_keras_utils import CandleCkptKeras, MultiGPUCheckpoint
     from .ckpt_utils import CandleCkpt, ModelType

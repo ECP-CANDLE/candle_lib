@@ -386,13 +386,13 @@ model_conf = [
         "abv": "a",
         "type": str,
         "default": argparse.SUPPRESS,
-        "help": "keras activation function to use in inner layers: relu, tanh, sigmoid...",
+        "help": "Keras activation function to use in inner layers: relu, tanh, sigmoid...",
     },
     {
         "name": "out_activation",
         "type": str,
         "default": argparse.SUPPRESS,
-        "help": "keras activation function to use in out layer: softmax, linear, ...",
+        "help": "Keras activation function to use in out layer: softmax, linear, ...",
     },
     {
         "name": "lstm_size",
@@ -430,13 +430,13 @@ model_conf = [
         "name": "loss",
         "type": str,
         "default": argparse.SUPPRESS,
-        "help": "keras loss function to use: mse, ...",
+        "help": "Keras loss function to use: mse, ...",
     },
     {
         "name": "optimizer",
         "type": str,
         "default": argparse.SUPPRESS,
-        "help": "keras optimizer to use: sgd, rmsprop, ...",
+        "help": "Keras optimizer to use: sgd, rmsprop, ...",
     },
     {
         "name": "metrics",
@@ -472,7 +472,7 @@ training_conf = [
         "name": "early_stop",
         "type": str2bool,
         "default": argparse.SUPPRESS,
-        "help": "activates keras callback for early stopping of training in function of the monitored variable specified.",
+        "help": "activates Keras callback for early stopping of training in function of the monitored variable specified.",
     },
     {
         "name": "momentum",

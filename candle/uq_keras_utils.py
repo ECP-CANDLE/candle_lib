@@ -34,9 +34,9 @@ def abstention_loss(alpha, mask: Array):
 
     def loss(y_true, y_pred):
         """
-        :param y_true: keras tensor. True values to predict
-        :param y_pred: keras tensor. Prediction made by the model. \
-            It is assumed that this keras tensor includes extra columns to store the abstaining classes.
+        :param y_true: Keras tensor. True values to predict
+        :param y_pred: Keras tensor. Prediction made by the model. \
+            It is assumed that this Keras tensor includes extra columns to store the abstaining classes.
         """
         base_pred = (1 - mask) * y_pred + K.epsilon()
         base_true = y_true
@@ -67,9 +67,9 @@ def sparse_abstention_loss(alpha, mask: Array):
 
     def loss(y_true, y_pred):
         """
-        :param y_true: keras tensor. True values to predict
-        :param y_pred: keras tensor. Prediction made by the model. \
-            It is assumed that this keras tensor includes extra columns to store the abstaining classes.
+        :param y_true: Keras tensor. True values to predict
+        :param y_pred: Keras tensor. Prediction made by the model. \
+            It is assumed that this Keras tensor includes extra columns to store the abstaining classes.
         """
         base_pred = (1 - mask) * y_pred + K.epsilon()
         base_true = y_true
@@ -96,9 +96,9 @@ def abstention_acc_metric(nb_classes: Union[int, Array]):
 
     def metric(y_true, y_pred):
         """
-        :param y_true: keras tensor. True values to predict
-        :param y_pred: keras tensor. Prediction made by the model.\
-            It is assumed that this keras tensor includes extra columns to store the abstaining classes.
+        :param y_true: Keras tensor. True values to predict
+        :param y_pred: Keras tensor. Prediction made by the model.\
+            It is assumed that this Keras tensor includes extra columns to store the abstaining classes.
         """
         # matching in original classes
         true_pred = K.sum(
@@ -141,9 +141,9 @@ def sparse_abstention_acc_metric(nb_classes: Union[int, Array]):
 
     def metric(y_true, y_pred):
         """
-        :param y_true: keras tensor. True values to predict
-        :param y_pred: keras tensor. Prediction made by the model. \
-            It is assumed that this keras tensor includes extra columns to store the abstaining classes.
+        :param y_true: Keras tensor. True values to predict
+        :param y_pred: Keras tensor. Prediction made by the model. \
+            It is assumed that this Keras tensor includes extra columns to store the abstaining classes.
         """
         # matching in original classes
         y_pred_index = K.argmax(y_pred, axis=-1)
@@ -183,9 +183,9 @@ def abstention_metric(nb_classes: Union[int, Array]):
 
     def metric(y_true, y_pred):
         """
-        :param y_true: keras tensor. True values to predict
-        :param y_pred: keras tensor.  Prediction made by the model. \
-            It is assumed that this keras tensor includes extra columns to store the abstaining classes.
+        :param y_true: Keras tensor. True values to predict
+        :param y_pred: Keras tensor.  Prediction made by the model. \
+            It is assumed that this Keras tensor includes extra columns to store the abstaining classes.
         """
         # total abstention
         total_abs = K.sum(
@@ -215,9 +215,9 @@ def acc_class_i_metric(class_i: int):
 
     def metric(y_true, y_pred):
         """
-        :param y_true: keras tensor. True values to predict
-        :param y_pred: keras tensor. Prediction made by the model. \
-            It is assumed that this keras tensor includes extra columns to store the abstaining classes.
+        :param y_true: Keras tensor. True values to predict
+        :param y_pred: Keras tensor. Prediction made by the model. \
+            It is assumed that this Keras tensor includes extra columns to store the abstaining classes.
         """
         # Find locations in ground truth belonging to class i
         ytrueint = K.cast(K.equal(K.argmax(y_true, axis=-1), class_i), "int64")
@@ -261,9 +261,9 @@ def abstention_acc_class_i_metric(nb_classes: Union[int, Array], class_i: int):
 
     def metric(y_true, y_pred):
         """
-        :param y_true: keras tensor. True values to predict
-        :param y_pred: keras tensor. Prediction made by the model. \
-            It is assumed that this keras tensor includes extra columns to store the abstaining classes.
+        :param y_true: Keras tensor. True values to predict
+        :param y_pred: Keras tensor. Prediction made by the model. \
+            It is assumed that this Keras tensor includes extra columns to store the abstaining classes.
         """
         # Find locations in ground truth belonging to class i
         ytrueint = K.cast(K.equal(K.argmax(y_true, axis=-1), class_i), "int64")
@@ -313,9 +313,9 @@ def abstention_class_i_metric(nb_classes: Union[int, Array], class_i: int):
 
     def metric(y_true, y_pred):
         """
-        :param y_true: keras tensor. True values to predict
-        :param y_pred: keras tensor. Prediction made by the model. \
-            It is assumed that this keras tensor includes extra columns to store the abstaining classes.
+        :param y_true: Keras tensor. True values to predict
+        :param y_pred: Keras tensor. Prediction made by the model. \
+            It is assumed that this Keras tensor includes extra columns to store the abstaining classes.
         """
         # Find locations in ground truth belonging to class i
         ytrue_i_int = K.cast(K.equal(K.argmax(y_true, axis=-1), class_i), "int64")
@@ -412,7 +412,7 @@ class AbstentionAdapt_Callback(Callback):
         Updates the weight of abstention term on epoch end.
 
         :param int epoch: Current epoch in training.
-        :param logs: Metrics stored during current keras training.
+        :param logs: Metrics stored during current Keras training.
         """
 
         new_alpha_val = K.get_value(self.alpha)
@@ -525,18 +525,18 @@ def add_model_output(
     activation: Optional[str] = None,
 ):
     """
-    This function modifies the last dense layer in the passed keras model.
+    This function modifies the last dense layer in the passed Keras model.
     The modification includes adding units and optionally changing the
     activation function.
 
-    :param modelIn: keras model. Keras model to be modified.
+    :param modelIn: Keras model. Keras model to be modified.
     :param string mode: Mode to modify the layer. It could be:
 
         - 'abstain' for adding an arbitrary number of units for the abstention optimization strategy.
         - 'qtl' for quantile regression which needs the outputs to be tripled.
         - 'het' for heteroscedastic regression which needs the outputs to be doubled.
     :param int num_add: Number of units to add. This only applies to the 'abstain' mode.
-    :param string activation: String with keras specification of activation function (e.g. 'relu', 'sigomid', 'softmax', etc.)
+    :param string activation: String with Keras specification of activation function (e.g. 'relu', 'sigomid', 'softmax', etc.)
 
     :return: Keras model after last dense layer has been modified as specified. \
         If there is no mode specified it returns the same model. \
@@ -878,9 +878,9 @@ def contamination_loss(nout: int, T_k, a, sigmaSQ, gammaSQ):
 
     def loss(y_true, y_pred):
         """
-        :param y_true: keras tensor. True values to predict. It is assumed that this keras tensor \
+        :param y_true: Keras tensor. True values to predict. It is assumed that this Keras tensor \
             includes extra columns to store the index of the data sample in the training set.
-        :param y_pred: keras tensor. Prediction made by the model.
+        :param y_pred: Keras tensor. Prediction made by the model.
         """
         y_shape = K.shape(y_pred)
         y_true_ = K.reshape(y_true[:, :-1], y_shape)
@@ -979,7 +979,7 @@ class Contamination_Callback(Callback):
         of global parameters (a, sigmaSQ and gammaSQ).
 
         :param int epoch: Current epoch in training.
-        :param logs: keras logs. Metrics stored during current keras training.
+        :param logs: Keras logs. Metrics stored during current Keras training.
         """
         y_pred = self.model.predict(self.x)
         error = self.y.squeeze() - y_pred.squeeze()
@@ -1035,7 +1035,7 @@ def mse_contamination_metric(nout: int):
     def metric(y_true, y_pred):
         """
         :param y_true: Keras tensor. \
-            Keras tensor including the ground truth. Since the keras tensor includes an extra column to store the index of the data sample in the training set this column is ignored.
+            Keras tensor including the ground truth. Since the Keras tensor includes an extra column to store the index of the data sample in the training set this column is ignored.
         :param y_pred: Keras tensor. \
             Keras tensor with the predictions of the contamination model (no data index).
         """
@@ -1059,7 +1059,7 @@ def mae_contamination_metric(nout: int):
     def metric(y_true, y_pred):
         """
         :param y_true: Keras tensor. \
-            Keras tensor including the ground truth. Since the keras tensor includes an extra column to store the index of the data sample in the training set this column is ignored.
+            Keras tensor including the ground truth. Since the Keras tensor includes an extra column to store the index of the data sample in the training set this column is ignored.
         :param y_pred: Keras tensor. \
             Keras tensor with the predictions of the contamination model (no data index).
         """
@@ -1083,7 +1083,7 @@ def r2_contamination_metric(nout: int):
     def metric(y_true, y_pred):
         """
         :param y_true: Keras tensor. \
-            Keras tensor including the ground truth. Since the keras tensor includes an extra column to store the index of the data sample in the training set this column is ignored.
+            Keras tensor including the ground truth. Since the Keras tensor includes an extra column to store the index of the data sample in the training set this column is ignored.
         :param y_pred: Keras tensor. \
             Keras tensor with the predictions of the contamination model (no data index).
         """
