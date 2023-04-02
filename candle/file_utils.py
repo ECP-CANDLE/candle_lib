@@ -191,8 +191,10 @@ def directory_tree_from_parameters(
 
     # Construct data directory trees recursively without
     # complaining if they exist
-    if not os.path.exists(datadir):
-        os.makedirs(datadir, exist_ok=True)
+    # TODO: Understand why this is commented out and why it is needed?
+    # This breaks when we don't have access to the data directory
+    # if not os.path.exists(datadir):
+    #     os.makedirs(datadir, exist_ok=True)
 
     # Output directory tree part
     # First part can be:
