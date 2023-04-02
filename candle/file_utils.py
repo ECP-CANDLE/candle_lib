@@ -44,8 +44,8 @@ def get_file(
     if cache_subdir is not None:
         datadir = os.path.join(datadir, cache_subdir)
 
-    if not os.path.exists(datadir):
-        os.makedirs(datadir)
+    # if not os.path.exists(datadir):
+    #     os.makedirs(datadir)
 
     if fname.endswith(".tar.gz"):
         fnamesplit = fname.split(".tar.gz")
