@@ -63,8 +63,10 @@ def get_file(
         unpack_fpath = None
 
     fpath = os.path.join(datadir, fname)
-    if not os.path.exists(os.path.dirname(fpath)):
-        os.makedirs(os.path.dirname(fpath))
+    print("fpath = ", fpath)
+    print("datadir = ", datadir)
+    # if not os.path.exists(os.path.dirname(fpath)):
+    #     os.makedirs(os.path.dirname(fpath))
 
     download = False
     if os.path.exists(fpath) or (
