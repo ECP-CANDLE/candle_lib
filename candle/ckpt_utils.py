@@ -165,6 +165,7 @@ class CandleCkpt:
                 log_string = gParameters["ckpt_directory"] + "/ckpt.log"
             else:
                 log_string = "save/ckpt.log"
+            log_string = os.path.join(gParameters["output_dir"], log_string)
 
             set_up_logger(
                 log_string,
@@ -188,7 +189,11 @@ class CandleCkpt:
         self.gParams = gParams
         self.epoch_max = self.param("epochs", ParamRequired(), ParamType.INTEGER_NN)
         self.skip_epochs = self.param("ckpt_skip_epochs", 0, ParamType.INTEGER_NN)
+
         self.ckpt_directory = self.param("ckpt_directory", "./save", ParamType.STRING)
+        # put the ckpt directory in the output path
+        self.ckpt_directory = os.path.join(gParams["output_dir"], self.ckpt_directory)
+
         self.save_best = self.param("ckpt_save_best", True, ParamType.BOOLEAN)
         self.save_best_metric = self.param(
             "ckpt_save_best_metric", None, ParamType.STRING
