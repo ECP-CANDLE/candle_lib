@@ -5,6 +5,7 @@ import os
 import sys
 import warnings
 from pprint import pprint
+from pprint import PrettyPrinter
 
 import numpy as np
 
@@ -801,6 +802,12 @@ def finalize_parameters(bmk):
     bmk.check_required_exists(gParameters)
     print("Params:")
     pprint(gParameters)
+    # Dump the parameters to the run directory
+    final_params = os.path.join(gParameters["output_dir"], "final_params.txt")
+    with open(final_params, "w") as fp:
+        pp = PrettyPrinter(stream=fp)
+        pp.pprint(gParameters)
+
     # Check that no keywords conflict
     check_flag_conflicts(gParameters)
 
