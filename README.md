@@ -30,4 +30,3 @@ python -m pytest
 See [here](https://ecp-candle.github.io/Candle/candle_lib/file_utils.html) for more detail about file utils.
 
 New documentation for candle_lib (beta) can be found here: https://candle-lib.readthedocs.io/en/latest/
-

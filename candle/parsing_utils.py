@@ -4,8 +4,7 @@ import argparse
 import os
 import sys
 import warnings
-from pprint import pprint
-from pprint import PrettyPrinter
+from pprint import PrettyPrinter, pprint
 
 import numpy as np
 
