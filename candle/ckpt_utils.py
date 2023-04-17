@@ -457,7 +457,7 @@ class CandleCkpt:
         os.symlink(src, dst)
 
     def relpath(self, p):
-        return p.relative_to(self.cwd)
+        return p.relative_to(self.cwd) if p.is_relative_to(self.cwd) else p
 
     def info(self, message):
         if self.logger is not None:
