@@ -98,7 +98,7 @@ def get_file(
         if "modac.cancer.gov" in origin:
             get_file_from_modac(fpath, origin)
         else:
-            print("Downloading data from", origin)
+            print("Downloading data from 2 ", origin)
             global progbar
             progbar = None
 
@@ -112,7 +112,7 @@ def get_file(
             error_msg = "URL fetch failure on {}: {} -- {}"
             try:
                 try:
-                    urlretrieve(origin, fpath, dl_progress)
+                    urlretrieve(origin, fpath) # , dl_progress
                     # fpath = wget.download(origin)
                 except URLError as e:
                     raise Exception(error_msg.format(origin, e.errno, e.reason))
