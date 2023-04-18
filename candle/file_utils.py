@@ -17,6 +17,7 @@ def get_file(
     md5_hash: str = None,
     cache_subdir: str = "common",
     datadir: str = None,
+    verbose = True
 ) -> str:
     """
     Downloads a file from a URL if it not already in the cache. Passing the
@@ -63,7 +64,8 @@ def get_file(
         unpack_fpath = None
 
     fpath = os.path.join(datadir, fname)
-    print("getfile(): fname: " + fname)
+    if verbose:
+        print("getfile(): getting file: " + fpath)
     if not os.path.exists(os.path.dirname(fpath)):
         os.makedirs(os.path.dirname(fpath))
 
@@ -80,6 +82,8 @@ def get_file(
                 )
                 download = True
     else:
+        if verbose:
+            print("getfile(): local file not found: " + fpath)
         download = True
 
     # fix ftp protocol if needed
