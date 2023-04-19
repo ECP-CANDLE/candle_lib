@@ -63,7 +63,7 @@ def build_pytorch_optimizer(
     else:
         params = model.parameters()
 
-    # schedule = optimizers.optimizer.Schedule() # constant lr (equivalent to default keras setting)
+    # schedule = optimizers.optimizer.Schedule() # constant lr (equivalent to default Keras setting)
 
     if optimizer == "sgd":
         return torch.optim.GradientDescentMomentum(

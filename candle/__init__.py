@@ -4,7 +4,7 @@ __version__ = "0.0.1"
 # import framework dependent utils
 import sys
 
-from .benchmark_def import Benchmark
+from .benchmark_def import Benchmark, create_params
 
 # import from data_preprocessing_utils
 from .data_preprocessing_utils import (
@@ -93,10 +93,16 @@ try:
 except ImportError:
     pass
 
-if "tensorflow" in sys.modules:
-    print("Importing candle utils for keras")
+try:
+    import torch
+except ImportError:
+    pass
 
-    from .ckpt_keras_utils import CandleCheckpointCallback, MultiGPUCheckpoint, restart
+if "tensorflow" in sys.modules:
+    print("Importing candle utils for Keras")
+
+    from .ckpt_keras_utils import CandleCkptKeras, MultiGPUCheckpoint
+    from .ckpt_utils import CandleCkpt, ModelType
     from .clr_keras_utils import CyclicLR, clr_callback, clr_check_args, clr_set_args
     from .keras_utils import (
         CandleRemoteMonitor,
@@ -143,8 +149,9 @@ if "tensorflow" in sys.modules:
     )
     from .viz_utils import plot_metrics
 
-elif "torch" in sys.modules:
+if "torch" in sys.modules:
     print("Importing candle utils for pytorch")
+    from .ckpt_pytorch_utils import CandleCkptPyTorch
     from .pytorch_utils import (
         build_pytorch_activation,
         build_pytorch_optimizer,
@@ -156,8 +163,8 @@ elif "torch" in sys.modules:
         set_pytorch_threads,
     )
 
-else:
-    raise Exception("No backend has been specified.")
+# else:
+#     raise Exception("No backend has been specified.")
 
 
 __all__ = [

@@ -70,7 +70,7 @@ def get_function(name: str):
 
     mapped = mapping.get(name)
     if not mapped:
-        raise Exception('No keras function found for "{}"'.format(name))
+        raise Exception('No Keras function found for "{}"'.format(name))
 
     return mapped
 
@@ -85,7 +85,7 @@ def build_optimizer(optimizer, lr, kerasDefaults):
         Options recognized: 'sgd', 'rmsprop', 'adagrad', adadelta', 'adam' \
         See the Keras documentation for a full description of the options
     :param float lr: Learning rate
-    :param List kerasDefaults: List of default parameter values to ensure consistency between frameworks
+    :param Dict kerasDefaults: Dictionary of default parameter values to ensure consistency between frameworks
 
     :return: The appropriate Keras optimizer function
     """
@@ -141,7 +141,7 @@ def build_initializer(
         Options recognized: 'constant', 'uniform', 'normal', \
         'glorot_uniform', 'lecun_uniform', 'he_normal' \
         See the Keras documentation for a full description of the options
-    :param List kerasDefaults: List of default parameter values to ensure consistency between frameworks
+    :param Dict kerasDefaults: Dictionary of default parameter values to ensure consistency between frameworks
     :param int seed: Random number seed
     :param float constant: Constant value (for the constant initializer only)
 

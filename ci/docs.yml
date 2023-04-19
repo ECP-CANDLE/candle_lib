@@ -1,0 +1,32 @@
+name: candle-docs
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.9
+  - tensorflow
+  - keras
+  - pytorch=1.9.*
+  - numpy
+  - pathlib
+  - pytest-cov
+  - astropy
+  - matplotlib
+  - numpy
+  - pandas
+  - patsy
+  - requests
+  - scikit-learn
+  - scipy
+  - statsmodels
+  - tqdm
+  - pip
+  - ipykernel
+  - ipython
+  - jupyter_client
+  - matplotlib-base
+  - sphinx-book-theme
+  - myst-nb
+  - sphinx-design
+  - nbsphinx
+  - protobuf=3.19

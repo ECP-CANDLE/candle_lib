@@ -4,7 +4,7 @@ import argparse
 import os
 import sys
 import warnings
-from pprint import pprint
+from pprint import PrettyPrinter, pprint
 
 import numpy as np
 
@@ -15,7 +15,7 @@ else:
 
 from typing import Any, List, Optional, Set, Type, Union
 
-from .file_utils import directory_from_parameters
+from .file_utils import directory_tree_from_parameters
 from .helper_utils import str2bool
 
 # Seed for random generation -- default value
@@ -113,6 +113,7 @@ class ParseDict(TypedDict):
     parameters."""
 
     name: str
+    # ABV = abbreviated form
     abv: Optional[str]
     action: Union[str, Type[ListOfListsAction]]
     type: Optional[Any]
@@ -343,6 +344,23 @@ data_preprocess_conf = [
     },
 ]
 
+extra_conf = [
+    {
+        "name": "jupyter",
+        "abv": "f",
+        "type": str,
+        "default": argparse.SUPPRESS,
+        "help": "Reserve abv f for Jupyter notebook",
+    },
+    {
+        "name": "HistoryManager.hist_file=:memory",
+        "abv": "HistoryManager.hist_file=:memory",
+        "type": str,
+        "default": argparse.SUPPRESS,
+        "help": "Reserve abv f for Jupyter notebook",
+    },
+]
+
 model_conf = [
     {
         "name": "dense",
@@ -368,13 +386,13 @@ model_conf = [
         "abv": "a",
         "type": str,
         "default": argparse.SUPPRESS,
-        "help": "keras activation function to use in inner layers: relu, tanh, sigmoid...",
+        "help": "Keras activation function to use in inner layers: relu, tanh, sigmoid...",
     },
     {
         "name": "out_activation",
         "type": str,
         "default": argparse.SUPPRESS,
-        "help": "keras activation function to use in out layer: softmax, linear, ...",
+        "help": "Keras activation function to use in out layer: softmax, linear, ...",
     },
     {
         "name": "lstm_size",
@@ -412,13 +430,13 @@ model_conf = [
         "name": "loss",
         "type": str,
         "default": argparse.SUPPRESS,
-        "help": "keras loss function to use: mse, ...",
+        "help": "Keras loss function to use: mse, ...",
     },
     {
         "name": "optimizer",
         "type": str,
         "default": argparse.SUPPRESS,
-        "help": "keras optimizer to use: sgd, rmsprop, ...",
+        "help": "Keras optimizer to use: sgd, rmsprop, ...",
     },
     {
         "name": "metrics",
@@ -454,7 +472,7 @@ training_conf = [
         "name": "early_stop",
         "type": str2bool,
         "default": argparse.SUPPRESS,
-        "help": "activates keras callback for early stopping of training in function of the monitored variable specified.",
+        "help": "activates Keras callback for early stopping of training in function of the monitored variable specified.",
     },
     {
         "name": "momentum",
@@ -623,6 +641,7 @@ registered_conf = [
     training_conf,
     cyclic_learning_conf,
     ckpt_conf,
+    extra_conf,
 ]
 
 
@@ -750,8 +769,21 @@ def finalize_parameters(bmk):
     else:  # a 'config_file' has been set --> use this file
         if os.path.isabs(conffile_txt):
             conffile = conffile_txt
-        else:
+        elif conffile_txt.startswith(
+            "./"
+        ):  # user is trying to use a builtin alternate model file
             conffile = os.path.join(bmk.file_path, conffile_txt)
+        else:
+            if os.environ["CANDLE_DATA_DIR"] is not None:
+                conffile = os.path.join(os.environ["CANDLE_DATA_DIR"], conffile_txt)
+            else:
+                conffile = os.path.join(bmk.file_path, conffile_txt)
+            if not os.path.isfile(conffile):
+                raise Exception(
+                    "ERROR ! Specified configuration file "
+                    + conffile
+                    + " not found ... Exiting"
+                )
 
     # print("Configuration file: ", conffile)
     fileParameters = bmk.read_config_file(
@@ -769,6 +801,12 @@ def finalize_parameters(bmk):
     bmk.check_required_exists(gParameters)
     print("Params:")
     pprint(gParameters)
+    # Dump the parameters to the run directory
+    final_params = os.path.join(gParameters["output_dir"], "final_params.txt")
+    with open(final_params, "w") as fp:
+        pp = PrettyPrinter(stream=fp)
+        pp.pprint(gParameters)
+
     # Check that no keywords conflict
     check_flag_conflicts(gParameters)
 
@@ -802,9 +840,13 @@ def args_overwrite_config(args, config: ConfigDict):
             params["data_type"] = get_choice(params["data_type"])
 
     if "output_dir" not in params:
-        params["output_dir"] = directory_from_parameters(params)
+        params["data_dir"], params["output_dir"] = directory_tree_from_parameters(
+            params
+        )
     else:
-        params["output_dir"] = directory_from_parameters(params, params["output_dir"])
+        params["data_dir"], params["output_dir"] = directory_tree_from_parameters(
+            params, params["output_dir"]
+        )
 
     if "rng_seed" not in params:
         params["rng_seed"] = DEFAULT_SEED

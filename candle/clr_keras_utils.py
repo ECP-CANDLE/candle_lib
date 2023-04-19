@@ -49,7 +49,7 @@ def clr_callback(
     gamma: float = 0.999994,
 ) -> Callback:
     """
-    Creates keras callback for cyclical learning rate.
+    Creates Keras callback for cyclical learning rate.
     """
 
     if mode == "trng1":
@@ -191,7 +191,6 @@ class CyclicLR(Callback):
             K.set_value(self.model.optimizer.lr, self.clr())
 
     def on_batch_end(self, epoch, logs=None):
-
         logs = logs or {}
         self.trn_iterations += 1
         self.clr_iterations += 1
