@@ -115,6 +115,7 @@ A log of ckpt operations is in ckpt_directory/ckpt.log
 import json
 import os
 import shutil
+import sys
 import time
 from enum import Enum, auto, unique
 from pathlib import PosixPath
@@ -457,7 +458,17 @@ class CandleCkpt:
         os.symlink(src, dst)
 
     def relpath(self, p):
-        return p.relative_to(self.cwd)
+        """
+        If Path p is relative to CWD, relativize it and return it.
+        Should have no effect on program behavior.
+        Creates shorter, more readable logging messages,
+        especially on systems with large directory trees.
+        Requires >= Python 3.9 .
+        """
+        if sys.version_info[0] >= 3 and sys.version_info[1] >= 9:
+            if p.is_relative_to(self.cwd):
+                return p.relative_to(self.cwd)
+        return p
 
     def info(self, message):
         if self.logger is not None:
