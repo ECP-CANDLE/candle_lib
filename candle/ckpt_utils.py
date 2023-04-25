@@ -458,6 +458,13 @@ class CandleCkpt:
         os.symlink(src, dst)
 
     def relpath(self, p):
+        """
+        If Path p is relative to CWD, relativize it and return it.
+        Should have no effect on program behavior.
+        Creates shorter, more readable logging messages,
+        especially on systems with large directory trees.
+        Requires Python 3.9 .
+        """
         if sys.version_info[0] >= 3 and sys.version_info[1] >= 9:
             # Python 3.9 and greater:
             return p.relative_to(self.cwd) \
