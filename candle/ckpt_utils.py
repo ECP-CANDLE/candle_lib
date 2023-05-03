@@ -615,9 +615,12 @@ class CandleCkpt:
         return J
 
     def checksum_file(self, filename):
-        """Read file, compute checksum, return it as a string."""
+        """
+        Read file, compute checksum, return it as a string.
+        filename: A PosixPath
+        """
 
-        self.info("checksumming: " + filename)
+        self.info("checksumming: " + str(filename))
         import zlib
 
         start = time.time()
