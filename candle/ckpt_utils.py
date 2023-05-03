@@ -658,7 +658,7 @@ class CandleCkpt:
         if param_ckpt_mode == "off":
             return None
 
-        dir_last = self.ckpt_directory + "/save/ckpts/last"
+        dir_last = self.ckpt_directory + "/ckpts/last"
         model_file = dir_last + "/model.h5"
         if not os.path.exists(model_file):
             if param_ckpt_mode == "required":
