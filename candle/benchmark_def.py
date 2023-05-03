@@ -46,7 +46,7 @@ class Benchmark:
 
         :param string filepath: ./
             os.path.dirname where the benchmark is located. Necessary to locate utils and
-            establish input/ouput paths
+            establish input/output paths
         :param string defmodel: 'p*b*_default_model.txt'
             string corresponding to the default model of the benchmark
         :param string framework : 'keras', 'neon', 'mxnet', 'pytorch'
