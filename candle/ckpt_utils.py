@@ -616,6 +616,8 @@ class CandleCkpt:
 
     def checksum_file(self, filename):
         """Read file, compute checksum, return it as a string."""
+
+        self.info("checksumming: " + filename)
         import zlib
 
         start = time.time()
@@ -659,7 +661,7 @@ class CandleCkpt:
             if param_ckpt_mode == "required":
                 raise Exception(
                     "ckpt_restart_mode=='required' but no checkpoint "
-                    + "could be found!"
+                    + "could be found at %s" % str(PosixPath(model_file).resolve())
                 )
             # We must be under AUTO - proceed without restart
             assert param_ckpt_mode == "auto"
