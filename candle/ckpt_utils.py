@@ -163,13 +163,13 @@ class CandleCkpt:
 
             self.logger = logging.getLogger("CandleCkpt")
             if gParameters["ckpt_directory"] is not None:
-                log_string = gParameters["ckpt_directory"] + "/ckpt.log"
+                log_filename = gParameters["ckpt_directory"] + "/ckpt.log"
             else:
-                log_string = "save/ckpt.log"
-            log_string = os.path.join(gParameters["output_dir"], log_string)
+                log_filename = "save/ckpt.log"
+            log_path = os.path.join(gParameters["output_dir"], log_filename)
 
             set_up_logger(
-                log_string,
+                log_path,
                 self.logger,
                 verbose=verbose,
                 fmt_line="%(asctime)s CandleCkpt: %(message)s",
