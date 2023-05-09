@@ -40,7 +40,8 @@ ckpt_keep_mode : string
     Default: "linear"
 
 ckpt_keep_limit: integer GZ
-    Maximal number of checkpoints to keep.
+    Maximal number of checkpoints to keep,
+    not counting the best checkpoint.
     This can be set lower to reduce disk usage.
     Default: 1000000
 
@@ -275,7 +276,7 @@ class CandleCkpt:
         )
         os.rename(dir_work, dir_this)
         self.epochs.append(epoch)
-        if self.epoch_best == epoch:
+        if self.save_best and self.epoch_best == epoch:
             self.symlink(dir_this, dir_best)
         self.symlink(dir_this, dir_last)
         self.clean(epoch)
@@ -431,7 +432,7 @@ class CandleCkpt:
             # We just wrote this!
             self.debug("keep(): epoch is latest: %i" % epoch)
             return True
-        if self.epoch_best == epoch:
+        if self.save_best and self.epoch_best == epoch:
             # This is the best epoch
             self.debug("keep(): epoch is best: %i" % epoch)
             return True
@@ -442,7 +443,7 @@ class CandleCkpt:
         return False
 
     def delete(self, epoch):
-        dir_old = "save/ckpts/epochs/%03i" % epoch
+        dir_old = self.ckpt_directory + "/ckpts/epochs/%03i" % epoch
         if os.path.exists(dir_old):
             self.debug("removing: '%s'" % dir_old)
             shutil.rmtree(dir_old)
@@ -658,7 +659,7 @@ class CandleCkpt:
         if param_ckpt_mode == "off":
             return None
 
-        dir_last = self.ckpt_directory + "/ckpts/last"
+        dir_last = self.ckpt_directory + "save/ckpts/last"
         model_file = dir_last + "/model.h5"
         if not os.path.exists(model_file):
             if param_ckpt_mode == "required":
