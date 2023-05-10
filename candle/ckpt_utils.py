@@ -47,7 +47,7 @@ ckpt_keep_limit: integer GZ
 
 ckpt_directory: string
     The top directory to use.
-    Default: "./save"
+    Default: CANDLE parameter output_dir
     Typical user values:
     "/tmp/user/ckpts": I.e. I am going to move these myself.
     "/other-fs/user/ckpts": I.e. My working FS is different from the FS
@@ -119,7 +119,7 @@ import shutil
 import sys
 import time
 from enum import Enum, auto, unique
-from pathlib import PosixPath
+from pathlib import Path
 
 from .helper_utils import set_up_logger, str2bool
 
@@ -163,11 +163,11 @@ class CandleCkpt:
             import logging
 
             self.logger = logging.getLogger("CandleCkpt")
-            if gParameters["ckpt_directory"] is not None:
-                log_filename = gParameters["ckpt_directory"] + "/ckpt.log"
-            else:
-                log_filename = "save/ckpt.log"
-            log_path = os.path.join(gParameters["output_dir"], log_filename)
+            if gParameters["ckpt_directory"] is None:
+                assert(gParameters["output_dir"] is not None)
+                gParameters["ckpt_directory"] = gParameters["output_dir"] + "/ckpts"
+            log_filename = gParameters["ckpt_directory"] + "/ckpt.log"
+            log_path = os.path.join(gParameters["ckpt_directory"], log_filename)
 
             set_up_logger(
                 log_path,
@@ -191,10 +191,6 @@ class CandleCkpt:
         self.gParams = gParams
         self.epoch_max = self.param("epochs", ParamRequired(), ParamType.INTEGER_NN)
         self.skip_epochs = self.param("ckpt_skip_epochs", 0, ParamType.INTEGER_NN)
-
-        self.ckpt_directory = self.param("ckpt_directory", "./save", ParamType.STRING)
-        # put the ckpt directory in the output path
-        self.ckpt_directory = os.path.join(gParams["output_dir"], self.ckpt_directory)
 
         self.save_best = self.param("ckpt_save_best", True, ParamType.BOOLEAN)
         self.save_best_metric = self.param(
@@ -235,7 +231,7 @@ class CandleCkpt:
         if self.save_best:
             self.info("save_best_metric='%s'" % self.save_best_metric)
         self.info("PWD: " + os.getcwd())
-        self.info("ckpt_directory: %s" % PosixPath(self.ckpt_directory).resolve())
+        self.info("ckpt_directory: %s" % Path(self.ckpt_directory).resolve())
 
     def ckpt_epoch(self, epoch: int, direction: str, metric_value: float):
         """
@@ -254,7 +250,7 @@ class CandleCkpt:
 
         epoch += 1
 
-        dir_root = PosixPath(self.ckpt_directory).resolve()
+        dir_root = Path(self.ckpt_directory).resolve()
         dir_work = dir_root / "ckpts/work"
         dir_best = dir_root / "ckpts/best"  # a soft link
         dir_last = dir_root / "ckpts/last"  # a soft link
@@ -350,7 +346,7 @@ class CandleCkpt:
     def write_model(self, dir_work, epoch):
         """
         Do the I/O, report stats
-        dir_work: A PosixPath
+        dir_work: A pathlib.Path
         """
         self.model_file = dir_work / "model.h5"
         self.debug("writing model to: '%s'" % self.relpath(self.model_file))
@@ -374,7 +370,7 @@ class CandleCkpt:
     def checksum(self, dir_work):
         """
         Simple checksum dispatch
-        dir_work: A PosixPath
+        dir_work: A pathlib.Path
         """
         if self.checksum_enabled:
             self.cksum_model = self.checksum_file(dir_work / "model.h5")
@@ -437,13 +433,13 @@ class CandleCkpt:
             self.debug("keep(): epoch is best: %i" % epoch)
             return True
         if kept < self.keep_limit:
-            self.debug("keep(): epoch count is < limit %i" % self.keep_limit)
+            self.debug("keep(): ckpt count is < limit=%i" % self.keep_limit)
             return True
         # No reason to keep this: delete it:
         return False
 
     def delete(self, epoch):
-        dir_old = self.ckpt_directory + "/ckpts/epochs/%03i" % epoch
+        dir_old = self.ckpt_directory + "/epochs/%03i" % epoch
         if os.path.exists(dir_old):
             self.debug("removing: '%s'" % dir_old)
             shutil.rmtree(dir_old)
@@ -659,7 +655,7 @@ class CandleCkpt:
         if param_ckpt_mode == "off":
             return None
 
-        dir_last = self.ckpt_directory + "/ckpts/last"
+        dir_last = self.ckpt_directory + "/last"
         model_file = dir_last + "/model.h5"
         if not os.path.exists(model_file):
             if param_ckpt_mode == "required":
@@ -728,7 +724,7 @@ def ckpt_parser(parser):
     parser.add_argument(
         "--ckpt_directory",
         type=str,
-        default="./save",
+        default="./",
         help="Base directory in which to save checkpoints",
     )
     # saving
@@ -793,7 +789,7 @@ def ckpt_defs(self, defs):
         {
             "name": "ckpt_directory",
             "type": str,
-            "default": "./save",
+            "default": "./",
             "help": "Base directory in which to save checkpoints",
         },
         # saving
