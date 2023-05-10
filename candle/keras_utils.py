@@ -90,43 +90,89 @@ def build_optimizer(optimizer, lr, kerasDefaults):
     :return: The appropriate Keras optimizer function
     """
 
-    if optimizer == "sgd":
-        return optimizers.SGD(
-            lr=lr,
-            decay=kerasDefaults["decay_lr"],
-            momentum=kerasDefaults["momentum_sgd"],
-            nesterov=kerasDefaults["nesterov_sgd"],
-        )
+    import tensorflow as tf
 
-    elif optimizer == "rmsprop":
-        return optimizers.RMSprop(
-            lr=lr,
-            rho=kerasDefaults["rho"],
-            epsilon=kerasDefaults["epsilon"],
-            decay=kerasDefaults["decay_lr"],
-        )
+    # Some optimizer argument keywords change after TF 2.11:
+    if tf.__version__ < "2.11":
+        if optimizer == "sgd":
+            return optimizers.SGD(
+                lr=lr,
+                decay=kerasDefaults["decay_lr"],
+                momentum=kerasDefaults["momentum_sgd"],
+                nesterov=kerasDefaults["nesterov_sgd"],
+            )
 
-    elif optimizer == "adagrad":
-        return optimizers.Adagrad(
-            lr=lr, epsilon=kerasDefaults["epsilon"], decay=kerasDefaults["decay_lr"]
-        )
+        elif optimizer == "rmsprop":
+            return optimizers.RMSprop(
+                lr=lr,
+                rho=kerasDefaults["rho"],
+                epsilon=kerasDefaults["epsilon"],
+                decay=kerasDefaults["decay_lr"],
+            )
 
-    elif optimizer == "adadelta":
-        return optimizers.Adadelta(
-            lr=lr,
-            rho=kerasDefaults["rho"],
-            epsilon=kerasDefaults["epsilon"],
-            decay=kerasDefaults["decay_lr"],
-        )
+        elif optimizer == "adagrad":
+            return optimizers.Adagrad(
+                lr=lr,
+                epsilon=kerasDefaults["epsilon"],
+                decay=kerasDefaults["decay_lr"],
+            )
 
-    elif optimizer == "adam":
-        return optimizers.Adam(
-            lr=lr,
-            beta_1=kerasDefaults["beta_1"],
-            beta_2=kerasDefaults["beta_2"],
-            epsilon=kerasDefaults["epsilon"],
-            decay=kerasDefaults["decay_lr"],
+        elif optimizer == "adadelta":
+            return optimizers.Adadelta(
+                lr=lr,
+                rho=kerasDefaults["rho"],
+                epsilon=kerasDefaults["epsilon"],
+                decay=kerasDefaults["decay_lr"],
+            )
+
+        elif optimizer == "adam":
+            return optimizers.Adam(
+                lr=lr,
+                beta_1=kerasDefaults["beta_1"],
+                beta_2=kerasDefaults["beta_2"],
+                epsilon=kerasDefaults["epsilon"],
+                decay=kerasDefaults["decay_lr"],
+            )
+    else:  # TF >= 2.12
+        # Define a decay schedule that mimics the prior Keras behavior:
+        # Note that kerasDefaults["decay_lr"] is 0
+        decay_function = tf.keras.optimizers.schedules.ExponentialDecay(
+            lr, 100000, kerasDefaults["decay_lr"], staircase=True
         )
+        if optimizer == "sgd":
+            return optimizers.SGD(
+                learning_rate=decay_function,
+                momentum=kerasDefaults["momentum_sgd"],
+                nesterov=kerasDefaults["nesterov_sgd"],
+            )
+
+        elif optimizer == "rmsprop":
+            return optimizers.RMSprop(
+                learning_rate=decay_function,
+                rho=kerasDefaults["rho"],
+                epsilon=kerasDefaults["epsilon"],
+            )
+
+        elif optimizer == "adagrad":
+            return optimizers.Adagrad(
+                learning_rate=decay_function,
+                epsilon=kerasDefaults["epsilon"],
+            )
+
+        elif optimizer == "adadelta":
+            return optimizers.Adadelta(
+                learning_rate=decay_function,
+                rho=kerasDefaults["rho"],
+                epsilon=kerasDefaults["epsilon"],
+            )
+
+        elif optimizer == "adam":
+            return optimizers.Adam(
+                learning_rate=decay_function,
+                beta_1=kerasDefaults["beta_1"],
+                beta_2=kerasDefaults["beta_2"],
+                epsilon=kerasDefaults["epsilon"],
+            )
 
 
 def build_initializer(
