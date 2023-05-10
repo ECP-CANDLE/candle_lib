@@ -252,10 +252,10 @@ class CandleCkpt:
         epoch += 1
 
         dir_root = Path(self.ckpt_directory).resolve()
-        dir_work = dir_root / "ckpts/work"
-        dir_best = dir_root / "ckpts/best"  # a soft link
-        dir_last = dir_root / "ckpts/last"  # a soft link
-        dir_epochs = dir_root / "ckpts/epochs"
+        dir_work = dir_root / "work"
+        dir_best = dir_root / "best"  # a soft link
+        dir_last = dir_root / "last"  # a soft link
+        dir_epochs = dir_root / "epochs"
         dir_this = dir_epochs / ("%03i" % epoch)
 
         if not self.save_check(epoch, direction, metric_value):
@@ -615,7 +615,7 @@ class CandleCkpt:
     def checksum_file(self, filename):
         """
         Read file, compute checksum, return it as a string.
-        filename: A PosixPath
+        filename: A pathlib.Path
         """
 
         self.info("checksumming: " + str(filename))
@@ -662,7 +662,7 @@ class CandleCkpt:
             if param_ckpt_mode == "required":
                 raise Exception(
                     "ckpt_restart_mode=='required' but no checkpoint "
-                    + "could be found at '%s'" % str(PosixPath(model_file).resolve())
+                    + "could be found at '%s'" % str(Path(model_file).resolve())
                 )
             # We must be under AUTO - proceed without restart
             assert param_ckpt_mode == "auto"
