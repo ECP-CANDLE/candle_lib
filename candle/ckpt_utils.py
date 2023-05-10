@@ -189,6 +189,7 @@ class CandleCkpt:
     def scan_params(self, gParams):
         """Simply translate gParameters into instance fields"""
         self.gParams = gParams
+        self.ckpt_directory = gParams["ckpt_directory"]
         self.epoch_max = self.param("epochs", ParamRequired(), ParamType.INTEGER_NN)
         self.skip_epochs = self.param("ckpt_skip_epochs", 0, ParamType.INTEGER_NN)
 
