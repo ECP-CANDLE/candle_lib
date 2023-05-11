@@ -725,7 +725,8 @@ def ckpt_parser(parser):
     parser.add_argument(
         "--ckpt_directory",
         type=str,
-        default="./",
+        # A default is set programmatically in __init__():
+        default=None,
         help="Base directory in which to save checkpoints",
     )
     # saving
@@ -790,7 +791,8 @@ def ckpt_defs(self, defs):
         {
             "name": "ckpt_directory",
             "type": str,
-            "default": "./",
+            # A default is set programmatically in __init__():
+            "default": None,
             "help": "Base directory in which to save checkpoints",
         },
         # saving
