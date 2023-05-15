@@ -590,7 +590,8 @@ ckpt_conf = [
     {
         "name": "ckpt_directory",
         "type": str,
-        "default": "./save",
+        # When unset, the default is handled by the ckpt modules
+        "default": None,
         "help": "Base directory in which to save checkpoints.",
     },
     {
