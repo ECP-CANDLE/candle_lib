@@ -164,7 +164,7 @@ class CandleCkpt:
 
             self.logger = logging.getLogger("CandleCkpt")
             if gParameters["ckpt_directory"] is None:
-                assert(gParameters["output_dir"] is not None)
+                assert gParameters["output_dir"] is not None
                 gParameters["ckpt_directory"] = gParameters["output_dir"] + "/ckpts"
             log_filename = gParameters["ckpt_directory"] + "/ckpt.log"
             log_path = os.path.join(gParameters["ckpt_directory"], log_filename)
