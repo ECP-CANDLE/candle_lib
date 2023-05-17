@@ -43,7 +43,7 @@ ckpt_keep_limit: integer GZ
     Maximal number of checkpoints to keep,
     not counting the best checkpoint.
     This can be set lower to reduce disk usage.
-    Default: 1000000
+    Default: 5
 
 ckpt_directory: string
     The top directory to use.
@@ -216,7 +216,7 @@ class CandleCkpt:
             ParamType.STRING,
             allowed=[None, "all", "linear"],
         )
-        self.keep_limit = self.param("ckpt_keep_limit", 1000000, ParamType.INTEGER_GZ)
+        self.keep_limit = self.param("ckpt_keep_limit", 5, ParamType.INTEGER_GZ)
         self.metadata = self.param("metadata", None, ParamType.STRING)
         self.timestamp_last = self.param("ckpt_timestamp_last", None, ParamType.STRING)
         self.cwd = os.getcwd()
@@ -759,7 +759,7 @@ def ckpt_parser(parser):
         help="Checkpoint saving mode. " + "Choices are 'linear' or 'exponential' ",
     )
     parser.add_argument(
-        "--ckpt_keep_limit", type=int, default=1000000, help="Limit checkpoints to keep"
+        "--ckpt_keep_limit", type=int, default=5, help="Limit checkpoints to keep"
     )
 
     return parser
@@ -830,7 +830,7 @@ def ckpt_defs(self, defs):
         {
             "name": "ckpt_keep_limit",
             "type": int,
-            "default": 1000000,
+            "default": 5,
             "help": "Limit checkpoints to keep",
         },
     ]

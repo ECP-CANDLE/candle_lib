@@ -628,7 +628,7 @@ ckpt_conf = [
     {
         "name": "ckpt_keep_limit",
         "type": int,
-        "default": 1000000,
+        "default": 5,
         "help": "Limit checkpoints to keep.",
     },
 ]
