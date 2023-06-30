@@ -779,14 +779,16 @@ def finalize_parameters(bmk):
                 conffile = os.path.join(os.environ["CANDLE_DATA_DIR"], conffile_txt)
             else:
                 conffile = os.path.join(bmk.file_path, conffile_txt)
-            if not os.path.isfile(conffile):
-                raise Exception(
-                    "ERROR ! Specified configuration file "
-                    + conffile
-                    + " not found ... Exiting"
-                )
+    # check conffile exists
+    if not os.path.isfile(conffile):
+        raise Exception(
+            "ERROR ! Specified configuration file "
+            + conffile
+            + " not found ... Exiting"
+        )
+    else:
+        print("Configuration file: ", conffile)
 
-    # print("Configuration file: ", conffile)
     fileParameters = bmk.read_config_file(
         conffile
     )  # aux.config_file)#args.config_file)
