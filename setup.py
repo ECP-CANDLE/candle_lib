@@ -24,7 +24,7 @@ setup(
         "scipy",
         "patsy",
         "statsmodels",
-        "protobuf==3.19",
+        "protobuf",
     ],
     setup_requires=["pytest-runner", "flake8"],
     tests_requires=["pytest"],
