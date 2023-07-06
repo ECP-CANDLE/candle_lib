@@ -800,10 +800,10 @@ def finalize_parameters(bmk):
     check_file_parameters_exists(args, bmk_dict, fileParameters)
     # Consolidate parameter set. Command-line parameters overwrite file configuration
     gParameters = args_overwrite_config(args, fileParameters)
-    # Check that required set of parameters has been defined
-    bmk.check_required_exists(gParameters)
     print("Params:")
     pprint(gParameters)
+    # Check that required set of parameters has been defined
+    bmk.check_required_exists(gParameters)
     # Dump the parameters to the run directory
     final_params = os.path.join(gParameters["output_dir"], "final_params.txt")
     with open(final_params, "w") as fp:
