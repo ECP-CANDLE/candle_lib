@@ -157,7 +157,7 @@ elif "torch" in sys.modules:
     )
 
 else:
-    raise Exception("No backend has been specified.")
+    raise Exception("No backend has been specified. Import candle after importing e.g. tensorflow or torch")
 
 
 __all__ = [
