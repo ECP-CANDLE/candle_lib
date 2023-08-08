@@ -357,8 +357,6 @@ def coxen_multi_drug_gene_selection(
             sample = np.hstack(
                 (np.reshape(ge_sample, (len(ge_sample), 1)), drug_sample)
             )
-            sample = sm.add_constant(sample)
-            mod = sm.OLS(drug_response_data.iloc[:, drug_response_col].values, sample)
             try:
                 res = mod.fit()
                 pvalue[i, 0] = res.pvalues[1]
