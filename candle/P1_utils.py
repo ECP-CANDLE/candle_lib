@@ -4,7 +4,6 @@ import numpy as np
 import numpy.linalg as la
 import pandas as pd
 import patsy
-import statsmodels.api as sm
 from sklearn.feature_selection import mutual_info_regression
 from sklearn.preprocessing import StandardScaler
 
