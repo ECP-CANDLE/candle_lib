@@ -50,7 +50,6 @@ from .noise_utils import (
 # Milestone 16 specific
 from .P1_utils import (
     combat_batch_effect_removal,
-    coxen_multi_drug_gene_selection,
     coxen_single_drug_gene_selection,
     generate_gene_set_data,
 )
