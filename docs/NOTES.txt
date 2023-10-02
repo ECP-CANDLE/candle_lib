@@ -9,11 +9,21 @@ sphinx
 
 pip:
 
+(
 candle
 myst_nb
 sphinx_design
 sphinx_book_theme
+astropy
+matplotlib
 nbsphinx
+numpy
+pandas
+patsy
+scipy
+scikit-learn
+statsmodels
+)
 
 Then run:
 
