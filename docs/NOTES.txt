@@ -23,11 +23,17 @@ patsy
 scipy
 scikit-learn
 statsmodels
+tensorflow
+torch
 )
 
 Then run:
 
 make html
+
+NOTE:
+You must make clean before every make, and re-pip-install candle_lib!
+Sphinx will not update automatically.
 
 Adding a new example:
 
