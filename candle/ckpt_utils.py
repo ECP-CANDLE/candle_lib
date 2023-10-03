@@ -152,7 +152,7 @@ class ParamType(Enum):
 
 
 class CandleCkpt:
-    def __init__(self, gParameters=None, logger: Any = "DEFAULT", verbose: bool = True):
+    def __init__(self, gParameters=None, logger: any = "DEFAULT", verbose: bool = True):
         """
         The superclass for the ckpt classes
 
@@ -162,8 +162,9 @@ class CandleCkpt:
             The logger to use.
             May be None to disable or "DEFAULT" to use the default.
         verbose : boolean
-            If True, more verbose logging
-            Passed to helper_utils.set_up_logger(verbose) for the given logger
+            If True, more verbose logging.
+            Passed to ``helper_utils.set_up_logger()``
+            for the given logger
         """
         self.logger = logger
         if self.logger == "DEFAULT":
@@ -194,7 +195,14 @@ class CandleCkpt:
         self.report_initial()
 
     def scan_params(self, gParams):
-        """Simply translate gParameters into instance fields"""
+        """Simply translate gParameters into instance fields
+
+        Parameters
+        ----------
+        gParams : dict
+            The CANDLE hyperparameters to apply
+
+        """
         self.gParams = gParams
         self.ckpt_directory = gParams["ckpt_directory"]
         self.epoch_max = self.param("epochs", ParamRequired(), ParamType.INTEGER_NN)
