@@ -9,15 +9,34 @@ sphinx
 
 pip:
 
+(
 candle
 myst_nb
 sphinx_design
 sphinx_book_theme
+astropy
+matplotlib
 nbsphinx
+numpy
+pandas
+patsy
+scipy
+scikit-learn
+statsmodels
+tensorflow
+torch
+)
 
 Then run:
 
 make html
+
+NOTE:
+You must re-pip-install candle_lib before re-building the docs!
+Sphinx docs are based on the pip-installed copies.
+
+To add a new function:
+Add it to the corresponding api_*/index.rst file
 
 Adding a new example:
 
