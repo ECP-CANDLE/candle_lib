@@ -142,21 +142,28 @@ class ParamType(Enum):
     STRING = auto()
     BOOLEAN = auto()
     INTEGER = auto()
-    # integer: non-negative
+    #: integer, non-negative
     INTEGER_NN = auto()
-    # integer: greater-than-zero
+    #: integer, greater-than-zero
     INTEGER_GZ = auto()
     FLOAT = auto()
+    #: float, non-negative
     FLOAT_NN = auto()
 
 
 class CandleCkpt:
-    def __init__(self, gParameters=None, logger: str = "DEFAULT", verbose: bool = True):
+    def __init__(self, gParameters=None, logger: Any = "DEFAULT", verbose: bool = True):
         """
-        :param Logger logger: The logger to use.
+        The superclass for the ckpt classes
+
+        Parameters
+        ----------
+        logger : A Logger object or None or "DEFAULT"
+            The logger to use.
             May be None to disable or "DEFAULT" to use the default.
-        :param boolean verbose: If True, more verbose logging
-            Passed to helper_utils.set_up_logger(verbose) for this logger
+        verbose : boolean
+            If True, more verbose logging
+            Passed to helper_utils.set_up_logger(verbose) for the given logger
         """
         self.logger = logger
         if self.logger == "DEFAULT":
