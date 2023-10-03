@@ -32,8 +32,8 @@ Then run:
 make html
 
 NOTE:
-You must make clean before every make, and re-pip-install candle_lib!
-Sphinx will not update automatically.
+You must re-pip-install candle_lib before re-building the docs!
+Sphinx docs are based on the pip-installed copies.
 
 Adding a new example:
 
