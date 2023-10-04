@@ -1,0 +1,8 @@
+[Global_Params]
+model_name = 'MNIST'
+epochs = 3
+batch_size = 64
+learning_rate = 0.001
+save_path='save/'
+ckpt_save_best=True
+ckpt_save_interval=1
