@@ -187,6 +187,7 @@ class ConfigDict(TypedDict):
     ckpt_save_best: bool
     ckpt_save_best_metric: str
     ckpt_save_weights_only: bool
+    ckpt_save_weights_file: bool
     ckpt_save_interval: int
     ckpt_keep_mode: str
     ckpt_keep_limit: int
@@ -611,6 +612,12 @@ ckpt_conf = [
         "type": str2bool,
         "default": False,
         "help": "Toggle saving only weights (not optimizer) (NYI).",
+    },
+    {
+        "name": "ckpt_save_weights_file",
+        "type": str2bool,
+        "default": True,
+        "help": "Toggle whether to save weights.  JSON will still be saved.",
     },
     {
         "name": "ckpt_save_interval",
