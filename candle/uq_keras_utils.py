@@ -4,6 +4,7 @@ from typing import List, Optional, Tuple, Type, Union
 
 import numpy as np
 from scipy.stats import cauchy, norm
+from tensorflow import keras
 from tensorflow.keras import backend as K
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import Callback
@@ -514,7 +515,10 @@ def modify_labels(
 
     return labels_train, labels_test
 
-#### For regression
+###
+# For regression
+###
+
 
 def abstention_loss_mse(alpha, nout):
     """ Function to compute abstention loss for regression problems.
@@ -538,9 +542,9 @@ def abstention_loss_mse(alpha, nout):
             It is assumed that this keras tensor includes extra columns
             to store the abstaining classes.
         """
-        yabs = K.sigmoid(y_pred[:,2*nout]-0.5)
-        base_pred = y_pred[:,:nout]
-        base_true = y_true[:,:nout]
+        yabs = K.sigmoid(y_pred[:, 2 * nout] - 0.5)
+        base_pred = y_pred[:, :nout]
+        base_true = y_true[:, :nout]
 
         # Squared Error
         base_cost = K.sum((base_pred - base_true)**2, axis=-1)
@@ -570,12 +574,12 @@ def abstention_metric_regression(nout: int):
             It is assumed that this Keras tensor includes extra columns to store the abstaining class.
         """
         # total abstention
-        total_abs = K.sum(K.cast(K.greater(y_pred[:,2*nout], 0.5),
+        total_abs = K.sum(K.cast(K.greater(y_pred[:, 2 * nout], 0.5),
                                  "float32"))
-        #total in batch
+        # total in batch
         total = K.cast(K.shape(y_true)[0], "float32")
 
-        return  total_abs / total
+        return total_abs / total
 
     metric.__name__ = "abstention_reg"
     return metric
@@ -596,13 +600,12 @@ def abstention_loss_metric(nout):
             It is assumed that this Keras tensor includes extra columns to store the abstaining class.
         """
         # Find abstained samples (i.e abs out > 0.5)
-        yabs = K.cast(K.greater(y_pred[:,2*nout], 0.5), "float32")
-        base_pred = (1. - yabs) * y_pred[:,:nout]
-        base_true = (1. - yabs) * y_true[:,:nout]
-        max_true_ = K.max(K.abs(y_true[:,:nout]))
-        max_pred_ = K.max(K.abs(y_pred[:,:nout]))
+        yabs = K.cast(K.greater(y_pred[:, 2 * nout], 0.5), "float32")
+        base_pred = (1. - yabs) * y_pred[:, :nout]
+        base_true = (1. - yabs) * y_true[:, :nout]
+        max_true_ = K.max(K.abs(y_true[:, :nout]))
+        max_pred_ = K.max(K.abs(y_pred[:, :nout]))
         max_true = K.switch(max_true_ > max_pred_, max_true_, max_pred_)
-
 
         return mean_squared_error(base_true / max_true,
                                   base_pred / max_true)
@@ -662,7 +665,7 @@ class AbstentionAdapt_Regression_Callback(Callback):
         :param float max_abs_frac: Maximum abstention fraction to tolerate in the current training. Default: 0.4.
         :param float loss_gain: Factor to adjust alpha scale. Default: 1.0.
         :param float abs_gain: Factor to adjust alpha scale. Default: 1.0.
-        """         
+        """
         super(AbstentionAdapt_Regression_Callback, self).__init__()
 
         self.alpha0 = alpha0
@@ -680,7 +683,7 @@ class AbstentionAdapt_Regression_Callback(Callback):
         # max target loss (value specified as parameter of the run)
         self.max_abs_loss = max_abs_loss
         # maximum abstention fraction (value specified
-        #as parameter of the run)
+        # as parameter of the run)
         self.max_abs_frac = max_abs_frac
         # factor for adjusting alpha scale
         self.loss_gain = loss_gain
@@ -688,7 +691,6 @@ class AbstentionAdapt_Regression_Callback(Callback):
         self.abs_gain = abs_gain
         # array to store alpha evolution
         self.alphavalues = []
-
 
     def on_epoch_end(self, epoch, logs=None):
         """ Updates the weight of abstention term on epoch end.
@@ -729,13 +731,10 @@ class AbstentionAdapt_Regression_Callback(Callback):
 
                 # modify alpha as needed
                 loss_error = abs_loss - self.max_abs_loss
-                #loss_error = max(loss_error, 0.0)
                 loss_error = np.nanmax([loss_error, 0.0])
                 abs_error = abs_frac - self.max_abs_frac
-                #abs_error = max(abs_error, 0.0)
                 abs_error = np.nanmax([abs_error, 0.0])
                 new_scale = 1.0 - self.loss_gain * loss_error + self.abs_gain * abs_error
-                #new_scale = 1.0 + self.abs_gain * abs_error
                 if new_scale < 0.:
                     new_scale = 0.99
                 # threshold to avoid huge swings
