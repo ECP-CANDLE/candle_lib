@@ -514,6 +514,263 @@ def modify_labels(
 
     return labels_train, labels_test
 
+#### For regression
+
+def abstention_loss_mse(alpha, nout):
+    """ Function to compute abstention loss for regression problems.
+        It is composed by two terms:
+        (i) original loss of the regression problem using mean squared error,
+        (ii) cost associated to the abstaining samples.
+
+    :param alpha: Keras variable.  Weight of abstention term in cost function
+    :param int nout: Number of outputs in base model (without abstention
+           or heteroscedastic outputs). Note that outputs for std are
+           assumed (the 2*nout to locate the abstentin output). It is
+           also assumed that regression problems use two stages: the
+           abstention stage with only MSE loss and the heteroscedastic
+           stage where abstention is not trained anymore, only the
+           parameters of the std outputs using the heteroscedastic loss.
+    """
+    def loss(y_true, y_pred):
+        """
+        :param y_true : Keras tensor. True values to predict.
+        :param y_pred : keras tensor. Prediction made by the model.
+            It is assumed that this keras tensor includes extra columns
+            to store the abstaining classes.
+        """
+        yabs = K.sigmoid(y_pred[:,2*nout]-0.5)
+        base_pred = y_pred[:,:nout]
+        base_true = y_true[:,:nout]
+
+        # Squared Error
+        base_cost = K.sum((base_pred - base_true)**2, axis=-1)
+
+        # add some small value to prevent NaN when prediction
+        # is abstained
+        yabs = K.clip(yabs, K.epsilon(), 1. - K.epsilon())
+
+        # Average over all the samples
+        return K.mean((1. - yabs) * base_cost - alpha * K.log(1. - yabs))
+
+    return loss
+
+
+def abstention_metric_regression(nout: int):
+    """
+    Function to estimate fraction of the samples where the model is
+    abstaining.
+
+    :param int nout: Integer defining number of outputs in base model
+    (i.e. no additional abstention or heteroscedastic outputs).
+    """
+    def metric(y_true, y_pred):
+        """
+        :param y_true: Keras tensor. True values to predict
+        :param y_pred: Keras tensor.  Prediction made by the model. \
+            It is assumed that this Keras tensor includes extra columns to store the abstaining class.
+        """
+        # total abstention
+        total_abs = K.sum(K.cast(K.greater(y_pred[:,2*nout], 0.5),
+                                 "float32"))
+        #total in batch
+        total = K.cast(K.shape(y_true)[0], "float32")
+
+        return  total_abs / total
+
+    metric.__name__ = "abstention_reg"
+    return metric
+
+
+def abstention_loss_metric(nout):
+    """
+    Abstained loss: Function to estimate MSE loss over the predicted
+    samples after removing the samples where the model is abstaining.
+
+    :param int nout: Integer defining number of outputs in base model
+    (i.e. no additional abstention or heteroscedastic outputs).
+    """
+    def metric(y_true, y_pred):
+        """
+        :param y_true: Keras tensor. True values to predict
+        :param y_pred: Keras tensor.  Prediction made by the model. \
+            It is assumed that this Keras tensor includes extra columns to store the abstaining class.
+        """
+        # Find abstained samples (i.e abs out > 0.5)
+        yabs = K.cast(K.greater(y_pred[:,2*nout], 0.5), "float32")
+        base_pred = (1. - yabs) * y_pred[:,:nout]
+        base_true = (1. - yabs) * y_true[:,:nout]
+        max_true_ = K.max(K.abs(y_true[:,:nout]))
+        max_pred_ = K.max(K.abs(y_pred[:,:nout]))
+        max_true = K.switch(max_true_ > max_pred_, max_true_, max_pred_)
+
+
+        return mean_squared_error(base_true / max_true,
+                                  base_pred / max_true)
+
+    metric.__name__ = "abstention_loss_reg"
+    return metric
+
+
+class AbstentionAdapt_Regression_Callback(Callback):
+    """
+    This callback is used to adapt the parameter alpha in the abstention
+    loss for regression problems.
+
+    The parameter alpha (weight of the abstention term in the abstention
+    loss) is increased or decreased adaptively during the training run.
+    It is decreased if the current abstention loss is greater than the
+    maximum (normalized) target loss or increased if the current abstention
+    fraction is greater than the maximum target fraction. The abstention
+    loss metric to use must be specified as the 'loss_monitor' argument
+    in the initialization of the callback. It could be: the global
+    abstention loss (abstention_loss_reg), the validation abstention loss
+    (val_abstention_loss_reg), etc. The abstention metric to use must be
+    specified as the 'abs_monitor' argument in the initialization of the
+    callback. It should be the metric that computes the fraction of
+    samples for which the model is abstaining (abstention). The factor
+    alpha is modified if the current abstention loss is greater than
+    the maximum target loss or if the current abstention fraction is
+    greater than the maximum target fraction. Thresholds for minimum and
+    maximum correction factors are computed and the correction over
+    alpha is not allowed to be less or greater than them, respectively,
+    to avoid huge swings in the abstention loss evolution.
+    """
+    def __init__(self, loss_monitor, abs_monitor, alpha0,
+                 init_abs_epoch=4, alpha_scale_factor=0.8,
+                 max_abs_loss=1.0, max_abs_frac=0.4, loss_gain=1.0,
+                 abs_gain=1.0):
+        """
+        Initializer of the AbstentionAdapt_Regression_Callback.
+
+        :param keras.metric loss_monitor: Abstention loss metric to
+               monitor during the run. It is used as base to adapt the
+               weight of the abstention term (i.e. alpha) in the abstention
+               cost function. (Must be a loss metric that takes abstention
+               into account).
+        :param keras.metric abs_monitor: Abstention metric monitored
+               during the run. It is used as the other factor to adapt
+               the weight of the abstention term (i.e. alpha) in the
+               abstention loss function
+        :param float alpha0: Initial weight of abstention term in cost function
+        :param int init_abs_epoch: Value of the epochs to start adjusting
+               the weight of the abstention term (i.e. alpha). Default: 4.
+        :param float alpha_scale_factor: Factor to scale (increase by
+               dividing or decrease by multiplying) the weight of the
+               abstention term (i.e. alpha). Default: 0.8.
+        :param float max_abs_loss: Maximum (normalized) loss to target
+               in the current training. Default: 1.0.
+        :param float max_abs_frac: Maximum abstention fraction to tolerate in the current training. Default: 0.4.
+        :param float loss_gain: Factor to adjust alpha scale. Default: 1.0.
+        :param float abs_gain: Factor to adjust alpha scale. Default: 1.0.
+        """         
+        super(AbstentionAdapt_Regression_Callback, self).__init__()
+
+        self.alpha0 = alpha0
+        # Keras metric to monitor (must be loss with abstention)
+        self.loss_monitor = loss_monitor
+        # Keras metric momitoring abstention fraction
+        self.abs_monitor = abs_monitor
+        # Weight of abstention term
+        self.alpha = K.variable(value=0)
+        # epoch to init abstention
+        self.init_abs_epoch = init_abs_epoch
+        # factor to scale alpha (weight for abstention
+        # term in cost function)
+        self.alpha_scale_factor = alpha_scale_factor
+        # max target loss (value specified as parameter of the run)
+        self.max_abs_loss = max_abs_loss
+        # maximum abstention fraction (value specified
+        #as parameter of the run)
+        self.max_abs_frac = max_abs_frac
+        # factor for adjusting alpha scale
+        self.loss_gain = loss_gain
+        # factor for adjusting alpha scale
+        self.abs_gain = abs_gain
+        # array to store alpha evolution
+        self.alphavalues = []
+
+
+    def on_epoch_end(self, epoch, logs=None):
+        """ Updates the weight of abstention term on epoch end.
+
+        :param int epoch: Current epoch in training.
+        :param keras logs logs: Metrics stored during current keras
+               training.
+        """
+
+        new_alpha_val = K.get_value(self.alpha)
+        if epoch == self.init_abs_epoch:
+            new_alpha_val = self.alpha0
+            K.set_value(self.alpha, new_alpha_val)
+            print("alpha: ", new_alpha_val)
+        elif epoch > self.init_abs_epoch:
+            if self.loss_monitor is None or self.abs_monitor is None:
+                raise Exception("ERROR! Abstention Adapt conditioned "
+                                "on metrics " + str(self.loss_monitor)
+                                + " and " + str(self.abs_monitor) +
+                                " which are not available. Available "
+                                "metrics are: " +
+                                ",".join(list(logs.keys())) +
+                                "... Exiting")
+            else:
+                # Current loss (with abstention)
+                abs_loss = logs.get(self.loss_monitor)
+                # Current abstention fraction
+                abs_frac = logs.get(self.abs_monitor)
+                if abs_loss is None or abs_frac is None:
+                    raise Exception("ERROR! Abstention Adapt "
+                                    "conditioned on metrics " +
+                                    str(self.loss_monitor) +
+                                    " and " + str(self.abs_monitor)
+                                    + " which are not available. "
+                                    "Available metrics are: " +
+                                    ",".join(list(logs.keys())) +
+                                    "... Exiting")
+
+                # modify alpha as needed
+                loss_error = abs_loss - self.max_abs_loss
+                #loss_error = max(loss_error, 0.0)
+                loss_error = np.nanmax([loss_error, 0.0])
+                abs_error = abs_frac - self.max_abs_frac
+                #abs_error = max(abs_error, 0.0)
+                abs_error = np.nanmax([abs_error, 0.0])
+                new_scale = 1.0 - self.loss_gain * loss_error + self.abs_gain * abs_error
+                #new_scale = 1.0 + self.abs_gain * abs_error
+                if new_scale < 0.:
+                    new_scale = 0.99
+                # threshold to avoid huge swings
+                min_scale = self.alpha_scale_factor
+                max_scale = 1. / self.alpha_scale_factor
+                new_scale = min(new_scale, max_scale)
+                new_scale = max(new_scale, min_scale)
+
+                print("")
+                print("Scaling factor: ", new_scale)
+                new_alpha_val *= new_scale
+                if np.isnan(new_alpha_val):
+                    new_alpha_val = self.alpha
+                K.set_value(self.alpha, new_alpha_val)
+                print("alpha: ", new_alpha_val)
+
+        self.alphavalues.append(new_alpha_val)
+
+
+def freeze_abstention_output_model(model_in, prelayers: int):
+    """Freezes model parameters associated with abstention output.
+
+    Freezes model parameters of an specified number of layers and of
+    the abstention layer. In principle, only model parameters for
+    the heteroscedastic STD should be trained.
+
+    :param Keras Model model_in: A trainable Keras model.
+    :param int prelayers: Number of (input) layers to freeze in Keras model.
+    """
+    model = keras.models.clone_model(model_in)
+    model.set_weights(model_in.get_weights())
+    for layer in model.layers[:prelayers]:
+        layer.trainable = False
+    model.layers[-1].trainable = False
+    return model
 
 ###################################################################
 
