@@ -5,6 +5,8 @@ from typing import Tuple, Union
 import torch
 import torch.nn as nn
 
+from torch.autograd import Variable
+
 
 class abstention_loss_old(nn.Module):
     """
@@ -19,7 +21,7 @@ class abstention_loss_old(nn.Module):
         :param ndarray mask: Numpy array to use as mask for abstention: \
         it is 1 on the output associated to the abstention class and 0 otherwise
         """
-        super(abstention_loss, self).__init__()
+        super(abstention_loss_old, self).__init__()
         self.alpha = alpha
         self.mask = mask
         self.ndevices = torch.cuda.device_count()
@@ -406,6 +408,7 @@ class abstention_loss_mse(nn.Module):
 
 # UQ regression - utilities
 
+
 class RegressHetLoss_regl2(torch.nn.Module):
     """
     This torch module computes the heteroscedastic loss for the
@@ -422,7 +425,7 @@ class RegressHetLoss_regl2(torch.nn.Module):
         model : Torch model to train with heteroscedastic loss.
         ndevices : Number of GPUs available to train.
         """
-        super(RegressHetLoss_regl2,self).__init__()
+        super(RegressHetLoss_regl2, self).__init__()
         self.reg_l2 = reg_l2
         self.model_ = model
         self.ndevices = ndevices
@@ -447,10 +450,6 @@ class RegressHetLoss_regl2(torch.nn.Module):
             if isinstance(param, nn.Linear):
                 regularization_loss += torch.sum(torch.norm(param.weight.data))
 
-        if self.ndevices > 0:
-            loss_mse = nn.MSELoss().cuda()
-        else:
-            loss_mse = nn.MSELoss()
         x_mean = x[:, 0::2]
         x_logs2 = x[:, 1::2]
 
@@ -494,8 +493,8 @@ class RegressQtlLoss_regl2(torch.nn.Module):
         model : Torch model to train with heteroscedastic loss.
         ndevices : Number of GPUs available to train.
         """
-    
-        super(RegressQtlLoss_regl2,self).__init__()
+
+        super(RegressQtlLoss_regl2, self).__init__()
         self.reg_l2 = reg_l2
         self.qlow = qlow
         self.qhigh = qhigh
