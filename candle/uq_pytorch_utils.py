@@ -401,3 +401,133 @@ class abstention_loss_mse(nn.Module):
 
         # Average over all the samples
         return torch.mean((1. - xabs) * base_cost - self.alpha * torch.log(1. - xabs))
+
+###################################################################
+
+# UQ regression - utilities
+
+class RegressHetLoss_regl2(torch.nn.Module):
+    """
+    This torch module computes the heteroscedastic loss for the
+    heteroscedastic model. Both mean and standard deviation predictions
+    are taken into account.
+    """
+
+    def __init__(self, reg_l2: float, model, ndevices: int):
+        """Initialize heteroscedastic loss torch module.
+
+        Parameters
+        ----------
+        reg_l2 : Weight for l2 regularization over model weights.
+        model : Torch model to train with heteroscedastic loss.
+        ndevices : Number of GPUs available to train.
+        """
+        super(RegressHetLoss_regl2,self).__init__()
+        self.reg_l2 = reg_l2
+        self.model_ = model
+        self.ndevices = ndevices
+
+    def forward(self, x: torch.Tensor, y: torch.Tensor):
+        """ Compute heteroscedastic loss including l2 regularization
+        over model weights.
+
+        Parameters
+        ----------
+        x : Prediction made by the model.
+            It is assumed that this tensor includes extra columns to
+            store the standard deviations of the heteroscedastic model.
+        y : True values to predict
+        """
+
+        if self.ndevices > 0:
+            regularization_loss = Variable(torch.zeros(1)).float().cuda()
+        else:
+            regularization_loss = Variable(torch.zeros(1)).float()
+        for param in self.model_.parameters():
+            if isinstance(param, nn.Linear):
+                regularization_loss += torch.sum(torch.norm(param.weight.data))
+
+        if self.ndevices > 0:
+            loss_mse = nn.MSELoss().cuda()
+        else:
+            loss_mse = nn.MSELoss()
+        x_mean = x[:, 0::2]
+        x_logs2 = x[:, 1::2]
+
+        diff_sq = (y - x_mean)**2
+
+        totloss = torch.mean(torch.exp(-x_logs2) * diff_sq + x_logs2) + regularization_loss * self.reg_l2
+        return totloss
+
+
+def quantile_loss(quantile: float, y_true: torch.Tensor, y_pred: torch.Tensor):
+    """Compute quantile loss for the predicted quantile with
+    respect to the known ground truth.
+
+    Parameters
+    ----------
+    quantile : Quantile to predict. Must be float in (0., 1.).
+    y_true : Torch tensor of ground truths.
+    y_pred : Torch tensor of quantile predictions made by the model.
+    """
+
+    error = (y_true - y_pred)
+
+    return torch.mean(torch.maximum(quantile * error, (quantile - 1) * error))
+
+
+class RegressQtlLoss_regl2(torch.nn.Module):
+    """
+    This torch module computes the quantile loss for the
+    quantile model. Median, low and high quantile predictions
+    are taken into account.
+    """
+
+    def __init__(self, reg_l2: float, qlow: float, qhigh: float, model, ndevices: int):
+        """Initialize quantile loss torch module.
+
+        Parameters
+        ----------
+        reg_l2 : Weight for l2 regularization over model weights.
+        qlow : Low quantile to predict. Must be number in [0.05, 0.45]. Usually: 0.1.
+        qhigh : High quantile to predict. Must be number in [0.55, 0.95]. Usually: 0.9.
+        model : Torch model to train with heteroscedastic loss.
+        ndevices : Number of GPUs available to train.
+        """
+    
+        super(RegressQtlLoss_regl2,self).__init__()
+        self.reg_l2 = reg_l2
+        self.qlow = qlow
+        self.qhigh = qhigh
+        self.model_ = model
+        self.ndevices = ndevices
+
+    def forward(self, x: torch.Tensor, y: torch.Tensor):
+        """ Compute quantile loss including l2 regularization
+        over model weights.
+
+        Parameters
+        ----------
+        x : Prediction made by the model.
+            It is assumed that this tensor includes extra columns to
+            store the different quantiles specified to learn in the
+            model.
+        y : True values to predict. These are compared to the
+            predicted median.
+        """
+
+        if self.ndevices > 0:
+            regularization_loss = Variable(torch.zeros(1)).float().cuda()
+        else:
+            regularization_loss = Variable(torch.zeros(1)).float()
+        for param in self.model_.parameters():
+            if isinstance(param, nn.Linear):
+                regularization_loss += torch.sum(torch.norm(param.weight.data))
+
+        x_median = x[:, 0::3]
+        x_low = x[:, 1::3]
+        x_high = x[:, 2::3]
+
+        totloss = quantile_loss(self.qlow, y, x_low) + quantile_loss(self.qhigh, y, x_high) + 2. * quantile_loss(0.5, y, x_median) + regularization_loss * self.reg_l2
+
+        return totloss
