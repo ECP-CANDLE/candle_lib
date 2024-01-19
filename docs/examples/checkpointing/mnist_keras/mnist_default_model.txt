@@ -1,0 +1,10 @@
+[Global_Params]
+model_name="mnist_cnn"
+epochs=20
+batch_size=128
+activation='relu'
+optimizer='rmsprop'
+save_path='save/'
+ckpt_save_best=True
+ckpt_save_interval=1
+ckpt_restart_mode="off"
